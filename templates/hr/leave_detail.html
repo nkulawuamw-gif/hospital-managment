@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+{% block title %}Leave Detail - HMS{% endblock %}
+{% block page_title %}Leave Request{% endblock %}
+
+{% block content %}
+<div class="row g-3">
+    <div class="col-md-5">
+        <div class="card shadow-sm border-0">
+            <div class="card-body small">
+                <dl class="row mb-0">
+                    <dt class="col-sm-4 text-muted">Employee</dt>
+                    <dd class="col-sm-8 fw-medium">{{ leave.employee.user.get_full_name|default:leave.employee.user.email }}<br><small class="text-muted">{{ leave.employee.employee_id }}</small></dd>
+                    <dt class="col-sm-4 text-muted">Leave Type</dt>
+                    <dd class="col-sm-8"><span class="badge bg-info rounded-pill">{{ leave.get_leave_type_display }}</span></dd>
+                    <dt class="col-sm-4 text-muted">From</dt>
+                    <dd class="col-sm-8">{{ leave.start_date|date:"M d, Y" }}</dd>
+                    <dt class="col-sm-4 text-muted">To</dt>
+                    <dd class="col-sm-8">{{ leave.end_date|date:"M d, Y" }}</dd>
+                    <dt class="col-sm-4 text-muted">Duration</dt>
+                    <dd class="col-sm-8">{{ leave.end_date|timeuntil:leave.start_date }}</dd>
+                    <dt class="col-sm-4 text-muted">Status</dt>
+                    <dd class="col-sm-8"><span class="badge bg-{% if leave.status == 'approved' %}success{% elif leave.status == 'rejected' %}danger{% elif leave.status == 'cancelled' %}secondary{% else %}warning text-dark{% endif %} rounded-pill">{{ leave.get_status_display }}</span></dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-7">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-white"><h6 class="fw-semibold mb-0">Reason</h6></div>
+            <div class="card-body small">{{ leave.reason|linebreaks }}</div>
+        </div>
+        {% if leave.status == 'approved' or leave.status == 'rejected' %}
+        <div class="card shadow-sm border-0 mt-3">
+            <div class="card-header bg-white"><h6 class="fw-semibold mb-0">Approval</h6></div>
+            <div class="card-body small">
+                <dl class="row mb-0">
+                    <dt class="col-sm-4 text-muted">Approved By</dt>
+                    <dd class="col-sm-8">{{ leave.approved_by.get_full_name|default:leave.approved_by.email }}</dd>
+                    <dt class="col-sm-4 text-muted">Decision</dt>
+                    <dd class="col-sm-8"><span class="badge bg-{% if leave.status == 'approved' %}success{% else %}danger{% endif %} rounded-pill">{{ leave.get_status_display }}</span></dd>
+                </dl>
+            </div>
+        </div>
+        {% endif %}
+        <div class="card shadow-sm border-0 mt-3">
+            <div class="card-header bg-white"><h6 class="fw-semibold mb-0">Timeline</h6></div>
+            <div class="card-body small p-0">
+                <ul class="list-group list-group-flush" style="font-size: .85rem;">
+                    <li class="list-group-item d-flex justify-content-between">
+                        <span>Requested</span>
+                        <span class="text-muted">{{ leave.created_at|date:"M d, Y H:i" }}</span>
+                    </li>
+                    {% if leave.updated_at != leave.created_at %}
+                    <li class="list-group-item d-flex justify-content-between">
+                        <span>Last Updated</span>
+                        <span class="text-muted">{{ leave.updated_at|date:"M d, Y H:i" }}</span>
+                    </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

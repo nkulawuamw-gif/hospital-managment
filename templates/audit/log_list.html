@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% block title %}Audit Log - HMS{% endblock %}
+{% block page_title %}Audit Log{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+    <div class="d-flex gap-2">
+        <a href="{% url 'audit:list' %}" class="btn btn-sm btn-outline-secondary {% if not current_action %}active{% endif %}">All</a>
+        <a href="?action=login" class="btn btn-sm btn-outline-info {% if current_action == 'login' %}active{% endif %}">Login</a>
+        <a href="?action=create" class="btn btn-sm btn-outline-success {% if current_action == 'create' %}active{% endif %}">Create</a>
+        <a href="?action=update" class="btn btn-sm btn-outline-warning {% if current_action == 'update' %}active{% endif %}">Update</a>
+        <a href="?action=delete" class="btn btn-sm btn-outline-danger {% if current_action == 'delete' %}active{% endif %}">Delete</a>
+        <a href="?action=payment" class="btn btn-sm btn-outline-primary {% if current_action == 'payment' %}active{% endif %}">Payment</a>
+    </div>
+    <p class="text-muted small mb-0">{{ logs.count }} entries</p>
+</div>
+<div class="card shadow-sm border-0">
+    <div class="card-body p-0">
+        <table class="table table-hover datatable mb-0" style="font-size: .85rem;">
+            <thead class="table-light">
+                <tr><th>Timestamp</th><th>User</th><th>Action</th><th>Model</th><th>Object ID</th><th>Description</th><th>IP</th></tr>
+            </thead>
+            <tbody>
+                {% for log in logs %}
+                <tr>
+                    <td>{{ log.timestamp|date:"M d, Y H:i" }}</td>
+                    <td class="fw-medium">{{ log.user.get_full_name|default:log.user.email|default:'System' }}</td>
+                    <td><span class="badge bg-{% if log.action == 'login' or log.action == 'logout' %}info{% elif log.action == 'create' %}success{% elif log.action == 'update' %}warning text-dark{% elif log.action == 'delete' %}danger{% elif log.action == 'payment' %}primary{% else %}secondary{% endif %} rounded-pill">{{ log.get_action_display }}</span></td>
+                    <td>{{ log.model_name|default:'-' }}</td>
+                    <td><code>{{ log.object_id|default:'-' }}</code></td>
+                    <td>{{ log.description|truncatewords:12|default:'-' }}</td>
+                    <td><code>{{ log.ip_address|default:'-' }}</code></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

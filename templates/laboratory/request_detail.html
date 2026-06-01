@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+{% block title %}Lab Request #{{ r.pk }} - HMS{% endblock %}
+{% block page_title %}Lab Request Details{% endblock %}
+
+{% block content %}
+<div class="row g-3">
+    <div class="col-md-4">
+        <div class="card shadow-sm border-0">
+            <div class="card-body">
+                <div class="d-flex align-items-center gap-3 mb-3">
+                    <div class="avatar" style="width: 56px; height: 56px; background: #0d1b2a; color: #fff;">
+                        {{ r.patient.first_name|first|upper }}{{ r.patient.last_name|first|upper }}
+                    </div>
+                    <div>
+                        <h6 class="fw-semibold mb-0">{{ r.patient.full_name }}</h6>
+                        <a href="{% url 'patients:detail' r.patient.pk %}" class="text-muted small">{{ r.patient.patient_id }}</a>
+                    </div>
+                </div>
+                <hr>
+                <dl class="row small mb-0">
+                    <dt class="col-sm-5 text-muted">Doctor</dt>
+                    <dd class="col-sm-7 fw-medium">Dr. {{ r.doctor.get_full_name }}</dd>
+                    <dt class="col-sm-5 text-muted">Date</dt>
+                    <dd class="col-sm-7">{{ r.created_at|date:"M d, Y H:i" }}</dd>
+                    <dt class="col-sm-5 text-muted">Priority</dt>
+                    <dd class="col-sm-7"><span class="badge bg-{% if r.priority == 'urgent' %}danger{% elif r.priority == 'stat' %}dark{% else %}secondary{% endif %} rounded-pill">{{ r.get_priority_display }}</span></dd>
+                    <dt class="col-sm-5 text-muted">Status</dt>
+                    <dd class="col-sm-7"><span class="badge bg-{% if r.status == 'approved' %}dark{% elif r.status == 'completed' %}success{% elif r.status == 'processing' %}primary{% elif r.status == 'sample_collected' %}info{% elif r.status == 'cancelled' %}danger{% else %}warning text-dark{% endif %} rounded-pill">{{ r.get_status_display }}</span></dd>
+                </dl>
+                {% if r.clinical_notes %}<hr><p class="small mb-0"><span class="text-muted">Notes:</span> {{ r.clinical_notes }}</p>{% endif %}
+            </div>
+            <div class="card-footer bg-white border-top-0 d-flex gap-2 flex-wrap">
+                {% if r.status == 'pending' %}
+                <a href="{% url 'laboratory:collect_sample' r.pk %}" class="btn btn-info btn-sm"><i class="bi bi-syringe me-1"></i>Collect Sample</a>
+                {% elif r.status == 'sample_collected' or r.status == 'processing' %}
+                <a href="{% url 'laboratory:enter_results' r.pk %}" class="btn btn-primary btn-sm"><i class="bi bi-pencil-square me-1"></i>Enter Results</a>
+                {% elif r.status == 'completed' %}
+                <a href="{% url 'laboratory:approve_results' r.pk %}" class="btn btn-success btn-sm"><i class="bi bi-check-circle me-1"></i>Approve</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-8">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-white">
+                <h6 class="fw-semibold mb-0"><i class="bi bi-flask me-2"></i>Tests & Results</h6>
+            </div>
+            <div class="card-body p-0">
+                <table class="table mb-0" style="font-size: .875rem;">
+                    <thead class="table-light">
+                        <tr><th>Test</th><th>Result</th><th>Status</th><th>Actions</th></tr>
+                    </thead>
+                    <tbody>
+                        {% for item in r.items.all %}
+                        <tr>
+                            <td class="fw-medium">{{ item.test.name }}</td>
+                            <td>{{ item.result|default:'<span class="text-muted">Pending</span>' }}</td>
+                            <td>{% if item.result %}<span class="badge bg-success rounded-pill">Done</span>{% else %}<span class="badge bg-warning text-dark rounded-pill">Pending</span>{% endif %}</td>
+                            <td>
+                                {% if item.result_file %}
+                                <a href="{{ item.result_file.url }}" class="btn btn-sm btn-outline-secondary btn-icon" target="_blank"><i class="bi bi-file-earmark-pdf"></i></a>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        {% if r.sample_collected_at %}
+        <div class="card shadow-sm border-0 mt-3">
+            <div class="card-body py-2 small">
+                <i class="bi bi-syringe text-info me-1"></i> Sample collected by <span class="fw-medium">{{ r.sample_collected_by.get_full_name }}</span> on {{ r.sample_collected_at|date:"M d, Y H:i" }}
+            </div>
+        </div>
+        {% endif %}
+        {% if r.processed_at %}
+        <div class="card shadow-sm border-0 mt-2">
+            <div class="card-body py-2 small">
+                <i class="bi bi-check-circle text-primary me-1"></i> Results entered by <span class="fw-medium">{{ r.processed_by.get_full_name }}</span> on {{ r.processed_at|date:"M d, Y H:i" }}
+            </div>
+        </div>
+        {% endif %}
+        {% if r.approved_at %}
+        <div class="card shadow-sm border-0 mt-2">
+            <div class="card-body py-2 small">
+                <i class="bi bi-check2-circle text-success me-1"></i> Approved by <span class="fw-medium">{{ r.approved_by.get_full_name }}</span> on {{ r.approved_at|date:"M d, Y H:i" }}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

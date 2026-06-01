@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+{% block title %}New Lab Request - HMS{% endblock %}
+{% block page_title %}New Laboratory Request{% endblock %}
+
+{% block content %}
+<div class="card shadow-sm border-0" style="max-width: 700px;">
+    <div class="card-body p-4">
+        <form method="post">
+            {% csrf_token %}
+            <div class="row g-3 mb-3">
+                <div class="col-md-6">
+                    <label class="form-label small fw-medium">Patient *</label>
+                    <select name="patient" class="form-select select2" required>
+                        <option value="">-- Select Patient --</option>
+                        {% for p in patients %}
+                        <option value="{{ p.pk }}">{{ p.patient_id }} - {{ p.full_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label small fw-medium">Doctor *</label>
+                    <select name="doctor" class="form-select select2" required>
+                        <option value="">-- Select Doctor --</option>
+                        {% for d in doctors %}
+                        <option value="{{ d.pk }}">Dr. {{ d.get_full_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label small fw-medium">Priority</label>
+                <select name="priority" class="form-select" style="max-width: 200px;">
+                    <option value="routine">Routine</option>
+                    <option value="urgent">Urgent</option>
+                    <option value="stat">STAT</option>
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label small fw-medium">Tests *</label>
+                <select name="tests" class="form-select select2" multiple required>
+                    {% for t in tests %}
+                    <option value="{{ t.pk }}">{{ t.name }} - KES {{ t.price|floatformat:0 }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="mb-4">
+                <label class="form-label small fw-medium">Clinical Notes</label>
+                <textarea name="clinical_notes" class="form-control" rows="3" placeholder="Relevant clinical information for the lab"></textarea>
+            </div>
+
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-dark"><i class="bi bi-check-lg me-1"></i>Submit Request</button>
+                <a href="{% url 'laboratory:request_list' %}" class="btn btn-outline-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+{% block title %}Appointments - HMS{% endblock %}
+{% block page_title %}Appointment Management{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+    <div class="d-flex gap-2 flex-wrap">
+        <a href="{% url 'appointments:list' %}" class="btn btn-sm btn-outline-secondary {% if not current_status %}active{% endif %}">All</a>
+        <a href="?status=scheduled" class="btn btn-sm btn-outline-warning {% if current_status == 'scheduled' %}active{% endif %}">Scheduled <span class="badge bg-warning text-dark ms-1">{{ stats.scheduled|default:0 }}</span></a>
+        <a href="?status=confirmed" class="btn btn-sm btn-outline-info {% if current_status == 'confirmed' %}active{% endif %}">Confirmed <span class="badge bg-info ms-1">{{ stats.confirmed|default:0 }}</span></a>
+        <a href="?status=in_progress" class="btn btn-sm btn-outline-primary {% if current_status == 'in_progress' %}active{% endif %}">In Progress <span class="badge bg-primary ms-1">{{ stats.in_progress|default:0 }}</span></a>
+        <a href="?status=completed" class="btn btn-sm btn-outline-success {% if current_status == 'completed' %}active{% endif %}">Completed <span class="badge bg-success ms-1">{{ stats.completed|default:0 }}</span></a>
+        <a href="?status=cancelled" class="btn btn-sm btn-outline-danger {% if current_status == 'cancelled' %}active{% endif %}">Cancelled <span class="badge bg-danger ms-1">{{ stats.cancelled|default:0 }}</span></a>
+    </div>
+    <div class="d-flex gap-2">
+        <a href="{% url 'appointments:calendar' %}" class="btn btn-sm btn-outline-dark"><i class="bi bi-calendar-week me-1"></i>Calendar</a>
+        <a href="{% url 'appointments:create' %}" class="btn btn-dark btn-sm"><i class="bi bi-plus-lg me-1"></i>Book Appointment</a>
+    </div>
+</div>
+
+<div class="card shadow-sm border-0">
+    <div class="card-body p-0">
+        <table class="table table-hover datatable mb-0" style="font-size: .875rem;">
+            <thead class="table-light">
+                <tr>
+                    <th>Patient</th>
+                    <th>Doctor</th>
+                    <th>Date</th>
+                    <th>Time</th>
+                    <th>Reason</th>
+                    <th>Status</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for apt in appointments %}
+                <tr>
+                    <td>
+                        <a href="{% url 'patients:detail' apt.patient.pk %}" class="text-decoration-none fw-medium">{{ apt.patient.full_name }}</a>
+                        <div class="text-muted" style="font-size: .75rem;">{{ apt.patient.patient_id }}</div>
+                    </td>
+                    <td>Dr. {{ apt.doctor.get_full_name }}</td>
+                    <td>{{ apt.appointment_date|date:"M d, Y" }}</td>
+                    <td>{{ apt.appointment_time|time:"H:i" }}</td>
+                    <td>{{ apt.reason|truncatechars:30|default:'-' }}</td>
+                    <td>
+                        <span class="badge bg-{% if apt.status == 'completed' %}success{% elif apt.status == 'cancelled' %}danger{% elif apt.status == 'in_progress' %}primary{% elif apt.status == 'confirmed' %}info{% else %}warning text-dark{% endif %} rounded-pill">
+                            {{ apt.get_status_display }}
+                        </span>
+                    </td>
+                    <td class="text-end">
+                        <a href="{% url 'appointments:detail' apt.pk %}" class="btn btn-sm btn-outline-secondary btn-icon" title="View"><i class="bi bi-eye"></i></a>
+                        {% if apt.status == 'scheduled' or apt.status == 'confirmed' %}
+                        <a href="{% url 'appointments:checkin' apt.pk %}" class="btn btn-sm btn-outline-success btn-icon" title="Check In"><i class="bi bi-box-arrow-in-right"></i></a>
+                        {% elif apt.status == 'in_progress' %}
+                        <a href="{% url 'appointments:checkout' apt.pk %}" class="btn btn-sm btn-outline-primary btn-icon" title="Check Out"><i class="bi bi-box-arrow-right"></i></a>
+                        {% endif %}
+                        {% if apt.status != 'completed' and apt.status != 'cancelled' %}
+                        <a href="{% url 'appointments:cancel' apt.pk %}" class="btn btn-sm btn-outline-danger btn-icon" title="Cancel" onclick="return confirm('Cancel this appointment?')"><i class="bi bi-x-lg"></i></a>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

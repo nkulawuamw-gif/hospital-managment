@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% block title %}PO {{ po.order_number }} - HMS{% endblock %}
+{% block page_title %}Purchase Order {{ po.order_number }}{% endblock %}
+
+{% block content %}
+<div class="row g-3">
+    <div class="col-md-4">
+        <div class="card shadow-sm border-0">
+            <div class="card-body">
+                <dl class="row small mb-0">
+                    <dt class="col-sm-5 text-muted">Order #</dt>
+                    <dd class="col-sm-7 fw-medium">{{ po.order_number }}</dd>
+                    <dt class="col-sm-5 text-muted">Supplier</dt>
+                    <dd class="col-sm-7">{{ po.supplier.name }}</dd>
+                    <dt class="col-sm-5 text-muted">Date</dt>
+                    <dd class="col-sm-7">{{ po.created_at|date:"M d, Y" }}</dd>
+                    <dt class="col-sm-5 text-muted">Status</dt>
+                    <dd class="col-sm-7"><span class="badge bg-{% if po.status == 'received' %}success{% elif po.status == 'approved' %}info{% elif po.status == 'cancelled' %}danger{% else %}warning text-dark{% endif %} rounded-pill">{{ po.get_status_display }}</span></dd>
+                    <dt class="col-sm-5 text-muted">Total</dt>
+                    <dd class="col-sm-7 fw-bold">KES {{ po.total_amount|floatformat:0 }}</dd>
+                </dl>
+                {% if po.notes %}<hr><p class="small mb-0">{{ po.notes }}</p>{% endif %}
+                <hr>
+                {% if po.status == 'approved' %}
+                <a href="{% url 'inventory:receive_stock' po.pk %}" class="btn btn-success btn-sm w-100"><i class="bi bi-box-arrow-in-down me-1"></i>Receive Stock</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="col-md-8">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-white"><h6 class="fw-semibold mb-0"><i class="bi bi-list-check me-2"></i>Order Items</h6></div>
+            <div class="card-body p-0">
+                <table class="table mb-0" style="font-size: .85rem;">
+                    <thead class="table-light">
+                        <tr><th>Supply</th><th>Ordered</th><th>Received</th><th>Unit Price</th><th class="text-end">Total</th></tr>
+                    </thead>
+                    <tbody>
+                        {% for item in po.items.all %}
+                        <tr>
+                            <td class="fw-medium">{{ item.supply.name }}</td>
+                            <td>{{ item.quantity_ordered }}</td>
+                            <td>{{ item.quantity_received }}</td>
+                            <td>KES {{ item.unit_price|floatformat:0 }}</td>
+                            <td class="text-end fw-medium">KES {{ item.total_price|floatformat:0 }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

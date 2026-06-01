@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ site_name|default:"Hope Clinic" }} - Quality Healthcare for You and Your Family</title>
+    <meta name="description" content="Hope Clinic provides compassionate, affordable and professional healthcare services including OPD, Antenatal Care, Family Planning, Laboratory and Pharmacy services.">
+    <meta name="keywords" content="healthcare, clinic, hospital, OPD, antenatal care, family planning, immunization, laboratory, pharmacy">
+    <meta name="robots" content="index, follow">
+    <meta property="og:title" content="Hope Clinic - Quality Healthcare for You and Your Family">
+    <meta property="og:description" content="Providing compassionate, affordable and professional healthcare services for all ages.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="{{ request.build_absolute_uri }}">
+    <link rel="canonical" href="{{ request.build_absolute_uri }}">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
+    <link href="{% static 'landing/css/landing.css' %}" rel="stylesheet">
+</head>
+<body>
+
+<!-- ==================== TOP HEADER BAR ==================== -->
+<header class="top-header py-2 d-none d-md-block">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <div class="header-info d-flex flex-wrap gap-3">
+                    <span><i class="bi bi-telephone-fill"></i> +254 700 100 200</span>
+                    <span><i class="bi bi-envelope-fill"></i> info@hopeclinic.co.ke</span>
+                    <span><i class="bi bi-geo-alt-fill"></i> Nairobi, Kenya</span>
+                    <span><i class="bi bi-clock-fill"></i> Mon-Sat: 7:00 AM - 8:00 PM</span>
+                </div>
+            </div>
+            <div class="col-md-4 text-end">
+                <span class="emergency-badge"><i class="bi bi-telephone-outbound-fill"></i> Emergency: +254 700 100 300</span>
+                <a href="#" class="ms-2 social-icon"><i class="bi bi-facebook"></i></a>
+                <a href="#" class="ms-2 social-icon"><i class="bi bi-twitter-x"></i></a>
+                <a href="#" class="ms-2 social-icon"><i class="bi bi-instagram"></i></a>
+                <a href="#" class="ms-2 social-icon"><i class="bi bi-youtube"></i></a>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- Messages -->
+{% if messages %}
+<div class="container mt-3">
+    {% for message in messages %}
+    <div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show" role="alert">
+        <i class="bi bi-{% if message.tags == 'success' %}check-circle{% elif message.tags == 'error' %}exclamation-circle{% else %}info-circle{% endif %} me-2"></i>
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<!-- ==================== NAVIGATION ==================== -->
+<nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm sticky-top" id="mainNav">
+    <div class="container">
+        <a class="navbar-brand fw-bold" href="/">
+            <i class="bi bi-heart-pulse-fill text-primary me-2"></i>{{ site_name|default:"Hope Clinic" }}
+        </a>
+        <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="mainNavbar">
+            <ul class="navbar-nav ms-auto align-items-lg-center">
+                <li class="nav-item"><a class="nav-link active" href="#hero">Home</a></li>
+                <li class="nav-item"><a class="nav-link" href="#about">About Us</a></li>
+                <li class="nav-item"><a class="nav-link" href="#services">Services</a></li>
+                <li class="nav-item"><a class="nav-link" href="#departments">Departments</a></li>
+                <li class="nav-item"><a class="nav-link" href="#doctors">Doctors</a></li>
+                <li class="nav-item"><a class="nav-link" href="#health-info">Health Info</a></li>
+                <li class="nav-item"><a class="nav-link" href="#appointment">Book Appointment</a></li>
+                <li class="nav-item"><a class="nav-link" href="#contact">Contact Us</a></li>
+                <li class="nav-item ms-lg-2">
+                    <a href="/accounts/web/login/" class="btn btn-primary btn-sm rounded-pill px-3 staff-login-btn">
+                        <i class="bi bi-shield-lock-fill me-1"></i>STAFF LOGIN
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<!-- ==================== HERO SECTION ==================== -->
+<section id="hero" class="hero-section d-flex align-items-center">
+    <div class="hero-overlay"></div>
+    <div class="container position-relative z-1">
+        <div class="row align-items-center">
+            <div class="col-lg-7 text-white" data-aos="fade-up">
+                <h1 class="hero-title display-4 fw-bold">Quality Healthcare for You and Your Family</h1>
+                <p class="hero-subtitle lead my-4">Providing compassionate, affordable and professional healthcare services for all ages.</p>
+                <div class="d-flex flex-wrap gap-3">
+                    <a href="#appointment" class="btn btn-light btn-lg rounded-pill px-4"><i class="bi bi-calendar-check me-2"></i>Book Appointment</a>
+                    <a href="#contact" class="btn btn-outline-light btn-lg rounded-pill px-4"><i class="bi bi-telephone me-2"></i>Contact Us</a>
+                    <a href="/accounts/web/login/" class="btn btn-primary btn-lg rounded-pill px-4"><i class="bi bi-shield-lock-fill me-2"></i>Staff Login</a>
+                </div>
+            </div>
+            <div class="col-lg-5 mt-4 mt-lg-0" data-aos="fade-left">
+                <div class="hero-stats row g-3">
+                    <div class="col-6"><div class="stat-card text-center p-3"><h3 class="counter" data-target="15000">0</h3><p>Patients Served</p></div></div>
+                    <div class="col-6"><div class="stat-card text-center p-3"><h3 class="counter" data-target="25">0</h3><p>Years of Service</p></div></div>
+                    <div class="col-6"><div class="stat-card text-center p-3"><h3 class="counter" data-target="120">0</h3><p>Qualified Staff</p></div></div>
+                    <div class="col-6"><div class="stat-card text-center p-3"><h3 class="counter" data-target="14">0</h3><p>Services Offered</p></div></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ==================== WHY CHOOSE US ==================== -->
+<section id="about" class="section-padding bg-light">
+    <div class="container">
+        <div class="text-center mb-5" data-aos="fade-up">
+            <h2 class="section-title">Why Choose <span class="text-primary">Hope Clinic</span></h2>
+            <p class="text-muted mx-auto" style="max-width:600px;">We are committed to providing the highest standard of medical care with compassion and professionalism.</p>
+        </div>
+        <div class="row g-4">
+            <div class="col-md-4" data-aos="fade-up"><div class="choose-card text-center p-4"><div class="icon-box mx-auto"><i class="bi bi-person-badge-fill"></i></div><h5>Qualified Professionals</h5><p class="text-muted small">Our team of experienced doctors and specialists deliver expert care.</p></div></div>
+            <div class="col-md-4" data-aos="fade-up" data-aos-delay="100"><div class="choose-card text-center p-4"><div class="icon-box mx-auto"><i class="bi bi-cash-coin"></i></div><h5>Affordable Healthcare</h5><p class="text-muted small">Quality medical services at prices accessible to all members of our community.</p></div></div>
+            <div class="col-md-4" data-aos="fade-up" data-aos-delay="200"><div class="choose-card text-center p-4"><div class="icon-box mx-auto"><i class="bi bi-motherboard-fill"></i></div><h5>Modern Equipment</h5><p class="text-muted small">State-of-the-art diagnostic and treatment equipment for accurate results.</p></div></div>
+            <div class="col-md-4" data-aos="fade-up"><div class="choose-card text-center p-4"><div class="icon-box mx-auto"><i class="bi bi-heart-fill"></i></div><h5>Patient-Centered Care</h5><p class="text-muted small">Your health and comfort are our top priorities, every step of the way.</p></div></div>
+            <div class="col-md-4" data-aos="fade-up" data-aos-delay="100"><div class="choose-card text-center p-4"><div class="icon-box mx-auto"><i class="bi bi-lightning-fill"></i></div><h5>Fast Service Delivery</h5><p class="text-muted small">Minimal waiting times and efficient service to get you treated quickly.</p></div></div>
+            <div class="col-md-4" data-aos="fade-up" data-aos-delay="200"><div class="choose-card text-center p-4"><div class="icon-box mx-auto"><i class="bi bi-shield-check"></i></div><h5>Safe & Clean Environment</h5><p class="text-muted small">We maintain the highest standards of hygiene and infection control.</p></div></div>
+        </div>
+    </div>
+</section>
+
+<!-- ==================== SERVICES ==================== -->
+<section id="services" class="section-padding">
+    <div class="container">
+        <div class="text-center mb-5" data-aos="fade-up">
+            <h2 class="section-title">Our <span class="text-primary">Services</span></h2>
+            <p class="text-muted mx-auto" style="max-width:600px;">Comprehensive healthcare services tailored to meet the needs of our community.</p>
+        </div>
+        <div class="row g-4">
+
+            <div class="col-lg-4 col-md-6" data-aos="fade-up">
+                <div class="service-card h-100"><div class="card-body p-4">
+                    <div class="service-icon"><i class="bi bi-hospital"></i></div>
+                    <h4 class="fw-bold">A. OPD Services</h4>
+                    <ul class="list-unstyled mt-3 service-list">
+                        <li><i class="bi bi-check-circle-fill text-primary me-2"></i>General Consultation</li>
+                        <li><i class="bi bi-check-circle-fill text-primary me-2"></i>Minor Procedures</li>
+                        <li><i class="bi bi-check-circle-fill text-primary me-2"></i>Medical Reviews</li>
+                        <li><i class="bi bi-check-circle-fill text-primary me-2"></i>Referrals</li>
+                    </ul>
+                </div></div>
+            </div>
+
+            <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="100">
+                <div class="service-card h-100"><div class="card-body p-4">
+                    <div class="service-icon"><i class="bi bi-people"></i></div>
+                    <h4 class="fw-bold">B. Under-Five Clinic</h4>
+                    <ul class="list-unstyled mt-3 service-list">
+                        <li><i class="bi bi-check-circle-fill text-primary me-2"></i>Growth Monitoring</li>
+                        <li><i class="bi bi-check-circle-fill text-primary me-2"></i>Child Health Assessment</li>
+                        <li><i class="bi bi-check-circle-fill text-primary me-2"></i>Immunization</li>
+                        <li><i class="bi bi-check-circle-fill text-primary me-2"></i>Nutrition Monitoring</li>
+                    </ul>
+                </div></div>
+            </div>
+
+            <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="200">
+                <div class="service-card h-100"><div class="card-body p-4">
+                    <div class="service-icon"><i class="bi bi-flower1"></i></div>
+                    <h4 class="fw-bold">C. Antenatal Care (ANC)</h4>
+                    <ul class="list-unstyled mt-3 service-list">
+                        <li><i class="bi bi-check-circle-fill text-primary me-2"></i>Pregnancy Monitoring</li>
+                        <li><i class="bi bi-check-circle-fill text-primary me-2"></i>Maternal Health Assessment</li>
+                        <li><i class="bi bi-check-circle-fill text-primary me-2"></i>Health Education</li>
+                        <li><i class="bi bi-check-circle-fill text-primary me-2"></i>Birth Preparedness</li>
+                    </ul>
+                </div></div>
+            </div>
+
+            <div class="col-lg-4 col-md-6" data-aos="fade-up">
+                <div class="service-card h-100"><div class="card-body p-4">
+                    <div class="service-icon"><i class="bi bi-chat-heart-fill"></i></div>
+                    <h4 class="fw-bold">D. Family Planning</h4>
+                    <ul class="list-unstyled mt-3 service-list">
+                        <li><i class="bi bi-check-circle-fill text-primary me-2"></i>Counseling</li>
+                        <li><i class="bi bi-check-circle-fill text-primary me-2"></i>Contraceptive Services</li>
+                        <li><i class="bi bi-check-circle-fill text-primary me-2"></i>Reproductive Health Education</li>
+                    </ul>
+                </div></div>
+            </div>
+
+            <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="100">
+                <div class="service-card h-100"><div class="card-body p-4">
+                    <div class="service-icon"><i class="bi bi-microscope"></i></div>
+                    <h4 class="fw-bold">E. Laboratory Services</h4>
+                    <ul class="list-unstyled mt-3 service-list">
+                        <li><i class="bi bi-check-circle-fill text-primary me-2"></i>Blood Tests</li>
+                        <li><i class="bi bi-check-circle-fill text-primary me-2"></i>Urine Tests</li>
+                        <li><i class="bi bi-check-circle-fill text-primary me-2"></i>Diagnostic Screening</li>
+                    </ul>
+                </div></div>
+            </div>
+
+            <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="200">
+                <div class="service-card h-100"><div class="card-body p-4">
+                    <div class="service-icon"><i class="bi bi-capsule"></i></div>
+                    <h4 class="fw-bold">F. Pharmacy Services</h4>
+                    <ul class="list-unstyled mt-3 service-list">
+                        <li><i class="bi bi-check-circle-fill text-primary me-2"></i>Prescription Dispensing</li>
+                        <li><i class="bi bi-check-circle-fill text-primary me-2"></i>Medication Counseling</li>
+                        <li><i class="bi bi-check-circle-fill text-primary me-2"></i>Stock Management</li>
+                    </ul>
+                </div></div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<!-- ==================== HEALTH EDUCATION ==================== -->
+<section id="health-info" class="section-padding bg-light">
+    <div class="container">
+        <div class="text-center mb-5" data-aos="fade-up">
+            <h2 class="section-title">Health <span class="text-primary">Education</span></h2>
+            <p class="text-muted mx-auto" style="max-width:600px;">Empowering our community with knowledge for better health outcomes.</p>
+        </div>
+        <div class="row mb-4" data-aos="fade-up">
+            <div class="col-md-6 mx-auto">
+                <div class="input-group">
+                    <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
+                    <input type="text" class="form-control" id="healthSearch" placeholder="Search health tips...">
+                </div>
+            </div>
+        </div>
+        <div class="row g-4" id="healthArticles">
+            {% if health_articles %}
+                {% for article in health_articles %}
+                <div class="col-md-4 health-article" data-aos="fade-up" {% if not forloop.counter0|divisibleby:3 %}data-aos-delay="{{ forloop.counter0|add:-1|add:100 }}"{% endif %}>
+                    <div class="card border-0 shadow-sm h-100"><div class="card-body p-4">
+                        <div class="article-icon mb-3"><i class="{{ article.icon|default:'bi bi-heart-pulse-fill' }} fs-2 text-primary"></i></div>
+                        <h5>{{ article.title }}</h5>
+                        <p class="text-muted small">{{ article.summary|default:article.content|truncatewords:30 }}</p>
+                    </div></div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="col-md-4 health-article" data-aos="fade-up">
+                    <div class="card border-0 shadow-sm h-100"><div class="card-body p-4">
+                        <div class="article-icon mb-3"><i class="bi bi-heart-pulse-fill fs-2 text-primary"></i></div>
+                        <h5>Importance of Antenatal Care</h5>
+                        <p class="text-muted small">Regular ANC visits ensure healthy pregnancy, early detection of complications, and better outcomes for mother and baby.</p>
+                    </div></div>
+                </div>
+                <div class="col-md-4 health-article" data-aos="fade-up" data-aos-delay="100">
+                    <div class="card border-0 shadow-sm h-100"><div class="card-body p-4">
+                        <div class="article-icon mb-3"><i class="bi bi-shield-plus fs-2 text-primary"></i></div>
+                        <h5>Child Immunization Benefits</h5>
+                        <p class="text-muted small">Vaccines protect children from life-threatening diseases. Stay up to date with the national immunization schedule.</p>
+                    </div></div>
+                </div>
+                <div class="col-md-4 health-article" data-aos="fade-up" data-aos-delay="200">
+                    <div class="card border-0 shadow-sm h-100"><div class="card-body p-4">
+                        <div class="article-icon mb-3"><i class="bi bi-chat-heart-fill fs-2 text-primary"></i></div>
+                        <h5>Family Planning Awareness</h5>
+                        <p class="text-muted small">Access to family planning services empowers families to make informed decisions about spacing and number of children.</p>
+                    </div></div>
+                </div>
+                <div class="col-md-4 health-article" data-aos="fade-up">
+                    <div class="card border-0 shadow-sm h-100"><div class="card-body p-4">
+                        <div class="article-icon mb-3"><i class="bi bi-basket-fill fs-2 text-primary"></i></div>
+                        <h5>Nutrition Tips for Families</h5>
+                        <p class="text-muted small">A balanced diet rich in fruits, vegetables, proteins, and whole grains supports growth, immunity, and overall health.</p>
+                    </div></div>
+                </div>
+                <div class="col-md-4 health-article" data-aos="fade-up" data-aos-delay="100">
+                    <div class="card border-0 shadow-sm h-100"><div class="card-body p-4">
+                        <div class="article-icon mb-3"><i class="bi bi-virus fs-2 text-primary"></i></div>
+                        <h5>Preventing Common Diseases</h5>
+                        <p class="text-muted small">Hand washing, vaccination, safe water, and mosquito control are simple ways to prevent many infectious diseases.</p>
+                    </div></div>
+                </div>
+                <div class="col-md-4 health-article" data-aos="fade-up" data-aos-delay="200">
+                    <div class="card border-0 shadow-sm h-100"><div class="card-body p-4">
+                        <div class="article-icon mb-3"><i class="bi bi-activity fs-2 text-primary"></i></div>
+                        <h5>Chronic Disease Management</h5>
+                        <p class="text-muted small">Regular check-ups, medication adherence, and lifestyle changes help manage hypertension, diabetes, and other chronic conditions.</p>
+                    </div></div>
+                </div>
+            {% endif %}
+    </div>
+</section>
+
+<!-- ==================== DEPARTMENTS ==================== -->
+<section id="departments" class="section-padding">
+    <div class="container">
+        <div class="text-center mb-5" data-aos="fade-up">
+            <h2 class="section-title">Our <span class="text-primary">Departments</span></h2>
+            <p class="text-muted mx-auto" style="max-width:600px;">Specialized departments working together for comprehensive healthcare delivery.</p>
+        </div>
+        <div class="row g-4">
+            <div class="col-lg-2 col-md-4 col-6" data-aos="fade-up"><div class="dept-card text-center p-4"><div class="dept-icon"><i class="bi bi-hospital"></i></div><h6 class="mt-3">OPD</h6></div></div>
+            <div class="col-lg-2 col-md-4 col-6" data-aos="fade-up" data-aos-delay="50"><div class="dept-card text-center p-4"><div class="dept-icon"><i class="bi bi-flower1"></i></div><h6 class="mt-3">Maternal Health</h6></div></div>
+            <div class="col-lg-2 col-md-4 col-6" data-aos="fade-up" data-aos-delay="100"><div class="dept-card text-center p-4"><div class="dept-icon"><i class="bi bi-people"></i></div><h6 class="mt-3">Child Health</h6></div></div>
+            <div class="col-lg-2 col-md-4 col-6" data-aos="fade-up" data-aos-delay="150"><div class="dept-card text-center p-4"><div class="dept-icon"><i class="bi bi-chat-heart-fill"></i></div><h6 class="mt-3">Family Planning</h6></div></div>
+            <div class="col-lg-2 col-md-4 col-6" data-aos="fade-up" data-aos-delay="200"><div class="dept-card text-center p-4"><div class="dept-icon"><i class="bi bi-microscope"></i></div><h6 class="mt-3">Laboratory</h6></div></div>
+            <div class="col-lg-2 col-md-4 col-6" data-aos="fade-up" data-aos-delay="250"><div class="dept-card text-center p-4"><div class="dept-icon"><i class="bi bi-capsule"></i></div><h6 class="mt-3">Pharmacy</h6></div></div>
+        </div>
+    </div>
+</section>
+
+<!-- ==================== DOCTORS ==================== -->
+<section id="doctors" class="section-padding bg-light">
+    <div class="container">
+        <div class="text-center mb-5" data-aos="fade-up">
+            <h2 class="section-title">Our <span class="text-primary">Medical Team</span></h2>
+            <p class="text-muted mx-auto" style="max-width:600px;">Meet our dedicated team of healthcare professionals committed to your wellbeing.</p>
+        </div>
+        <div class="row g-4" id="doctorsContainer">
+            {% if doctors %}
+                {% for doctor in doctors %}
+                <div class="col-lg-3 col-md-6" data-aos="fade-up">
+                    <div class="doctor-card text-center p-4">
+                        {% if doctor.profile_image %}
+                        <img src="{{ doctor.profile_image }}" alt="{{ doctor.full_name }}" class="doctor-img rounded-circle mb-3">
+                        {% else %}
+                        <div class="doctor-img-placeholder rounded-circle mx-auto mb-3 d-flex align-items-center justify-content-center bg-primary text-white">
+                            <i class="bi bi-person-fill fs-1"></i>
+                        </div>
+                        {% endif %}
+                        <h5 class="fw-bold">{{ doctor.full_name }}</h5>
+                        <p class="text-primary mb-1">{{ doctor.specialization }}</p>
+                        <p class="text-muted small">{{ doctor.qualification }}</p>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="col-12 text-center py-5" data-aos="fade-up">
+                    <div class="doctor-card d-inline-block p-5">
+                        <i class="bi bi-people-fill fs-1 text-primary mb-3 d-block"></i>
+                        <h5>Our Medical Team</h5>
+                        <p class="text-muted">Our team of qualified doctors and healthcare professionals is ready to serve you.</p>
+                        <a href="#appointment" class="btn btn-primary rounded-pill">Book an Appointment</a>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+<!-- ==================== APPOINTMENT ==================== -->
+<section id="appointment" class="section-padding position-relative" style="background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);">
+    <div class="container position-relative z-1">
+        <div class="row align-items-center">
+            <div class="col-lg-5 text-white mb-4 mb-lg-0" data-aos="fade-right">
+                <h2 class="display-6 fw-bold">Book an Appointment</h2>
+                <p class="lead">Schedule your visit today. We'll confirm your appointment promptly.</p>
+                <ul class="list-unstyled mt-4">
+                    <li class="mb-2"><i class="bi bi-check-circle-fill me-2"></i> Same-day appointments available</li>
+                    <li class="mb-2"><i class="bi bi-check-circle-fill me-2"></i> Minimal waiting time</li>
+                    <li class="mb-2"><i class="bi bi-check-circle-fill me-2"></i> Professional medical team</li>
+                    <li><i class="bi bi-check-circle-fill me-2"></i> Affordable consultation fees</li>
+                </ul>
+            </div>
+            <div class="col-lg-6 offset-lg-1" data-aos="fade-left">
+                <div class="card border-0 shadow-lg">
+                    <div class="card-body p-4">
+                        <h4 class="fw-bold mb-4"><i class="bi bi-calendar-check me-2 text-primary"></i>Request Appointment</h4>
+                        <form id="appointmentForm" method="post" action="{% url 'dashboard:book_appointment' %}">
+                            {% csrf_token %}
+                            <div class="row g-3">
+                                <div class="col-md-6"><input type="text" name="full_name" class="form-control" placeholder="Full Name" required></div>
+                                <div class="col-md-6"><input type="tel" name="phone" class="form-control" placeholder="Phone Number" required></div>
+                                <div class="col-md-6"><input type="email" name="email" class="form-control" placeholder="Email Address"></div>
+                                <div class="col-md-6">
+                                    <select name="service" class="form-select" required>
+                                        <option value="">Select Service</option>
+                                        <option>General Consultation</option>
+                                        <option>OPD Services</option>
+                                        <option>Under-Five Clinic</option>
+                                        <option>Antenatal Care</option>
+                                        <option>Family Planning</option>
+                                        <option>Laboratory Services</option>
+                                        <option>Pharmacy Services</option>
+                                        <option>Immunization</option>
+                                        <option>HIV Testing and Counseling</option>
+                                        <option>Chronic Disease Management</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6"><input type="date" name="preferred_date" class="form-control" required></div>
+                                <div class="col-md-6"><input type="time" name="preferred_time" class="form-control"></div>
+                                <div class="col-12"><textarea name="message" class="form-control" rows="3" placeholder="Additional message (optional)"></textarea></div>
+                                <div class="col-12">
+                                    <button type="submit" class="btn btn-primary w-100 btn-lg rounded-pill">
+                                        <i class="bi bi-send-fill me-2"></i>Submit Appointment Request
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                        <div id="appointmentResponse" class="mt-3"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ==================== TESTIMONIALS ==================== -->
+<section class="section-padding">
+    <div class="container">
+        <div class="text-center mb-5" data-aos="fade-up">
+            <h2 class="section-title">What Our <span class="text-primary">Patients Say</span></h2>
+            <p class="text-muted mx-auto" style="max-width:600px;">Hear from our patients about their experience at Hope Clinic.</p>
+        </div>
+        <div class="swiper testimonialSwiper" data-aos="fade-up">
+            <div class="swiper-wrapper">
+                <div class="swiper-slide"><div class="testimonial-card p-4"><i class="bi bi-quote fs-1 text-primary opacity-25"></i><p class="mt-2">"The staff was incredibly professional and caring. I received excellent treatment and follow-up care."</p><div class="d-flex align-items-center mt-3"><div class="avatar bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width:50px;height:50px;"><span class="fw-bold">JM</span></div><div><h6 class="mb-0">Jane Mwangi</h6><small class="text-muted">OPD Patient</small></div></div></div></div>
+                <div class="swiper-slide"><div class="testimonial-card p-4"><i class="bi bi-quote fs-1 text-primary opacity-25"></i><p class="mt-2">"The ANC program at this clinic is amazing. I felt supported throughout my pregnancy journey."</p><div class="d-flex align-items-center mt-3"><div class="avatar bg-success text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width:50px;height:50px;"><span class="fw-bold">AW</span></div><div><h6 class="mb-0">Alice Wanjiku</h6><small class="text-muted">ANC Patient</small></div></div></div></div>
+                <div class="swiper-slide"><div class="testimonial-card p-4"><i class="bi bi-quote fs-1 text-primary opacity-25"></i><p class="mt-2">"My children receive all their immunizations here. The under-five clinic is very child-friendly."</p><div class="d-flex align-items-center mt-3"><div class="avatar bg-info text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width:50px;height:50px;"><span class="fw-bold">PK</span></div><div><h6 class="mb-0">Peter Kamau</h6><small class="text-muted">Parent</small></div></div></div></div>
+                <div class="swiper-slide"><div class="testimonial-card p-4"><i class="bi bi-quote fs-1 text-primary opacity-25"></i><p class="mt-2">"Affordable and quality healthcare. The pharmacy always has the medicines I need and the staff are helpful."</p><div class="d-flex align-items-center mt-3"><div class="avatar bg-warning text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width:50px;height:50px;"><span class="fw-bold">SN</span></div><div><h6 class="mb-0">Sarah Njoroge</h6><small class="text-muted">Pharmacy Patient</small></div></div></div></div>
+            </div>
+            <div class="swiper-pagination mt-4 position-relative"></div>
+        </div>
+    </div>
+</section>
+
+<!-- ==================== STATISTICS ==================== -->
+<section class="section-padding stats-section text-white" style="background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);">
+    <div class="container">
+        <div class="row text-center g-4">
+            <div class="col-md-3 col-6" data-aos="fade-up"><div class="stat-item"><i class="bi bi-people-fill display-5"></i><h2 class="counter mt-3" data-target="15000">0</h2><p>Patients Served</p></div></div>
+            <div class="col-md-3 col-6" data-aos="fade-up" data-aos-delay="100"><div class="stat-item"><i class="bi bi-calendar-check-fill display-5"></i><h2 class="counter mt-3" data-target="45000">0</h2><p>Appointments Completed</p></div></div>
+            <div class="col-md-3 col-6" data-aos="fade-up" data-aos-delay="200"><div class="stat-item"><i class="bi bi-heart-fill display-5"></i><h2 class="counter mt-3" data-target="5000">0</h2><p>Deliveries Supported</p></div></div>
+            <div class="col-md-3 col-6" data-aos="fade-up" data-aos-delay="300"><div class="stat-item"><i class="bi bi-shield-plus display-5"></i><h2 class="counter mt-3" data-target="12000">0</h2><p>Children Vaccinated</p></div></div>
+        </div>
+    </div>
+</section>
+
+<!-- ==================== CONTACT ==================== -->
+<section id="contact" class="section-padding">
+    <div class="container">
+        <div class="text-center mb-5" data-aos="fade-up">
+            <h2 class="section-title">Contact <span class="text-primary">Us</span></h2>
+            <p class="text-muted mx-auto" style="max-width:600px;">We'd love to hear from you. Reach out to us through any of the channels below.</p>
+        </div>
+        <div class="row g-4">
+            <div class="col-lg-5" data-aos="fade-right">
+                <div class="ratio ratio-4x3 rounded-3 overflow-hidden shadow">
+                    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15955.000000000!2d36.8219!3d-1.2921!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMcKwMTcnMzEuNyJTIDM2wrA0OScxOC44IkU!5e0!3m2!1sen!2ske!4v1" allowfullscreen loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="Hope Clinic Location"></iframe>
+                </div>
+            </div>
+            <div class="col-lg-6 offset-lg-1" data-aos="fade-left">
+                <div class="row g-4">
+                    <div class="col-sm-6"><div class="contact-card p-4 text-center"><i class="bi bi-telephone-fill fs-3 text-primary"></i><h6 class="mt-3">Phone</h6><p class="mb-0 small">+254 700 100 200</p><p class="small">+254 700 100 300</p></div></div>
+                    <div class="col-sm-6"><div class="contact-card p-4 text-center"><i class="bi bi-envelope-fill fs-3 text-primary"></i><h6 class="mt-3">Email</h6><p class="mb-0 small">info@hopeclinic.co.ke</p><p class="small">admin@hopeclinic.co.ke</p></div></div>
+                    <div class="col-sm-6"><div class="contact-card p-4 text-center"><i class="bi bi-geo-alt-fill fs-3 text-primary"></i><h6 class="mt-3">Address</h6><p class="mb-0 small">Nairobi, Kenya</p><p class="small">Next to City Hospital</p></div></div>
+                    <div class="col-sm-6"><div class="contact-card p-4 text-center"><i class="bi bi-clock-fill fs-3 text-primary"></i><h6 class="mt-3">Working Hours</h6><p class="mb-0 small">Mon - Sat: 7:00 AM - 8:00 PM</p><p class="small">Sunday: Closed (Emergencies Only)</p></div></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ==================== FOOTER ==================== -->
+<footer class="footer-section text-white">
+    <div class="container">
+        <div class="row g-4 py-5">
+            <div class="col-lg-4">
+                <h5 class="fw-bold mb-3"><i class="bi bi-heart-pulse-fill me-2"></i>{{ site_name|default:"Hope Clinic" }}</h5>
+                <p>Providing compassionate, affordable and professional healthcare services for all ages. Your health is our priority.</p>
+                <div class="social-links mt-3">
+                    <a href="#" class="me-2"><i class="bi bi-facebook"></i></a>
+                    <a href="#" class="me-2"><i class="bi bi-twitter-x"></i></a>
+                    <a href="#" class="me-2"><i class="bi bi-instagram"></i></a>
+                    <a href="#" class="me-2"><i class="bi bi-youtube"></i></a>
+                </div>
+            </div>
+            <div class="col-lg-2 col-md-4">
+                <h6 class="fw-bold mb-3">Quick Links</h6>
+                <ul class="list-unstyled">
+                    <li class="mb-2"><a href="#hero" class="text-white-50 text-decoration-none">Home</a></li>
+                    <li class="mb-2"><a href="#about" class="text-white-50 text-decoration-none">About Us</a></li>
+                    <li class="mb-2"><a href="#services" class="text-white-50 text-decoration-none">Services</a></li>
+                    <li class="mb-2"><a href="#doctors" class="text-white-50 text-decoration-none">Doctors</a></li>
+                    <li class="mb-2"><a href="#appointment" class="text-white-50 text-decoration-none">Book Appointment</a></li>
+                    <li><a href="/accounts/web/login/" class="text-white-50 text-decoration-none">Staff Login</a></li>
+                </ul>
+            </div>
+            <div class="col-lg-3 col-md-4">
+                <h6 class="fw-bold mb-3">Our Services</h6>
+                <ul class="list-unstyled">
+                    <li class="mb-2"><span class="text-white-50">OPD Services</span></li>
+                    <li class="mb-2"><span class="text-white-50">Under-Five Clinic</span></li>
+                    <li class="mb-2"><span class="text-white-50">Antenatal Care</span></li>
+                    <li class="mb-2"><span class="text-white-50">Family Planning</span></li>
+                    <li class="mb-2"><span class="text-white-50">Laboratory Services</span></li>
+                    <li><span class="text-white-50">Pharmacy Services</span></li>
+                </ul>
+            </div>
+            <div class="col-lg-3 col-md-4">
+                <h6 class="fw-bold mb-3">Contact Info</h6>
+                <ul class="list-unstyled text-white-50">
+                    <li class="mb-2"><i class="bi bi-telephone-fill me-2"></i>+254 700 100 200</li>
+                    <li class="mb-2"><i class="bi bi-envelope-fill me-2"></i>info@hopeclinic.co.ke</li>
+                    <li class="mb-2"><i class="bi bi-geo-alt-fill me-2"></i>Nairobi, Kenya</li>
+                    <li><i class="bi bi-clock-fill me-2"></i>Mon-Sat: 7AM - 8PM</li>
+                </ul>
+                <a href="/accounts/web/login/" class="btn btn-outline-light btn-sm rounded-pill mt-2">
+                    <i class="bi bi-shield-lock-fill me-1"></i>Staff Login
+                </a>
+            </div>
+        </div>
+        <div class="border-top border-secondary pt-3 pb-4 text-center text-white-50">
+            <p class="mb-0 small">&copy; {% now "Y" %} {{ site_name|default:"Hope Clinic" }}. All rights reserved. Powered by HMS.</p>
+        </div>
+    </div>
+</footer>
+
+<!-- Back to top -->
+<button id="backToTop" class="btn btn-primary rounded-circle position-fixed" aria-label="Back to top"><i class="bi bi-chevron-up"></i></button>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+<script src="{% static 'landing/js/landing.js' %}"></script>
+</body>
+</html>

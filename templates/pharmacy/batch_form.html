@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% block title %}Add Batch - HMS{% endblock %}
+{% block page_title %}Add Medicine Batch{% endblock %}
+
+{% block content %}
+<div class="card shadow-sm border-0" style="max-width: 600px;">
+    <div class="card-body p-4">
+        <form method="post">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label class="form-label small fw-medium">Medicine *</label>
+                <select name="medicine" class="form-select select2" required>
+                    <option value="">-- Select --</option>
+                    {% for m in medicines %}
+                    <option value="{{ m.pk }}">{{ m.name }} ({{ m.strength|default:'' }})</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="mb-3">
+                <label class="form-label small fw-medium">Batch Number *</label>
+                <input type="text" name="batch_number" class="form-control" required>
+            </div>
+            <div class="row g-3 mb-3">
+                <div class="col-md-6">
+                    <label class="form-label small fw-medium">Quantity *</label>
+                    <input type="number" name="quantity" class="form-control" required>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label small fw-medium">Supplier</label>
+                    <input type="text" name="supplier" class="form-control">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label small fw-medium">Manufacturing Date</label>
+                    <input type="date" name="manufacturing_date" class="form-control">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label small fw-medium">Expiry Date *</label>
+                    <input type="date" name="expiry_date" class="form-control" required>
+                </div>
+            </div>
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-dark"><i class="bi bi-check-lg me-1"></i>Add Batch</button>
+                <a href="{% url 'pharmacy:batches' %}" class="btn btn-outline-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

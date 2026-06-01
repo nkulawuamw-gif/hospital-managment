@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% block title %}{% if is_edit %}Edit{% else %}Add{% endif %} Insurance Company - HMS{% endblock %}
+{% block page_title %}{% if is_edit %}Edit Insurance Company{% else %}Add Insurance Company{% endif %}{% endblock %}
+
+{% block content %}
+<div class="card shadow-sm border-0" style="max-width: 600px;">
+    <div class="card-body p-4">
+        <form method="post">
+            {% csrf_token %}
+            <div class="row g-3 mb-3">
+                <div class="col-md-6">
+                    <label class="form-label small fw-medium">Company Name *</label>
+                    <input type="text" name="name" class="form-control" value="{{ company.name|default:'' }}" required>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label small fw-medium">Code *</label>
+                    <input type="text" name="code" class="form-control" value="{{ company.code|default:'' }}" required>
+                </div>
+            </div>
+            <div class="mb-3">
+                <label class="form-label small fw-medium">Contact Person</label>
+                <input type="text" name="contact_person" class="form-control" value="{{ company.contact_person|default:'' }}">
+            </div>
+            <div class="row g-3 mb-3">
+                <div class="col-md-6">
+                    <label class="form-label small fw-medium">Phone</label>
+                    <input type="text" name="phone" class="form-control" value="{{ company.phone|default:'' }}">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label small fw-medium">Email</label>
+                    <input type="email" name="email" class="form-control" value="{{ company.email|default:'' }}">
+                </div>
+            </div>
+            <div class="mb-3">
+                <label class="form-label small fw-medium">Address</label>
+                <textarea name="address" class="form-control" rows="2">{{ company.address|default:'' }}</textarea>
+            </div>
+            <div class="mb-4">
+                <label class="form-label small fw-medium">Default Coverage (%)</label>
+                <input type="number" name="coverage_percentage" class="form-control" value="{{ company.coverage_percentage|default:'80' }}">
+            </div>
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-dark"><i class="bi bi-check-lg me-1"></i>{% if is_edit %}Update{% else %}Add{% endif %} Company</button>
+                <a href="{% url 'insurance:company_list' %}" class="btn btn-outline-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% block title %}Leave Requests - HMS{% endblock %}
+{% block page_title %}Leave Requests{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div class="d-flex gap-2">
+        <a href="{% url 'hr:leave_list' %}" class="btn btn-sm btn-outline-secondary {% if not current_status %}active{% endif %}">All</a>
+        <a href="?status=pending" class="btn btn-sm btn-outline-warning {% if current_status == 'pending' %}active{% endif %}">Pending</a>
+        <a href="?status=approved" class="btn btn-sm btn-outline-success {% if current_status == 'approved' %}active{% endif %}">Approved</a>
+        <a href="?status=rejected" class="btn btn-sm btn-outline-danger {% if current_status == 'rejected' %}active{% endif %}">Rejected</a>
+        <a href="?status=cancelled" class="btn btn-sm btn-outline-secondary {% if current_status == 'cancelled' %}active{% endif %}">Cancelled</a>
+    </div>
+    <a href="{% url 'hr:leave_create' %}" class="btn btn-dark btn-sm"><i class="bi bi-plus-lg me-1"></i>New Request</a>
+</div>
+<div class="card shadow-sm border-0">
+    <div class="card-body p-0">
+        <table class="table table-hover datatable mb-0" style="font-size: .875rem;">
+            <thead class="table-light">
+                <tr><th>Employee</th><th>Type</th><th>From</th><th>To</th><th>Days</th><th>Status</th><th>Date</th><th class="text-end">Actions</th></tr>
+            </thead>
+            <tbody>
+                {% for l in leaves %}
+                <tr>
+                    <td class="fw-medium">{{ l.employee.user.get_full_name|default:l.employee.user.email }}</td>
+                    <td>{{ l.get_leave_type_display }}</td>
+                    <td>{{ l.start_date|date:"M d, Y" }}</td>
+                    <td>{{ l.end_date|date:"M d, Y" }}</td>
+                    <td>{{ l.end_date|timeuntil:l.start_date }}</td>
+                    <td><span class="badge bg-{% if l.status == 'approved' %}success{% elif l.status == 'rejected' %}danger{% elif l.status == 'cancelled' %}secondary{% else %}warning text-dark{% endif %} rounded-pill">{{ l.get_status_display }}</span></td>
+                    <td>{{ l.created_at|date:"M d, Y" }}</td>
+                    <td class="text-end">
+                        <a href="{% url 'hr:leave_detail' l.pk %}" class="btn btn-sm btn-outline-secondary btn-icon"><i class="bi bi-eye"></i></a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

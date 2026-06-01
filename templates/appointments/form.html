@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% block title %}Book Appointment - HMS{% endblock %}
+{% block page_title %}Book New Appointment{% endblock %}
+
+{% block content %}
+<div class="card shadow-sm border-0" style="max-width: 650px;">
+    <div class="card-body p-4">
+        <form method="post">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label class="form-label small fw-medium">Patient *</label>
+                <select name="patient" class="form-select select2" required>
+                    <option value="">-- Select Patient --</option>
+                    {% for p in patients %}
+                    <option value="{{ p.pk }}">{{ p.patient_id }} - {{ p.full_name }} ({{ p.phone }})</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="mb-3">
+                <label class="form-label small fw-medium">Doctor *</label>
+                <select name="doctor" class="form-select select2" required>
+                    <option value="">-- Select Doctor --</option>
+                    {% for d in doctors %}
+                    <option value="{{ d.pk }}">Dr. {{ d.get_full_name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="row g-3 mb-3">
+                <div class="col-md-6">
+                    <label class="form-label small fw-medium">Date *</label>
+                    <input type="date" name="appointment_date" class="form-control" required>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label small fw-medium">Time *</label>
+                    <input type="time" name="appointment_time" class="form-control" required>
+                </div>
+            </div>
+            <div class="mb-4">
+                <label class="form-label small fw-medium">Reason for Visit</label>
+                <textarea name="reason" class="form-control" rows="3" placeholder="Describe the reason for appointment"></textarea>
+            </div>
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-dark"><i class="bi bi-check-lg me-1"></i>Book Appointment</button>
+                <a href="{% url 'appointments:list' %}" class="btn btn-outline-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

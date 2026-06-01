@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% block title %}Quotations - HMS{% endblock %}
+{% block page_title %}Quotations{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <p class="text-muted small mb-0">{{ quotations.count }} quotations</p>
+    <a href="{% url 'billing:quotation_create' %}" class="btn btn-dark btn-sm"><i class="bi bi-plus-lg me-1"></i>New Quotation</a>
+</div>
+
+<div class="card shadow-sm border-0">
+    <div class="card-body p-0">
+        <table class="table table-hover datatable mb-0" style="font-size: .875rem;">
+            <thead class="table-light">
+                <tr><th>Patient</th><th>Amount</th><th>Valid Until</th><th>Created</th><th>Created By</th></tr>
+            </thead>
+            <tbody>
+                {% for q in quotations %}
+                <tr>
+                    <td><a href="{% url 'patients:detail' q.patient.pk %}" class="text-decoration-none fw-medium">{{ q.patient.full_name }}</a></td>
+                    <td class="fw-medium">KES {{ q.total_amount|floatformat:0 }}</td>
+                    <td>{{ q.valid_until|date:"M d, Y" }}</td>
+                    <td>{{ q.created_at|date:"M d, Y" }}</td>
+                    <td>{{ q.created_by.get_full_name|default:'-' }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

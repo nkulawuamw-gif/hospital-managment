@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% block title %}Lab Requests - HMS{% endblock %}
+{% block page_title %}Laboratory Requests{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+    <div class="d-flex gap-2 flex-wrap">
+        <a href="{% url 'laboratory:request_list' %}" class="btn btn-sm btn-outline-secondary {% if not current_status %}active{% endif %}">All</a>
+        <a href="?status=pending" class="btn btn-sm btn-outline-warning {% if current_status == 'pending' %}active{% endif %}">Pending</a>
+        <a href="?status=sample_collected" class="btn btn-sm btn-outline-info {% if current_status == 'sample_collected' %}active{% endif %}">Collected</a>
+        <a href="?status=processing" class="btn btn-sm btn-outline-primary {% if current_status == 'processing' %}active{% endif %}">Processing</a>
+        <a href="?status=completed" class="btn btn-sm btn-outline-success {% if current_status == 'completed' %}active{% endif %}">Completed</a>
+        <a href="?status=approved" class="btn btn-sm btn-outline-dark {% if current_status == 'approved' %}active{% endif %}">Approved</a>
+    </div>
+    <div class="d-flex gap-2">
+        <a href="{% url 'laboratory:test_list' %}" class="btn btn-sm btn-outline-secondary"><i class="bi bi-list-check me-1"></i>Tests</a>
+        <a href="{% url 'laboratory:request_create' %}" class="btn btn-dark btn-sm"><i class="bi bi-plus-lg me-1"></i>New Request</a>
+    </div>
+</div>
+
+<div class="card shadow-sm border-0">
+    <div class="card-body p-0">
+        <table class="table table-hover datatable mb-0" style="font-size: .875rem;">
+            <thead class="table-light">
+                <tr><th>Patient</th><th>Doctor</th><th>Date</th><th>Tests</th><th>Priority</th><th>Status</th><th class="text-end">Actions</th></tr>
+            </thead>
+            <tbody>
+                {% for r in requests %}
+                <tr>
+                    <td><a href="{% url 'patients:detail' r.patient.pk %}" class="text-decoration-none fw-medium">{{ r.patient.full_name }}</a></td>
+                    <td>Dr. {{ r.doctor.get_full_name }}</td>
+                    <td>{{ r.created_at|date:"M d, Y H:i" }}</td>
+                    <td>{{ r.tests.count }}</td>
+                    <td><span class="badge bg-{% if r.priority == 'urgent' %}danger{% elif r.priority == 'stat' %}dark{% else %}secondary{% endif %} rounded-pill">{{ r.get_priority_display }}</span></td>
+                    <td>
+                        <span class="badge bg-{% if r.status == 'approved' %}dark{% elif r.status == 'completed' %}success{% elif r.status == 'processing' %}primary{% elif r.status == 'sample_collected' %}info{% elif r.status == 'cancelled' %}danger{% else %}warning text-dark{% endif %} rounded-pill">{{ r.get_status_display }}</span>
+                    </td>
+                    <td class="text-end">
+                        <a href="{% url 'laboratory:request_detail' r.pk %}" class="btn btn-sm btn-outline-secondary btn-icon"><i class="bi bi-eye"></i></a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

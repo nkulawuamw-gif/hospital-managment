@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% block title %}Invoices - Billing - HMS{% endblock %}
+{% block page_title %}Billing & Invoices{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+    <div class="d-flex gap-2 flex-wrap">
+        <a href="{% url 'billing:invoice_list' %}" class="btn btn-sm btn-outline-secondary {% if not current_status %}active{% endif %}">All</a>
+        <a href="?status=pending" class="btn btn-sm btn-outline-warning {% if current_status == 'pending' %}active{% endif %}">Pending</a>
+        <a href="?status=paid" class="btn btn-sm btn-outline-success {% if current_status == 'paid' %}active{% endif %}">Paid</a>
+        <a href="?status=partial" class="btn btn-sm btn-outline-info {% if current_status == 'partial' %}active{% endif %}">Partial</a>
+        <a href="?status=overdue" class="btn btn-sm btn-outline-danger {% if current_status == 'overdue' %}active{% endif %}">Overdue</a>
+    </div>
+    <div class="d-flex gap-2">
+        <a href="{% url 'billing:quotation_list' %}" class="btn btn-sm btn-outline-secondary"><i class="bi bi-file-earmark-text me-1"></i>Quotations</a>
+        <a href="{% url 'billing:invoice_create' %}" class="btn btn-dark btn-sm"><i class="bi bi-plus-lg me-1"></i>New Invoice</a>
+    </div>
+</div>
+
+<div class="card shadow-sm border-0">
+    <div class="card-body p-0">
+        <table class="table table-hover datatable mb-0" style="font-size: .875rem;">
+            <thead class="table-light">
+                <tr><th>Invoice #</th><th>Patient</th><th>Date</th><th>Total</th><th>Paid</th><th>Balance</th><th>Status</th><th class="text-end">Actions</th></tr>
+            </thead>
+            <tbody>
+                {% for inv in invoices %}
+                <tr>
+                    <td class="fw-medium">{{ inv.invoice_number }}</td>
+                    <td><a href="{% url 'patients:detail' inv.patient.pk %}" class="text-decoration-none">{{ inv.patient.full_name }}</a></td>
+                    <td>{{ inv.created_at|date:"M d, Y" }}</td>
+                    <td>KES {{ inv.total|floatformat:0 }}</td>
+                    <td>KES {{ inv.amount_paid|floatformat:0 }}</td>
+                    <td>KES {{ inv.balance|floatformat:0 }}</td>
+                    <td>
+                        <span class="badge bg-{% if inv.status == 'paid' %}success{% elif inv.status == 'overdue' %}danger{% elif inv.status == 'partial' %}info{% elif inv.status == 'cancelled' %}secondary{% else %}warning text-dark{% endif %} rounded-pill">{{ inv.get_status_display }}</span>
+                    </td>
+                    <td class="text-end">
+                        <a href="{% url 'billing:invoice_detail' inv.pk %}" class="btn btn-sm btn-outline-secondary btn-icon"><i class="bi bi-eye"></i></a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

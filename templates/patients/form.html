@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+{% block title %}{% if is_edit %}Edit{% else %}Register{% endif %} Patient - HMS{% endblock %}
+{% block page_title %}{% if is_edit %}Edit Patient: {{ patient.patient_id }}{% else %}Register New Patient{% endif %}{% endblock %}
+
+{% block content %}
+<div class="card shadow-sm border-0">
+    <div class="card-body p-4">
+        <form method="post">
+            {% csrf_token %}
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label small fw-medium">First Name *</label>
+                    <input type="text" name="first_name" class="form-control" value="{{ patient.first_name|default:'' }}" required>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label small fw-medium">Last Name *</label>
+                    <input type="text" name="last_name" class="form-control" value="{{ patient.last_name|default:'' }}" required>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label small fw-medium">Gender *</label>
+                    <select name="gender" class="form-select" required>
+                        <option value="">-- Select --</option>
+                        <option value="male" {% if patient.gender == 'male' %}selected{% endif %}>Male</option>
+                        <option value="female" {% if patient.gender == 'female' %}selected{% endif %}>Female</option>
+                        <option value="other" {% if patient.gender == 'other' %}selected{% endif %}>Other</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label small fw-medium">Date of Birth *</label>
+                    <input type="date" name="date_of_birth" class="form-control" value="{{ patient.date_of_birth|date:'Y-m-d'|default:'' }}" required>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label small fw-medium">Blood Group</label>
+                    <select name="blood_group" class="form-select">
+                        <option value="">-- Select --</option>
+                        <option value="A+" {% if patient.blood_group == 'A+' %}selected{% endif %}>A+</option>
+                        <option value="A-" {% if patient.blood_group == 'A-' %}selected{% endif %}>A-</option>
+                        <option value="B+" {% if patient.blood_group == 'B+' %}selected{% endif %}>B+</option>
+                        <option value="B-" {% if patient.blood_group == 'B-' %}selected{% endif %}>B-</option>
+                        <option value="AB+" {% if patient.blood_group == 'AB+' %}selected{% endif %}>AB+</option>
+                        <option value="AB-" {% if patient.blood_group == 'AB-' %}selected{% endif %}>AB-</option>
+                        <option value="O+" {% if patient.blood_group == 'O+' %}selected{% endif %}>O+</option>
+                        <option value="O-" {% if patient.blood_group == 'O-' %}selected{% endif %}>O-</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label small fw-medium">Phone *</label>
+                    <input type="text" name="phone" class="form-control" value="{{ patient.phone|default:'' }}" required>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label small fw-medium">Email</label>
+                    <input type="email" name="email" class="form-control" value="{{ patient.email|default:'' }}">
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label small fw-medium">National ID</label>
+                    <input type="text" name="national_id" class="form-control" value="{{ patient.national_id|default:'' }}">
+                </div>
+                <div class="col-12">
+                    <label class="form-label small fw-medium">Address</label>
+                    <textarea name="address" class="form-control" rows="2">{{ patient.address|default:'' }}</textarea>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label small fw-medium">Emergency Contact Name</label>
+                    <input type="text" name="emergency_contact_name" class="form-control" value="{{ patient.emergency_contact_name|default:'' }}">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label small fw-medium">Emergency Contact Phone</label>
+                    <input type="text" name="emergency_contact_phone" class="form-control" value="{{ patient.emergency_contact_phone|default:'' }}">
+                </div>
+                <div class="col-12">
+                    <label class="form-label small fw-medium">Allergies</label>
+                    <textarea name="allergies" class="form-control" rows="2" placeholder="Comma separated">{{ patient.allergies|default:'' }}</textarea>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label small fw-medium">Insurance Provider</label>
+                    <input type="text" name="insurance_provider" class="form-control" value="{{ patient.insurance_provider|default:'' }}">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label small fw-medium">Insurance Policy Number</label>
+                    <input type="text" name="insurance_policy_number" class="form-control" value="{{ patient.insurance_policy_number|default:'' }}">
+                </div>
+            </div>
+
+            <div class="d-flex gap-2 mt-4 pt-3 border-top">
+                <button type="submit" class="btn btn-dark">
+                    <i class="bi bi-check-lg me-1"></i>{% if is_edit %}Update Patient{% else %}Register Patient{% endif %}
+                </button>
+                <a href="{% url 'patients:list' %}" class="btn btn-outline-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

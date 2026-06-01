@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+{% block title %}New Invoice - HMS{% endblock %}
+{% block page_title %}Create New Invoice{% endblock %}
+
+{% block content %}
+<div class="card shadow-sm border-0">
+    <div class="card-body p-4">
+        <form method="post" id="invoiceForm">
+            {% csrf_token %}
+            <div class="row g-3 mb-4">
+                <div class="col-md-6">
+                    <label class="form-label small fw-medium">Patient *</label>
+                    <select name="patient" class="form-select select2" required>
+                        <option value="">-- Select Patient --</option>
+                        {% for p in patients %}
+                        <option value="{{ p.pk }}">{{ p.patient_id }} - {{ p.full_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label small fw-medium">Due Date</label>
+                    <input type="date" name="due_date" class="form-control">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label small fw-medium">Discount (KES)</label>
+                    <input type="number" name="discount" class="form-control" value="0" step="0.01">
+                </div>
+            </div>
+
+            <h6 class="fw-semibold mb-3">Invoice Items</h6>
+            <table class="table table-bordered" style="font-size: .875rem;" id="itemsTable">
+                <thead class="table-light">
+                    <tr><th style="width:45%">Description</th><th style="width:15%">Quantity</th><th style="width:20%">Unit Price (KES)</th><th style="width:15%">Total</th><th style="width:5%"></th></tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><input type="text" name="description[]" class="form-control form-control-sm" required></td>
+                        <td><input type="number" name="quantity[]" class="form-control form-control-sm qty" value="1" min="1" required></td>
+                        <td><input type="number" name="unit_price[]" class="form-control form-control-sm price" value="0" step="0.01" required></td>
+                        <td><span class="row-total fw-medium">0.00</span></td>
+                        <td><button type="button" class="btn btn-sm btn-outline-danger btn-icon remove-row"><i class="bi bi-trash"></i></button></td>
+                    </tr>
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="3" class="text-end fw-medium">Grand Total:</td>
+                        <td><span id="grandTotal" class="fw-bold fs-6">0.00</span></td>
+                        <td></td>
+                    </tr>
+                </tfoot>
+            </table>
+            <button type="button" class="btn btn-sm btn-outline-secondary mb-3" id="addRow"><i class="bi bi-plus-lg me-1"></i>Add Item</button>
+
+            <div class="mb-4">
+                <label class="form-label small fw-medium">Notes</label>
+                <textarea name="notes" class="form-control" rows="2"></textarea>
+            </div>
+
+            <div class="d-flex gap-2 pt-3 border-top">
+                <button type="submit" class="btn btn-dark"><i class="bi bi-check-lg me-1"></i>Create Invoice</button>
+                <a href="{% url 'billing:invoice_list' %}" class="btn btn-outline-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function calcRow(row) { const qty = parseFloat(row.find('.qty').val())||0; const price = parseFloat(row.find('.price').val())||0; const total = qty*price; row.find('.row-total').text(total.toFixed(2)); calcGrandTotal(); }
+function calcGrandTotal() { let gt=0; $('.row-total').each(function(){gt+=parseFloat($(this).text())||0}); $('#grandTotal').text(gt.toFixed(2)); }
+$(document).on('input', '.qty, .price', function(){calcRow($(this).closest('tr'))});
+$('#addRow').click(function() { const tpl=$('#itemsTable tbody tr:first').clone(); tpl.find('input').val(''); tpl.find('.row-total').text('0.00'); $('#itemsTable tbody').append(tpl); });
+$(document).on('click', '.remove-row', function() { if($('#itemsTable tbody tr').length>1) $(this).closest('tr').remove(); calcGrandTotal(); });
+</script>
+{% endblock %}

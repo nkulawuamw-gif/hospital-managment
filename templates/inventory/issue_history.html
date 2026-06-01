@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% block title %}Issue History - HMS{% endblock %}
+{% block page_title %}Stock Issue History{% endblock %}
+
+{% block content %}
+<div class="card shadow-sm border-0">
+    <div class="card-body p-0">
+        <table class="table table-hover datatable mb-0" style="font-size: .875rem;">
+            <thead class="table-light">
+                <tr><th>#</th><th>Issued To</th><th>Date</th><th>Items</th><th>Issued By</th><th>Notes</th></tr>
+            </thead>
+            <tbody>
+                {% for issue in issues %}
+                <tr>
+                    <td>{{ issue.pk }}</td>
+                    <td class="fw-medium">{{ issue.issued_to }}</td>
+                    <td>{{ issue.issued_at|date:"M d, Y H:i" }}</td>
+                    <td>{% for i in issue.items.all %}{{ i.supply.name }} ({{ i.quantity }}){% if not forloop.last %}, {% endif %}{% endfor %}</td>
+                    <td>{{ issue.issued_by.get_full_name|default:issue.issued_by.email }}</td>
+                    <td>{{ issue.notes|default:'-' }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

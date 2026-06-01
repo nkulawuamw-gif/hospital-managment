@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% block title %}Suppliers - HMS{% endblock %}
+{% block page_title %}Suppliers{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <p class="text-muted small mb-0">{{ suppliers.count }} suppliers</p>
+    <a href="{% url 'inventory:supplier_create' %}" class="btn btn-dark btn-sm"><i class="bi bi-plus-lg me-1"></i>Add Supplier</a>
+</div>
+<div class="card shadow-sm border-0">
+    <div class="card-body p-0">
+        <table class="table table-hover datatable mb-0" style="font-size: .875rem;">
+            <thead class="table-light">
+                <tr><th>Name</th><th>Contact</th><th>Phone</th><th>Email</th><th>Status</th></tr>
+            </thead>
+            <tbody>
+                {% for s in suppliers %}
+                <tr>
+                    <td class="fw-medium">{{ s.name }}</td>
+                    <td>{{ s.contact_person|default:'-' }}</td>
+                    <td>{{ s.phone }}</td>
+                    <td>{{ s.email|default:'-' }}</td>
+                    <td>{% if s.is_active %}<span class="badge bg-success rounded-pill">Active</span>{% else %}<span class="badge bg-danger rounded-pill">Inactive</span>{% endif %}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

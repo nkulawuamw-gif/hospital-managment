@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+{% block title %}Enter Results - Lab #{{ r.pk }} - HMS{% endblock %}
+{% block page_title %}Enter Lab Results{% endblock %}
+
+{% block content %}
+<div class="row g-3 mb-3">
+    <div class="col-md-4">
+        <div class="card shadow-sm border-0">
+            <div class="card-body small">
+                <div class="fw-semibold">{{ r.patient.full_name }}</div>
+                <div class="text-muted">{{ r.patient.patient_id }}</div>
+                <div class="mt-2">Dr. {{ r.doctor.get_full_name }} | {{ r.created_at|date:"M d, Y" }}</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card shadow-sm border-0">
+    <div class="card-body p-4">
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            {% for item in r.items.all %}
+            <div class="mb-4 pb-3 border-bottom">
+                <h6 class="fw-semibold mb-3">{{ forloop.counter }}. {{ item.test.name }}</h6>
+                <div class="mb-3">
+                    <label class="form-label small fw-medium">Result / Value</label>
+                    <textarea name="result_{{ item.pk }}" class="form-control" rows="2">{{ item.result|default:'' }}</textarea>
+                </div>
+                <div class="form-check mb-3">
+                    <input type="checkbox" name="abnormal_{{ item.pk }}" class="form-check-input" id="abnormal_{{ item.pk }}" {% if item.is_abnormal %}checked{% endif %}>
+                    <label class="form-check-label small" for="abnormal_{{ item.pk }}">Mark as Abnormal</label>
+                </div>
+
+                {% if item.test.parameters.all %}
+                <div class="ms-3 mt-3">
+                    <p class="small fw-medium text-muted mb-2">Parameters:</p>
+                    {% for param in item.test.parameters.all %}
+                    {% with existing=None %}
+                    {% for rp in item.parameter_results.all %}
+                    {% if rp.parameter_id == param.pk %}{% with existing=rp %}{% endwith %}{% endif %}
+                    {% endfor %}
+                    <div class="row g-2 mb-2 align-items-center">
+                        <div class="col-md-3"><label class="small">{{ param.name }}</label></div>
+                        <div class="col-md-3">
+                            <input type="text" name="param_{{ existing.pk|default:'' }}" class="form-control form-control-sm" placeholder="Value" value="{{ existing.value|default:'' }}">
+                        </div>
+                        <div class="col-md-3">
+                            <span class="small text-muted">Range: {{ param.normal_range_min|default:'-' }} - {{ param.normal_range_max|default:'-' }} {{ param.unit }}</span>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-check">
+                                <input type="checkbox" name="param_abnormal_{{ existing.pk|default:'' }}" class="form-check-input" id="pab_{{ param.pk }}" {% if existing.is_abnormal %}checked{% endif %}>
+                                <label class="form-check-label small" for="pab_{{ param.pk }}">Abnormal</label>
+                            </div>
+                        </div>
+                    </div>
+                    {% endwith %}
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+                <div class="mt-2">
+                    <label class="form-label small fw-medium">Attach File (PDF/Image)</label>
+                    <input type="file" name="file_{{ item.pk }}" class="form-control form-control-sm" style="max-width: 300px;">
+                </div>
+            </div>
+            {% endfor %}
+
+            <div class="d-flex gap-2 pt-3">
+                <button type="submit" class="btn btn-primary"><i class="bi bi-check-lg me-1"></i>Save Results</button>
+                <a href="{% url 'laboratory:request_detail' r.pk %}" class="btn btn-outline-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% block title %}Insurance Claims - HMS{% endblock %}
+{% block page_title %}Insurance Claims{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div class="d-flex gap-2">
+        <a href="{% url 'insurance:claim_list' %}" class="btn btn-sm btn-outline-secondary {% if not current_status %}active{% endif %}">All</a>
+        <a href="?status=draft" class="btn btn-sm btn-outline-secondary {% if current_status == 'draft' %}active{% endif %}">Draft</a>
+        <a href="?status=submitted" class="btn btn-sm btn-outline-info {% if current_status == 'submitted' %}active{% endif %}">Submitted</a>
+        <a href="?status=approved" class="btn btn-sm btn-outline-success {% if current_status == 'approved' %}active{% endif %}">Approved</a>
+        <a href="?status=rejected" class="btn btn-sm btn-outline-danger {% if current_status == 'rejected' %}active{% endif %}">Rejected</a>
+        <a href="?status=paid" class="btn btn-sm btn-outline-primary {% if current_status == 'paid' %}active{% endif %}">Paid</a>
+    </div>
+    <a href="{% url 'insurance:claim_create' %}" class="btn btn-dark btn-sm"><i class="bi bi-plus-lg me-1"></i>New Claim</a>
+</div>
+<div class="card shadow-sm border-0">
+    <div class="card-body p-0">
+        <table class="table table-hover datatable mb-0" style="font-size: .875rem;">
+            <thead class="table-light">
+                <tr><th>Claim #</th><th>Patient</th><th>Company</th><th>Amount</th><th>Approved</th><th>Status</th><th>Date</th><th class="text-end">Actions</th></tr>
+            </thead>
+            <tbody>
+                {% for claim in claims %}
+                <tr>
+                    <td class="fw-medium">{{ claim.claim_number }}</td>
+                    <td>{{ claim.patient.first_name }} {{ claim.patient.last_name }}<br><small class="text-muted">{{ claim.patient.patient_id }}</small></td>
+                    <td>{{ claim.insurance_policy.insurance_company.name }}</td>
+                    <td>KES {{ claim.amount_claimed|floatformat:0 }}</td>
+                    <td>{% if claim.amount_approved %}KES {{ claim.amount_approved|floatformat:0 }}{% else %}-{% endif %}</td>
+                    <td><span class="badge bg-{% if claim.status == 'paid' %}primary{% elif claim.status == 'approved' %}success{% elif claim.status == 'rejected' %}danger{% elif claim.status == 'submitted' %}info{% else %}secondary{% endif %} rounded-pill">{{ claim.get_status_display }}</span></td>
+                    <td>{{ claim.created_at|date:"M d, Y" }}</td>
+                    <td class="text-end"><a href="{% url 'insurance:claim_detail' claim.pk %}" class="btn btn-sm btn-outline-secondary btn-icon"><i class="bi bi-eye"></i></a></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

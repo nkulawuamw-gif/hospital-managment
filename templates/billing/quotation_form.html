@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+{% block title %}New Quotation - HMS{% endblock %}
+{% block page_title %}Create Quotation{% endblock %}
+
+{% block content %}
+<div class="card shadow-sm border-0" style="max-width: 700px;">
+    <div class="card-body p-4">
+        <form method="post">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label class="form-label small fw-medium">Patient *</label>
+                <select name="patient" class="form-select select2" required>
+                    <option value="">-- Select Patient --</option>
+                    {% for p in patients %}
+                    <option value="{{ p.pk }}">{{ p.patient_id }} - {{ p.full_name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="mb-3">
+                <label class="form-label small fw-medium">Valid Until *</label>
+                <input type="date" name="valid_until" class="form-control" style="max-width: 250px;" required>
+            </div>
+
+            <h6 class="fw-semibold mb-3">Items</h6>
+            <table class="table table-bordered" style="font-size: .85rem;" id="itemsTable">
+                <thead class="table-light">
+                    <tr><th>Description</th><th>Qty</th><th>Unit Price</th><th>Total</th><th></th></tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><input type="text" name="description[]" class="form-control form-control-sm" required></td>
+                        <td><input type="number" name="quantity[]" class="form-control form-control-sm qty" value="1" min="1"></td>
+                        <td><input type="number" name="unit_price[]" class="form-control form-control-sm price" value="0" step="0.01"></td>
+                        <td><span class="row-total fw-medium">0.00</span></td>
+                        <td><button type="button" class="btn btn-sm btn-outline-danger btn-icon remove-row"><i class="bi bi-trash"></i></button></td>
+                    </tr>
+                </tbody>
+                <tfoot>
+                    <tr><td colspan="3" class="text-end fw-medium">Total:</td><td><span id="grandTotal" class="fw-bold">0.00</span></td><td></td></tr>
+                </tfoot>
+            </table>
+            <button type="button" class="btn btn-sm btn-outline-secondary mb-3" id="addRow"><i class="bi bi-plus-lg me-1"></i>Add Item</button>
+
+            <div class="d-flex gap-2 pt-3 border-top">
+                <button type="submit" class="btn btn-dark"><i class="bi bi-check-lg me-1"></i>Create Quotation</button>
+                <a href="{% url 'billing:quotation_list' %}" class="btn btn-outline-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function calcRow(r){const q=parseFloat(r.find('.qty').val())||0,p=parseFloat(r.find('.price').val())||0;r.find('.row-total').text((q*p).toFixed(2));calcTotal()}
+function calcTotal(){let t=0;$('.row-total').each(function(){t+=parseFloat($(this).text())||0});$('#grandTotal').text(t.toFixed(2))}
+$(document).on('input','.qty,.price',function(){calcRow($(this).closest('tr'))});
+$('#addRow').click(function(){const t=$('#itemsTable tbody tr:first').clone();t.find('input').val('');t.find('.row-total').text('0.00');$('#itemsTable tbody').append(t)});
+$(document).on('click','.remove-row',function(){if($('#itemsTable tbody tr').length>1)$(this).closest('tr').remove();calcTotal()});
+</script>
+{% endblock %}

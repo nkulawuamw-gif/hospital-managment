@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% block title %}Add Employee - HMS{% endblock %}
+{% block page_title %}Register Employee{% endblock %}
+
+{% block content %}
+<div class="card shadow-sm border-0" style="max-width: 600px;">
+    <div class="card-body p-4">
+        <form method="post">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label class="form-label small fw-medium">User *</label>
+                <select name="user" class="form-select select2" required>
+                    <option value="">-- Select User --</option>
+                    {% for u in users %}
+                    <option value="{{ u.pk }}">{{ u.get_full_name|default:u.email }} ({{ u.email }})</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="row g-3 mb-3">
+                <div class="col-md-6">
+                    <label class="form-label small fw-medium">Employee ID *</label>
+                    <input type="text" name="employee_id" class="form-control" required>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label small fw-medium">Employment Type</label>
+                    <select name="employment_type" class="form-select">
+                        <option value="full_time">Full Time</option>
+                        <option value="part_time">Part Time</option>
+                        <option value="contract">Contract</option>
+                        <option value="intern">Intern</option>
+                    </select>
+                </div>
+            </div>
+            <div class="mb-3">
+                <label class="form-label small fw-medium">Date Joined *</label>
+                <input type="date" name="date_joined" class="form-control" required>
+            </div>
+            <div class="mb-3">
+                <label class="form-label small fw-medium">Salary (KES)</label>
+                <input type="number" name="salary" class="form-control" value="0" step="0.01">
+            </div>
+            <div class="row g-3 mb-4">
+                <div class="col-md-6">
+                    <label class="form-label small fw-medium">Emergency Contact</label>
+                    <input type="text" name="emergency_contact" class="form-control">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label small fw-medium">Emergency Phone</label>
+                    <input type="text" name="emergency_phone" class="form-control">
+                </div>
+            </div>
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-dark"><i class="bi bi-check-lg me-1"></i>Add Employee</button>
+                <a href="{% url 'hr:employee_list' %}" class="btn btn-outline-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

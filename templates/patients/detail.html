@@ -1,0 +1,220 @@
+{% extends 'base.html' %}
+{% block title %}{{ patient.full_name }} - Patient - HMS{% endblock %}
+{% block page_title %}Patient Profile{% endblock %}
+
+{% block content %}
+<div class="row g-3 mb-4">
+    <div class="col-md-4">
+        <div class="card shadow-sm border-0">
+            <div class="card-body text-center p-4">
+                <div class="avatar mx-auto mb-3" style="width: 80px; height: 80px; font-size: 2rem; background: #0d1b2a; color: #fff;">
+                    {{ patient.first_name|first|upper }}{{ patient.last_name|first|upper }}
+                </div>
+                <h5 class="fw-semibold">{{ patient.full_name }}</h5>
+                <p class="text-primary fw-medium small mb-2">{{ patient.patient_id }}</p>
+                <span class="badge bg-{% if patient.is_active %}success{% else %}danger{% endif %} rounded-pill mb-3">
+                    {{ patient.is_active|yesno:"Active,Inactive" }}
+                </span>
+                <hr>
+                <div class="text-start small">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted">Gender</span><span class="fw-medium">{{ patient.get_gender_display }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted">Age</span><span class="fw-medium">{{ patient.age }} years</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted">Blood Group</span><span class="fw-medium">{{ patient.blood_group|default:'-' }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted">Phone</span><span class="fw-medium">{{ patient.phone }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted">Email</span><span class="fw-medium">{{ patient.email|default:'-' }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted">National ID</span><span class="fw-medium">{{ patient.national_id|default:'-' }}</span>
+                    </div>
+                </div>
+                <hr>
+                <a href="{% url 'patients:edit' patient.pk %}" class="btn btn-outline-dark btn-sm w-100">
+                    <i class="bi bi-pencil me-1"></i>Edit Patient
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-8">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-white">
+                <ul class="nav nav-tabs card-header-tabs" role="tablist">
+                    <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tab-medical" type="button"><i class="bi bi-file-medical me-1"></i>Medical History</button></li>
+                    <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-appointments" type="button"><i class="bi bi-calendar me-1"></i>Appointments</button></li>
+                    <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-consultations" type="button"><i class="bi bi-chat-dots me-1"></i>Consultations</button></li>
+                    <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-prescriptions" type="button"><i class="bi bi-capsule me-1"></i>Prescriptions</button></li>
+                    <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-lab" type="button"><i class="bi bi-flask me-1"></i>Lab Results</button></li>
+                    <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-billing" type="button"><i class="bi bi-currency-dollar me-1"></i>Billing</button></li>
+                    <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-admissions" type="button"><i class="bi bi-hospital me-1"></i>Admissions</button></li>
+                </ul>
+            </div>
+            <div class="card-body">
+                <div class="tab-content">
+                    <!-- Medical History -->
+                    <div class="tab-pane fade show active" id="tab-medical">
+                        {% if medical_histories %}
+                        <div class="list-group list-group-flush">
+                            {% for mh in medical_histories %}
+                            <div class="list-group-item px-0">
+                                <div class="fw-semibold">{{ mh.condition }}</div>
+                                <div class="text-muted small">Diagnosed: {{ mh.diagnosed_date|date:"M d, Y"|default:'N/A' }}</div>
+                                {% if mh.notes %}<div class="small mt-1">{{ mh.notes }}</div>{% endif %}
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        <div class="text-center text-muted py-4"><i class="bi bi-inbox me-2"></i>No medical history recorded</div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Appointments -->
+                    <div class="tab-pane fade" id="tab-appointments">
+                        {% if appointments %}
+                        <table class="table table-sm datatable mb-0" style="font-size: .85rem;">
+                            <thead><tr><th>Date</th><th>Time</th><th>Doctor</th><th>Status</th></tr></thead>
+                            <tbody>
+                                {% for a in appointments %}
+                                <tr>
+                                    <td>{{ a.appointment_date|date:"M d, Y" }}</td>
+                                    <td>{{ a.appointment_time|time:"H:i" }}</td>
+                                    <td>Dr. {{ a.doctor.last_name }}</td>
+                                    <td><span class="badge bg-{% if a.status == 'completed' %}success{% elif a.status == 'cancelled' %}danger{% elif a.status == 'in_progress' %}info{% else %}warning text-dark{% endif %} rounded-pill">{{ a.get_status_display }}</span></td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                        {% else %}
+                        <div class="text-center text-muted py-4"><i class="bi bi-inbox me-2"></i>No appointments</div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Consultations -->
+                    <div class="tab-pane fade" id="tab-consultations">
+                        {% if consultations %}
+                        <table class="table table-sm datatable mb-0" style="font-size: .85rem;">
+                            <thead><tr><th>Date</th><th>Doctor</th><th>Chief Complaint</th><th>Diagnosis</th></tr></thead>
+                            <tbody>
+                                {% for c in consultations %}
+                                <tr>
+                                    <td>{{ c.created_at|date:"M d, Y" }}</td>
+                                    <td>Dr. {{ c.doctor.last_name }}</td>
+                                    <td>{{ c.chief_complaint|truncatechars:40 }}</td>
+                                    <td>{{ c.diagnosis|truncatechars:40|default:'-' }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                        {% else %}
+                        <div class="text-center text-muted py-4"><i class="bi bi-inbox me-2"></i>No consultations</div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Prescriptions -->
+                    <div class="tab-pane fade" id="tab-prescriptions">
+                        {% if prescriptions %}
+                        <table class="table table-sm datatable mb-0" style="font-size: .85rem;">
+                            <thead><tr><th>Date</th><th>Doctor</th><th>Status</th></tr></thead>
+                            <tbody>
+                                {% for p in prescriptions %}
+                                <tr>
+                                    <td>{{ p.created_at|date:"M d, Y" }}</td>
+                                    <td>Dr. {{ p.doctor.last_name }}</td>
+                                    <td><span class="badge bg-{% if p.status == 'dispensed' %}success{% elif p.status == 'pending' %}warning text-dark{% else %}secondary{% endif %} rounded-pill">{{ p.get_status_display }}</span></td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                        {% else %}
+                        <div class="text-center text-muted py-4"><i class="bi bi-inbox me-2"></i>No prescriptions</div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Lab Results -->
+                    <div class="tab-pane fade" id="tab-lab">
+                        {% if lab_requests %}
+                        <table class="table table-sm datatable mb-0" style="font-size: .85rem;">
+                            <thead><tr><th>Date</th><th>Tests</th><th>Priority</th><th>Status</th></tr></thead>
+                            <tbody>
+                                {% for lr in lab_requests %}
+                                <tr>
+                                    <td>{{ lr.created_at|date:"M d, Y" }}</td>
+                                    <td>{{ lr.tests.count }} test(s)</td>
+                                    <td><span class="badge bg-{% if lr.priority == 'urgent' %}danger{% else %}secondary{% endif %} rounded-pill">{{ lr.get_priority_display }}</span></td>
+                                    <td><span class="badge bg-{% if lr.status == 'completed' or lr.status == 'approved' %}success{% elif lr.status == 'processing' %}info{% else %}warning text-dark{% endif %} rounded-pill">{{ lr.get_status_display }}</span></td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                        {% else %}
+                        <div class="text-center text-muted py-4"><i class="bi bi-inbox me-2"></i>No lab requests</div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Billing -->
+                    <div class="tab-pane fade" id="tab-billing">
+                        {% if invoices %}
+                        <table class="table table-sm datatable mb-0" style="font-size: .85rem;">
+                            <thead><tr><th>Invoice #</th><th>Date</th><th>Total</th><th>Paid</th><th>Balance</th><th>Status</th></tr></thead>
+                            <tbody>
+                                {% for inv in invoices %}
+                                <tr>
+                                    <td class="fw-medium">{{ inv.invoice_number }}</td>
+                                    <td>{{ inv.created_at|date:"M d, Y" }}</td>
+                                    <td>KES {{ inv.total|floatformat:0 }}</td>
+                                    <td>KES {{ inv.amount_paid|floatformat:0 }}</td>
+                                    <td>KES {{ inv.balance|floatformat:0 }}</td>
+                                    <td><span class="badge bg-{% if inv.status == 'paid' %}success{% elif inv.status == 'overdue' %}danger{% elif inv.status == 'pending' %}warning text-dark{% else %}secondary{% endif %} rounded-pill">{{ inv.get_status_display }}</span></td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                        {% else %}
+                        <div class="text-center text-muted py-4"><i class="bi bi-inbox me-2"></i>No invoices</div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Admissions -->
+                    <div class="tab-pane fade" id="tab-admissions">
+                        {% if admissions %}
+                        <table class="table table-sm datatable mb-0" style="font-size: .85rem;">
+                            <thead><tr><th>Admitted</th><th>Ward</th><th>Doctor</th><th>Status</th><th>Discharged</th></tr></thead>
+                            <tbody>
+                                {% for a in admissions %}
+                                <tr>
+                                    <td>{{ a.admission_date|date:"M d, Y" }}</td>
+                                    <td>{{ a.ward.name|default:'-' }}</td>
+                                    <td>Dr. {{ a.doctor.last_name|default:'-' }}</td>
+                                    <td><span class="badge bg-{% if a.status == 'admitted' %}warning text-dark{% elif a.status == 'discharged' %}success{% else %}info{% endif %} rounded-pill">{{ a.get_status_display }}</span></td>
+                                    <td>{{ a.discharge_date|date:"M d, Y"|default:'-' }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                        {% else %}
+                        <div class="text-center text-muted py-4"><i class="bi bi-inbox me-2"></i>No admissions</div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {% if patient.allergies %}
+        <div class="card shadow-sm border-0 mt-3">
+            <div class="card-body py-2">
+                <span class="fw-semibold small"><i class="bi bi-exclamation-triangle text-warning me-1"></i>Allergies:</span>
+                <span class="small">{{ patient.allergies }}</span>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

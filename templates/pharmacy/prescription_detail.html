@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+{% block title %}Prescription #{{ p.pk }} - HMS{% endblock %}
+{% block page_title %}Prescription Details{% endblock %}
+
+{% block content %}
+<div class="row g-3">
+    <div class="col-md-5">
+        <div class="card shadow-sm border-0">
+            <div class="card-body">
+                <div class="d-flex align-items-center gap-3 mb-3">
+                    <div class="avatar" style="width: 56px; height: 56px; background: #0d1b2a; color: #fff;">
+                        {{ p.patient.first_name|first|upper }}{{ p.patient.last_name|first|upper }}
+                    </div>
+                    <div>
+                        <h6 class="fw-semibold mb-0">{{ p.patient.full_name }}</h6>
+                        <a href="{% url 'patients:detail' p.patient.pk %}" class="text-muted small">{{ p.patient.patient_id }}</a>
+                    </div>
+                </div>
+                <hr>
+                <dl class="row small mb-0">
+                    <dt class="col-sm-4 text-muted">Doctor</dt>
+                    <dd class="col-sm-8 fw-medium">Dr. {{ p.doctor.get_full_name }}</dd>
+                    <dt class="col-sm-4 text-muted">Date</dt>
+                    <dd class="col-sm-8">{{ p.created_at|date:"M d, Y H:i" }}</dd>
+                    <dt class="col-sm-4 text-muted">Status</dt>
+                    <dd class="col-sm-8">
+                        <span class="badge bg-{% if p.status == 'dispensed' %}success{% elif p.status == 'partial' %}info{% elif p.status == 'cancelled' %}danger{% else %}warning text-dark{% endif %} rounded-pill">{{ p.get_status_display }}</span>
+                    </dd>
+                </dl>
+                <hr>
+                {% if p.status == 'pending' %}
+                <a href="{% url 'pharmacy:prescription_dispense' p.pk %}" class="btn btn-success btn-sm w-100"><i class="bi bi-capsule me-1"></i>Dispense</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-7">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-white">
+                <h6 class="fw-semibold mb-0"><i class="bi bi-list-check me-2"></i>Prescription Items</h6>
+            </div>
+            <div class="card-body p-0">
+                <table class="table mb-0" style="font-size: .875rem;">
+                    <thead class="table-light">
+                        <tr><th>Medicine</th><th>Dosage</th><th>Qty</th><th>Days</th><th>Dispensed</th></tr>
+                    </thead>
+                    <tbody>
+                        {% for item in p.items.all %}
+                        <tr>
+                            <td class="fw-medium">{{ item.medicine.name }}</td>
+                            <td>{{ item.dosage }}</td>
+                            <td>{{ item.quantity }}</td>
+                            <td>{{ item.days_supply }}</td>
+                            <td>{% if item.is_dispensed %}<i class="bi bi-check-circle-fill text-success"></i> Yes{% else %}<i class="bi bi-x-circle-fill text-muted"></i> No{% endif %}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        {% if p.notes %}
+        <div class="card shadow-sm border-0 mt-3">
+            <div class="card-body">
+                <h6 class="fw-semibold small mb-2">Notes</h6>
+                <p class="small mb-0">{{ p.notes }}</p>
+            </div>
+        </div>
+        {% endif %}
+
+        {% if p.dispensations.all %}
+        <div class="card shadow-sm border-0 mt-3">
+            <div class="card-header bg-white">
+                <h6 class="fw-semibold mb-0"><i class="bi bi-clock-history me-2"></i>Dispensation History</h6>
+            </div>
+            <div class="card-body p-0">
+                <ul class="list-group list-group-flush">
+                    {% for d in p.dispensations.all %}
+                    <li class="list-group-item px-3 py-2 small">
+                        <span class="fw-medium">{{ d.dispensed_by.get_full_name|default:'System' }}</span> —
+                        {{ d.dispensed_at|date:"M d, Y H:i" }}
+                        {% if d.notes %}<br><span class="text-muted">{{ d.notes }}</span>{% endif %}
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

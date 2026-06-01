@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% block title %}Insurance Policies - HMS{% endblock %}
+{% block page_title %}Insurance Policies{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <p class="text-muted small mb-0">{{ policies.count }} policies</p>
+    <a href="{% url 'insurance:policy_create' %}" class="btn btn-dark btn-sm"><i class="bi bi-plus-lg me-1"></i>New Policy</a>
+</div>
+<div class="card shadow-sm border-0">
+    <div class="card-body p-0">
+        <table class="table table-hover datatable mb-0" style="font-size: .875rem;">
+            <thead class="table-light">
+                <tr><th>Policy #</th><th>Patient</th><th>Company</th><th>Coverage</th><th>Start Date</th><th>End Date</th><th>Status</th></tr>
+            </thead>
+            <tbody>
+                {% for p in policies %}
+                <tr>
+                    <td class="fw-medium">{{ p.policy_number }}</td>
+                    <td>{{ p.patient.first_name }} {{ p.patient.last_name }}<br><small class="text-muted">{{ p.patient.patient_id }}</small></td>
+                    <td>{{ p.insurance_company.name }}</td>
+                    <td>{{ p.coverage_percentage }}%</td>
+                    <td>{{ p.start_date|date:"M d, Y" }}</td>
+                    <td>{{ p.end_date|date:"M d, Y"|default:'-' }}</td>
+                    <td>{% if p.is_active %}<span class="badge bg-success rounded-pill">Active</span>{% else %}<span class="badge bg-secondary rounded-pill">Inactive</span>{% endif %}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

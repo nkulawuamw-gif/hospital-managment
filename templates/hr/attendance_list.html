@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+{% block title %}Attendance - HMS{% endblock %}
+{% block page_title %}Attendance Records{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+    <form method="get" class="d-flex gap-2 align-items-center">
+        <input type="date" name="date" class="form-control form-control-sm" style="width: auto;" value="{{ current_date }}" onchange="this.form.submit()">
+    </form>
+    <p class="text-muted small mb-0">{{ attendances.count }} records</p>
+</div>
+<div class="card shadow-sm border-0">
+    <div class="card-body p-0">
+        <table class="table table-hover datatable mb-0" style="font-size: .875rem;">
+            <thead class="table-light">
+                <tr><th>Date</th><th>Employee</th><th>Role</th><th>Clock In</th><th>Clock Out</th><th>Status</th><th>Notes</th></tr>
+            </thead>
+            <tbody>
+                {% for a in attendances %}
+                <tr>
+                    <td>{{ a.date|date:"M d, Y" }}</td>
+                    <td class="fw-medium">{{ a.employee.employee_id }} - {{ a.employee.user.get_full_name|default:a.employee.user.email }}</td>
+                    <td><span class="badge bg-secondary rounded-pill">{{ a.employee.user.get_role_display }}</span></td>
+                    <td>{{ a.clock_in|time:"H:i"|default:'-' }}</td>
+                    <td>{{ a.clock_out|time:"H:i"|default:'-' }}</td>
+                    <td>{% if a.is_present %}<span class="badge bg-success rounded-pill">Present</span>{% else %}<span class="badge bg-danger rounded-pill">Absent</span>{% endif %}</td>
+                    <td>{{ a.notes|default:'-' }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

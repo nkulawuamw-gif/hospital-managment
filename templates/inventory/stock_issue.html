@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% block title %}Issue Stock - HMS{% endblock %}
+{% block page_title %}Issue Stock{% endblock %}
+
+{% block content %}
+<div class="card shadow-sm border-0" style="max-width: 700px;">
+    <div class="card-body p-4">
+        <form method="post">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label class="form-label small fw-medium">Issued To *</label>
+                <input type="text" name="issued_to" class="form-control" placeholder="Department or person" required>
+            </div>
+            <h6 class="fw-semibold mb-3">Items to Issue</h6>
+            <table class="table table-bordered" style="font-size: .85rem;" id="itemsTable">
+                <thead class="table-light">
+                    <tr><th>Supply</th><th>Available</th><th>Quantity</th><th></th></tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><select name="supply[]" class="form-select form-select-sm">
+                            {% for s in supplies %}<option value="{{ s.pk }}">{{ s.name }} ({{ s.current_stock }})</option>{% endfor %}
+                        </select></td>
+                        <td id="stock"></td>
+                        <td><input type="number" name="quantity[]" class="form-control form-control-sm" value="1" min="1"></td>
+                        <td><button type="button" class="btn btn-sm btn-outline-danger btn-icon remove-row"><i class="bi bi-trash"></i></button></td>
+                    </tr>
+                </tbody>
+            </table>
+            <button type="button" class="btn btn-sm btn-outline-secondary mb-3" id="addRow"><i class="bi bi-plus-lg me-1"></i>Add Item</button>
+            <div class="mb-4">
+                <label class="form-label small fw-medium">Notes</label>
+                <textarea name="notes" class="form-control" rows="2"></textarea>
+            </div>
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-warning"><i class="bi bi-arrow-up-circle me-1"></i>Issue Stock</button>
+                <a href="{% url 'inventory:supply_list' %}" class="btn btn-outline-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+{% block extra_js %}
+<script>
+$('#addRow').click(function(){const t=$('#itemsTable tbody tr:first').clone();t.find('input').val('1');$('#itemsTable tbody').append(t)});
+$(document).on('click','.remove-row',function(){if($('#itemsTable tbody tr').length>1)$(this).closest('tr').remove()});
+</script>
+{% endblock %}

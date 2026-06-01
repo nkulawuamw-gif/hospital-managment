@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% block title %}Purchase Orders - HMS{% endblock %}
+{% block page_title %}Purchase Orders{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div class="d-flex gap-2">
+        <a href="{% url 'inventory:po_list' %}" class="btn btn-sm btn-outline-secondary {% if not current_status %}active{% endif %}">All</a>
+        <a href="?status=pending" class="btn btn-sm btn-outline-warning {% if current_status == 'pending' %}active{% endif %}">Pending</a>
+        <a href="?status=approved" class="btn btn-sm btn-outline-info {% if current_status == 'approved' %}active{% endif %}">Approved</a>
+        <a href="?status=received" class="btn btn-sm btn-outline-success {% if current_status == 'received' %}active{% endif %}">Received</a>
+        <a href="?status=cancelled" class="btn btn-sm btn-outline-danger {% if current_status == 'cancelled' %}active{% endif %}">Cancelled</a>
+    </div>
+    <a href="{% url 'inventory:po_create' %}" class="btn btn-dark btn-sm"><i class="bi bi-plus-lg me-1"></i>New PO</a>
+</div>
+<div class="card shadow-sm border-0">
+    <div class="card-body p-0">
+        <table class="table table-hover datatable mb-0" style="font-size: .875rem;">
+            <thead class="table-light">
+                <tr><th>Order #</th><th>Supplier</th><th>Date</th><th>Items</th><th>Total</th><th>Status</th><th class="text-end">Actions</th></tr>
+            </thead>
+            <tbody>
+                {% for po in pos %}
+                <tr>
+                    <td class="fw-medium">{{ po.order_number }}</td>
+                    <td>{{ po.supplier.name }}</td>
+                    <td>{{ po.created_at|date:"M d, Y" }}</td>
+                    <td>{{ po.items.count }}</td>
+                    <td>KES {{ po.total_amount|floatformat:0 }}</td>
+                    <td><span class="badge bg-{% if po.status == 'received' %}success{% elif po.status == 'approved' %}info{% elif po.status == 'cancelled' %}danger{% else %}warning text-dark{% endif %} rounded-pill">{{ po.get_status_display }}</span></td>
+                    <td class="text-end">
+                        <a href="{% url 'inventory:po_detail' po.pk %}" class="btn btn-sm btn-outline-secondary btn-icon"><i class="bi bi-eye"></i></a>
+                        {% if po.status == 'approved' %}
+                        <a href="{% url 'inventory:receive_stock' po.pk %}" class="btn btn-sm btn-outline-success btn-icon"><i class="bi bi-box-arrow-in-down"></i></a>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

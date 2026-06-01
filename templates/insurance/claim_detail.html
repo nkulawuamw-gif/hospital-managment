@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+{% block title %}Claim {{ claim.claim_number }} - HMS{% endblock %}
+{% block page_title %}Claim {{ claim.claim_number }}{% endblock %}
+
+{% block content %}
+<div class="row g-3">
+    <div class="col-md-5">
+        <div class="card shadow-sm border-0">
+            <div class="card-body small">
+                <dl class="row mb-0">
+                    <dt class="col-sm-5 text-muted">Patient</dt>
+                    <dd class="col-sm-7 fw-medium">{{ claim.patient.first_name }} {{ claim.patient.last_name }}<br><small class="text-muted">{{ claim.patient.patient_id }}</small></dd>
+                    <dt class="col-sm-5 text-muted">Company</dt>
+                    <dd class="col-sm-7">{{ claim.insurance_policy.insurance_company.name }}</dd>
+                    <dt class="col-sm-5 text-muted">Policy #</dt>
+                    <dd class="col-sm-7">{{ claim.insurance_policy.policy_number }}</dd>
+                    <dt class="col-sm-5 text-muted">Coverage</dt>
+                    <dd class="col-sm-7">{{ claim.insurance_policy.coverage_percentage }}%</dd>
+                    <dt class="col-sm-5 text-muted">Status</dt>
+                    <dd class="col-sm-7"><span class="badge bg-{% if claim.status == 'paid' %}primary{% elif claim.status == 'approved' %}success{% elif claim.status == 'rejected' %}danger{% elif claim.status == 'submitted' %}info{% else %}secondary{% endif %} rounded-pill">{{ claim.get_status_display }}</span></dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-7">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-white"><h6 class="fw-semibold mb-0">Financial Summary</h6></div>
+            <div class="card-body small">
+                <div class="row g-3">
+                    <div class="col-6">
+                        <div class="p-3 bg-light rounded-3 text-center">
+                            <div class="text-muted small">Amount Claimed</div>
+                            <div class="fw-bold fs-5">KES {{ claim.amount_claimed|floatformat:0 }}</div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="p-3 bg-light rounded-3 text-center">
+                            <div class="text-muted small">Amount Approved</div>
+                            <div class="fw-bold fs-5">{% if claim.amount_approved %}KES {{ claim.amount_approved|floatformat:0 }}{% else %}<span class="text-muted">-</span>{% endif %}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% if claim.notes %}
+        <div class="card shadow-sm border-0 mt-3">
+            <div class="card-header bg-white"><h6 class="fw-semibold mb-0">Notes</h6></div>
+            <div class="card-body small">{{ claim.notes|linebreaks }}</div>
+        </div>
+        {% endif %}
+        <div class="card shadow-sm border-0 mt-3">
+            <div class="card-header bg-white"><h6 class="fw-semibold mb-0">Timeline</h6></div>
+            <div class="card-body small p-0">
+                <ul class="list-group list-group-flush" style="font-size: .85rem;">
+                    <li class="list-group-item d-flex justify-content-between">
+                        <span>Created</span>
+                        <span class="text-muted">{{ claim.created_at|date:"M d, Y H:i" }}</span>
+                    </li>
+                    {% if claim.submitted_at %}
+                    <li class="list-group-item d-flex justify-content-between">
+                        <span>Submitted by {{ claim.submitted_by.get_full_name|default:claim.submitted_by.email }}</span>
+                        <span class="text-muted">{{ claim.submitted_at|date:"M d, Y H:i" }}</span>
+                    </li>
+                    {% endif %}
+                    {% if claim.approved_at %}
+                    <li class="list-group-item d-flex justify-content-between">
+                        <span>{% if claim.status == 'approved' %}Approved{% elif claim.status == 'rejected' %}Rejected{% endif %} by {{ claim.approved_by.get_full_name|default:claim.approved_by.email }}</span>
+                        <span class="text-muted">{{ claim.approved_at|date:"M d, Y H:i" }}</span>
+                    </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

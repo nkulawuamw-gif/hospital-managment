@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+{% block title %}Insurance Companies - HMS{% endblock %}
+{% block page_title %}Insurance Companies{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <p class="text-muted small mb-0">{{ companies.count }} companies</p>
+    <a href="{% url 'insurance:company_create' %}" class="btn btn-dark btn-sm"><i class="bi bi-plus-lg me-1"></i>Add Company</a>
+</div>
+<div class="card shadow-sm border-0">
+    <div class="card-body p-0">
+        <table class="table table-hover datatable mb-0" style="font-size: .875rem;">
+            <thead class="table-light">
+                <tr><th>Name</th><th>Code</th><th>Contact</th><th>Phone</th><th>Coverage</th><th>Status</th><th class="text-end">Actions</th></tr>
+            </thead>
+            <tbody>
+                {% for c in companies %}
+                <tr>
+                    <td class="fw-medium">{{ c.name }}</td>
+                    <td><code>{{ c.code }}</code></td>
+                    <td>{{ c.contact_person|default:'-' }}</td>
+                    <td>{{ c.phone|default:'-' }}</td>
+                    <td>{{ c.coverage_percentage }}%</td>
+                    <td>{% if c.is_active %}<span class="badge bg-success rounded-pill">Active</span>{% else %}<span class="badge bg-danger rounded-pill">Inactive</span>{% endif %}</td>
+                    <td class="text-end">
+                        <a href="{% url 'insurance:company_edit' c.pk %}" class="btn btn-sm btn-outline-secondary btn-icon"><i class="bi bi-pencil"></i></a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

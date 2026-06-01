@@ -1,0 +1,159 @@
+{% extends 'base.html' %}
+{% block title %}Consultation #{{ c.pk }} - EMR - HMS{% endblock %}
+{% block page_title %}Consultation Details{% endblock %}
+
+{% block content %}
+<div class="row g-3">
+    <div class="col-md-5">
+        <div class="card shadow-sm border-0">
+            <div class="card-body">
+                <div class="d-flex align-items-center gap-3 mb-3">
+                    <div class="avatar" style="width: 56px; height: 56px; font-size: 1.3rem; background: #0d1b2a; color: #fff;">
+                        {{ c.patient.first_name|first|upper }}{{ c.patient.last_name|first|upper }}
+                    </div>
+                    <div>
+                        <h6 class="fw-semibold mb-0">{{ c.patient.full_name }}</h6>
+                        <a href="{% url 'patients:detail' c.patient.pk %}" class="text-muted small">{{ c.patient.patient_id }}</a>
+                    </div>
+                </div>
+                <hr>
+                <dl class="row small mb-0">
+                    <dt class="col-sm-4 text-muted">Doctor</dt>
+                    <dd class="col-sm-8 fw-medium">Dr. {{ c.doctor.get_full_name }}</dd>
+                    <dt class="col-sm-4 text-muted">Date</dt>
+                    <dd class="col-sm-8">{{ c.created_at|date:"M d, Y H:i" }}</dd>
+                    {% if c.appointment %}
+                    <dt class="col-sm-4 text-muted">Appointment</dt>
+                    <dd class="col-sm-8">{{ c.appointment.appointment_date|date:"M d, Y" }}</dd>
+                    {% endif %}
+                    {% if c.follow_up_date %}
+                    <dt class="col-sm-4 text-muted">Follow-up</dt>
+                    <dd class="col-sm-8">{{ c.follow_up_date|date:"M d, Y" }}</dd>
+                    {% endif %}
+                </dl>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-7">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-white">
+                <h6 class="fw-semibold mb-0"><i class="bi bi-chat-dots me-2"></i>Chief Complaint</h6>
+            </div>
+            <div class="card-body">
+                <p class="mb-0">{{ c.chief_complaint }}</p>
+            </div>
+        </div>
+
+        {% if c.symptoms %}
+        <div class="card shadow-sm border-0 mt-3">
+            <div class="card-header bg-white">
+                <h6 class="fw-semibold mb-0"><i class="bi bi-activity me-2"></i>Symptoms</h6>
+            </div>
+            <div class="card-body">
+                <p class="mb-0">{{ c.symptoms }}</p>
+            </div>
+        </div>
+        {% endif %}
+
+        {% if c.diagnosis %}
+        <div class="card shadow-sm border-0 mt-3">
+            <div class="card-header bg-white">
+                <h6 class="fw-semibold mb-0"><i class="bi bi-stethoscope me-2"></i>Diagnosis</h6>
+            </div>
+            <div class="card-body">
+                <p class="mb-0">{{ c.diagnosis }}</p>
+            </div>
+        </div>
+        {% endif %}
+
+        {% if c.icd_codes.all %}
+        <div class="card shadow-sm border-0 mt-3">
+            <div class="card-header bg-white">
+                <h6 class="fw-semibold mb-0"><i class="bi bi-code me-2"></i>ICD Codes</h6>
+            </div>
+            <div class="card-body">
+                {% for code in c.icd_codes.all %}
+                <span class="badge bg-dark me-1 mb-1">{{ code.code }} - {{ code.description|truncatechars:40 }}</span>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        {% if c.treatment_plan %}
+        <div class="card shadow-sm border-0 mt-3">
+            <div class="card-header bg-white">
+                <h6 class="fw-semibold mb-0"><i class="bi bi-capsule me-2"></i>Treatment Plan</h6>
+            </div>
+            <div class="card-body">
+                <p class="mb-0">{{ c.treatment_plan }}</p>
+            </div>
+        </div>
+        {% endif %}
+
+        {% if c.soap_note %}
+        <div class="card shadow-sm border-0 mt-3">
+            <div class="card-header bg-white">
+                <h6 class="fw-semibold mb-0"><i class="bi bi-file-text me-2"></i>SOAP Notes</h6>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    {% if c.soap_note.subjective %}
+                    <div class="col-md-6">
+                        <div class="fw-medium small text-muted">Subjective</div>
+                        <p class="small mb-0">{{ c.soap_note.subjective }}</p>
+                    </div>
+                    {% endif %}
+                    {% if c.soap_note.objective %}
+                    <div class="col-md-6">
+                        <div class="fw-medium small text-muted">Objective</div>
+                        <p class="small mb-0">{{ c.soap_note.objective }}</p>
+                    </div>
+                    {% endif %}
+                    {% if c.soap_note.assessment %}
+                    <div class="col-md-6">
+                        <div class="fw-medium small text-muted">Assessment</div>
+                        <p class="small mb-0">{{ c.soap_note.assessment }}</p>
+                    </div>
+                    {% endif %}
+                    {% if c.soap_note.plan %}
+                    <div class="col-md-6">
+                        <div class="fw-medium small text-muted">Plan</div>
+                        <p class="small mb-0">{{ c.soap_note.plan }}</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        {% if c.notes %}
+        <div class="card shadow-sm border-0 mt-3">
+            <div class="card-header bg-white">
+                <h6 class="fw-semibold mb-0"><i class="bi bi-journal me-2"></i>Notes</h6>
+            </div>
+            <div class="card-body">
+                <p class="mb-0">{{ c.notes }}</p>
+            </div>
+        </div>
+        {% endif %}
+
+        {% if c.attachments.all %}
+        <div class="card shadow-sm border-0 mt-3">
+            <div class="card-header bg-white">
+                <h6 class="fw-semibold mb-0"><i class="bi bi-paperclip me-2"></i>Attachments</h6>
+            </div>
+            <div class="card-body">
+                <div class="list-group list-group-flush">
+                    {% for a in c.attachments.all %}
+                    <a href="{{ a.file.url }}" class="list-group-item list-group-item-action px-0" target="_blank">
+                        <i class="bi bi-file-earmark me-2"></i>{{ a.description|default:a.file.name }}
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

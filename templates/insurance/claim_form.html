@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% block title %}New Insurance Claim - HMS{% endblock %}
+{% block page_title %}Submit Insurance Claim{% endblock %}
+
+{% block content %}
+<div class="card shadow-sm border-0" style="max-width: 600px;">
+    <div class="card-body p-4">
+        <form method="post">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label class="form-label small fw-medium">Patient *</label>
+                <select name="patient" class="form-select select2" required>
+                    <option value="">-- Select Patient --</option>
+                    {% for p in patients %}
+                    <option value="{{ p.pk }}">{{ p.first_name }} {{ p.last_name }} ({{ p.patient_id }})</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="mb-3">
+                <label class="form-label small fw-medium">Insurance Policy *</label>
+                <select name="insurance_policy" class="form-select" required>
+                    <option value="">-- Select Policy --</option>
+                    {% for pol in policies %}
+                    <option value="{{ pol.pk }}">{{ pol.insurance_company.name }} - {{ pol.patient.first_name }} {{ pol.patient.last_name }} ({{ pol.policy_number }})</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="mb-3">
+                <label class="form-label small fw-medium">Invoice (optional)</label>
+                <input type="text" name="invoice" class="form-control" placeholder="Invoice ID">
+            </div>
+            <div class="mb-3">
+                <label class="form-label small fw-medium">Amount Claimed (KES) *</label>
+                <input type="number" name="amount_claimed" class="form-control" step="0.01" required>
+            </div>
+            <div class="mb-4">
+                <label class="form-label small fw-medium">Notes</label>
+                <textarea name="notes" class="form-control" rows="3"></textarea>
+            </div>
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-dark"><i class="bi bi-check-lg me-1"></i>Submit Claim</button>
+                <a href="{% url 'insurance:claim_list' %}" class="btn btn-outline-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

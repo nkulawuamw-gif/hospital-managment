@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Calendar - Appointments - HMS{% endblock %}
+{% block page_title %}Appointment Calendar{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <p class="text-muted small mb-0">Showing upcoming appointments ({{ appointments.count }} total)</p>
+    <a href="{% url 'appointments:create' %}" class="btn btn-dark btn-sm"><i class="bi bi-plus-lg me-1"></i>Book</a>
+</div>
+
+<div class="row g-3">
+    {% regroup appointments by appointment_date as date_groups %}
+    {% for group in date_groups %}
+    <div class="col-md-6 col-lg-4">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-white py-2">
+                <h6 class="fw-semibold mb-0 small">{{ group.grouper|date:"l, M d, Y" }}</h6>
+            </div>
+            <div class="card-body p-0">
+                <ul class="list-group list-group-flush">
+                    {% for apt in group.list %}
+                    <li class="list-group-item px-3 py-2">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <div class="fw-medium small">{{ apt.patient.full_name }}</div>
+                                <div class="text-muted" style="font-size: .75rem;">
+                                    <i class="bi bi-clock me-1"></i>{{ apt.appointment_time|time:"H:i" }}
+                                    <i class="bi bi-person-badge ms-2 me-1"></i>Dr. {{ apt.doctor.last_name }}
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="badge bg-{% if apt.status == 'in_progress' %}primary{% elif apt.status == 'confirmed' %}info{% else %}warning text-dark{% endif %} rounded-pill" style="font-size: .65rem;">
+                                    {{ apt.get_status_display }}
+                                </span>
+                                <a href="{% url 'appointments:detail' apt.pk %}" class="btn btn-sm btn-outline-secondary btn-icon" style="width: 28px; height: 28px;">
+                                    <i class="bi bi-chevron-right"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </li>
+                    {% empty %}
+                    <li class="list-group-item text-center text-muted py-3 small">No appointments</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="col-12">
+        <div class="card shadow-sm border-0">
+            <div class="card-body text-center py-5">
+                <i class="bi bi-calendar-x" style="font-size: 3rem; color: #dee2e6;"></i>
+                <p class="text-muted mt-3">No upcoming appointments</p>
+                <a href="{% url 'appointments:create' %}" class="btn btn-dark btn-sm">Book Appointment</a>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

@@ -1,0 +1,103 @@
+{% extends 'base.html' %}
+{% block title %}Appointment #{{ apt.pk }} - HMS{% endblock %}
+{% block page_title %}Appointment Details{% endblock %}
+
+{% block content %}
+<div class="row g-3">
+    <div class="col-md-5">
+        <div class="card shadow-sm border-0">
+            <div class="card-body">
+                <div class="d-flex align-items-center gap-3 mb-3">
+                    <div class="avatar" style="width: 56px; height: 56px; font-size: 1.3rem; background: #0d1b2a; color: #fff;">
+                        {{ apt.patient.first_name|first|upper }}{{ apt.patient.last_name|first|upper }}
+                    </div>
+                    <div>
+                        <h6 class="fw-semibold mb-0">{{ apt.patient.full_name }}</h6>
+                        <span class="text-muted small">{{ apt.patient.patient_id }}</span>
+                    </div>
+                </div>
+                <hr>
+                <dl class="row small mb-0">
+                    <dt class="col-sm-5 text-muted">Date</dt>
+                    <dd class="col-sm-7 fw-medium">{{ apt.appointment_date|date:"l, M d, Y" }}</dd>
+                    <dt class="col-sm-5 text-muted">Time</dt>
+                    <dd class="col-sm-7 fw-medium">{{ apt.appointment_time|time:"H:i" }}</dd>
+                    <dt class="col-sm-5 text-muted">Doctor</dt>
+                    <dd class="col-sm-7 fw-medium">Dr. {{ apt.doctor.get_full_name }}</dd>
+                    <dt class="col-sm-5 text-muted">Status</dt>
+                    <dd class="col-sm-7">
+                        <span class="badge bg-{% if apt.status == 'completed' %}success{% elif apt.status == 'cancelled' %}danger{% elif apt.status == 'in_progress' %}primary{% elif apt.status == 'confirmed' %}info{% else %}warning text-dark{% endif %} rounded-pill">
+                            {{ apt.get_status_display }}
+                        </span>
+                    </dd>
+                    <dt class="col-sm-5 text-muted">Reason</dt>
+                    <dd class="col-sm-7">{{ apt.reason|default:'-' }}</dd>
+                    {% if apt.checked_in_at %}
+                    <dt class="col-sm-5 text-muted">Checked In</dt>
+                    <dd class="col-sm-7">{{ apt.checked_in_at|date:"M d, Y H:i" }}</dd>
+                    {% endif %}
+                    {% if apt.checked_out_at %}
+                    <dt class="col-sm-5 text-muted">Checked Out</dt>
+                    <dd class="col-sm-7">{{ apt.checked_out_at|date:"M d, Y H:i" }}</dd>
+                    {% endif %}
+                </dl>
+            </div>
+            <div class="card-footer bg-white border-top-0 d-flex gap-2 flex-wrap">
+                <a href="{% url 'patients:detail' apt.patient.pk %}" class="btn btn-outline-dark btn-sm"><i class="bi bi-person me-1"></i>Patient Profile</a>
+                {% if apt.status == 'scheduled' or apt.status == 'confirmed' %}
+                <a href="{% url 'appointments:checkin' apt.pk %}" class="btn btn-success btn-sm"><i class="bi bi-box-arrow-in-right me-1"></i>Check In</a>
+                {% elif apt.status == 'in_progress' %}
+                <a href="{% url 'appointments:checkout' apt.pk %}" class="btn btn-primary btn-sm"><i class="bi bi-box-arrow-right me-1"></i>Check Out</a>
+                {% endif %}
+                {% if apt.status != 'completed' and apt.status != 'cancelled' %}
+                <a href="{% url 'appointments:cancel' apt.pk %}" class="btn btn-outline-danger btn-sm" onclick="return confirm('Cancel this appointment?')"><i class="bi bi-x-lg me-1"></i>Cancel</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="col-md-7">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-white">
+                <h6 class="fw-semibold mb-0"><i class="bi bi-clock-history me-2"></i>Appointment Timeline</h6>
+            </div>
+            <div class="card-body">
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item px-0 d-flex align-items-center gap-3">
+                        <div class="bg-warning rounded-circle" style="width: 12px; height: 12px;"></div>
+                        <div>
+                            <div class="fw-semibold small">Scheduled</div>
+                            <div class="text-muted" style="font-size: .8rem;">{{ apt.appointment_date|date:"M d, Y" }} at {{ apt.appointment_time|time:"H:i" }}</div>
+                        </div>
+                    </li>
+                    {% if apt.checked_in_at %}
+                    <li class="list-group-item px-0 d-flex align-items-center gap-3">
+                        <div class="bg-primary rounded-circle" style="width: 12px; height: 12px;"></div>
+                        <div>
+                            <div class="fw-semibold small">Checked In</div>
+                            <div class="text-muted" style="font-size: .8rem;">{{ apt.checked_in_at|date:"M d, Y H:i" }}</div>
+                        </div>
+                    </li>
+                    {% endif %}
+                    {% if apt.checked_out_at %}
+                    <li class="list-group-item px-0 d-flex align-items-center gap-3">
+                        <div class="bg-success rounded-circle" style="width: 12px; height: 12px;"></div>
+                        <div>
+                            <div class="fw-semibold small">Checked Out</div>
+                            <div class="text-muted" style="font-size: .8rem;">{{ apt.checked_out_at|date:"M d, Y H:i" }}</div>
+                        </div>
+                    </li>
+                    {% endif %}
+                    {% if apt.status == 'cancelled' %}
+                    <li class="list-group-item px-0 d-flex align-items-center gap-3">
+                        <div class="bg-danger rounded-circle" style="width: 12px; height: 12px;"></div>
+                        <div>
+                            <div class="fw-semibold small">Cancelled</div>
+                        </div>
+                    </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

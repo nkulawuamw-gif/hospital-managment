@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% block title %}My Profile - HMS{% endblock %}
+{% block page_title %}My Profile{% endblock %}
+
+{% block content %}
+<div class="row g-3">
+    <div class="col-md-4">
+        <div class="card shadow-sm border-0 text-center">
+            <div class="card-body p-4">
+                <div class="avatar mx-auto mb-3" style="width: 80px; height: 80px; font-size: 2rem; background: #0d1b2a; color: #fff;">
+                    {{ user.first_name|first|upper }}{{ user.last_name|first|upper }}
+                </div>
+                <h5 class="fw-semibold">{{ user.get_full_name }}</h5>
+                <span class="badge bg-dark rounded-pill mb-2">{{ user.get_role_display }}</span>
+                <p class="text-muted small mb-0">{{ user.email }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-8">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-white border-bottom-0 pt-3">
+                <h6 class="fw-semibold mb-0">Account Details</h6>
+            </div>
+            <div class="card-body">
+                <dl class="row mb-0">
+                    <dt class="col-sm-4 small text-muted">Email</dt>
+                    <dd class="col-sm-8">{{ user.email }}</dd>
+                    <dt class="col-sm-4 small text-muted">Full Name</dt>
+                    <dd class="col-sm-8">{{ user.get_full_name }}</dd>
+                    <dt class="col-sm-4 small text-muted">Role</dt>
+                    <dd class="col-sm-8">{{ user.get_role_display }}</dd>
+                    <dt class="col-sm-4 small text-muted">Phone</dt>
+                    <dd class="col-sm-8">{{ user.phone|default:'-' }}</dd>
+                    <dt class="col-sm-4 small text-muted">Joined</dt>
+                    <dd class="col-sm-8">{{ user.date_joined|date:"F d, Y" }}</dd>
+                    <dt class="col-sm-4 small text-muted">Last Login</dt>
+                    <dd class="col-sm-8">{{ user.last_login|date:"F d, Y H:i"|default:'Never' }}</dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
