@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Hospital Management System (HMS)
 
 Enterprise-level hospital management system built with Django REST Framework.
@@ -97,3 +98,6 @@ hms/
 ├── nginx/
 └── scripts/
 ```
+=======
+# hospital-managment
+>>>>>>> a9eba34245ec2c435a14d536f7ffd56422a93c9c
