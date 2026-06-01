@@ -1,0 +1,358 @@
+{% extends "admin/base_site.html" %}
+{% load static %}
+
+{% block title %}Landing Page Settings{% endblock %}
+{% block content %}
+<style>
+  .ls-section { background: #fff; border: 1px solid #dee2e6; border-radius: 8px; margin-bottom: 1.5rem; overflow: hidden; }
+  .ls-section-header { background: #f8f9fa; padding: 12px 20px; border-bottom: 1px solid #dee2e6; font-weight: 600; font-size: 1rem; display: flex; align-items: center; gap: 8px; cursor: pointer; user-select: none; }
+  .ls-section-header:hover { background: #e9ecef; }
+  .ls-section-body { padding: 20px; }
+  .ls-field { margin-bottom: 1rem; }
+  .ls-field label { font-weight: 500; display: block; margin-bottom: 4px; font-size: 0.85rem; color: #333; }
+  .ls-field input, .ls-field textarea, .ls-field select { width: 100%; padding: 8px 12px; border: 1px solid #ced4da; border-radius: 4px; font-size: 0.9rem; }
+  .ls-field textarea { min-height: 60px; }
+  .ls-field .help-text { font-size: 0.78rem; color: #6c757d; margin-top: 2px; }
+  .ls-item-row { background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 6px; padding: 12px 16px; margin-bottom: 8px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+  .ls-item-row .ls-field { margin-bottom: 0; flex: 1; min-width: 120px; }
+  .ls-item-row .ls-field input { padding: 6px 10px; }
+  .ls-btn { padding: 6px 16px; border-radius: 4px; border: none; cursor: pointer; font-size: 0.85rem; font-weight: 500; }
+  .ls-btn-primary { background: #0d6efd; color: #fff; }
+  .ls-btn-primary:hover { background: #0b5ed7; }
+  .ls-btn-danger { background: #dc3545; color: #fff; }
+  .ls-btn-danger:hover { background: #bb2d3b; }
+  .ls-btn-sm { padding: 4px 10px; font-size: 0.8rem; }
+  .ls-badge { background: #0d6efd; color: #fff; border-radius: 20px; padding: 2px 10px; font-size: 0.75rem; }
+  .ls-section-header .ls-badge { margin-left: auto; }
+  .ls-sub { border-left: 3px solid #0d6efd; padding-left: 12px; margin: 8px 0; font-size: 0.85rem; color: #555; }
+  .ls-add-form { background: #fff3cd; border: 1px dashed #ffc107; border-radius: 6px; padding: 16px; margin-top: 12px; display: none; }
+  .ls-add-form.visible { display: block; }
+  .ls-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .ls-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+  .ls-grid-4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 12px; }
+  .inline-items { margin-top: 8px; }
+  .inline-item { font-size: 0.85rem; color: #555; padding: 2px 0; }
+  .service-cat-card { background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 6px; padding: 12px; }
+  .service-list-inline { display: flex; flex-wrap: wrap; gap: 4px 12px; margin-top: 6px; }
+  .service-list-inline span { background: #e9ecef; padding: 2px 10px; border-radius: 12px; font-size: 0.8rem; }
+  .readonly-text { background: #f8f9fa; padding: 8px 12px; border-radius: 4px; border: 1px solid #e9ecef; font-size: 0.9rem; }
+</style>
+
+<div class="container-fluid p-4">
+
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h3 m-0"><i class="bi bi-gear-fill me-2"></i>Landing Page Settings</h1>
+    <a href="/" target="_blank" class="btn btn-outline-primary btn-sm">View Landing Page</a>
+  </div>
+
+  <form method="post">
+  {% csrf_token %}
+
+  <!-- SITE SETTINGS -->
+  <div class="ls-section">
+    <div class="ls-section-header" onclick="toggleSection(this)">Site Branding &amp; Contact</div>
+    <div class="ls-section-body">
+      <div class="ls-grid-2">
+        <div class="ls-field"><label>Site Name</label><input name="site_name" value="{{ site.site_name }}"></div>
+        <div class="ls-field"><label>Tagline</label><input name="tagline" value="{{ site.tagline }}"></div>
+      </div>
+      <div class="ls-field"><label>Meta Description</label><textarea name="meta_description" rows="2">{{ site.meta_description }}</textarea></div>
+      <div class="ls-field"><label>Meta Keywords</label><input name="meta_keywords" value="{{ site.meta_keywords }}"></div>
+      <hr>
+      <div class="ls-grid-2">
+        <div class="ls-field"><label>Phone 1</label><input name="phone" value="{{ site.phone }}"></div>
+        <div class="ls-field"><label>Phone 2</label><input name="phone_2" value="{{ site.phone_2 }}"></div>
+        <div class="ls-field"><label>Email 1</label><input name="email" value="{{ site.email }}"></div>
+        <div class="ls-field"><label>Email 2</label><input name="email_2" value="{{ site.email_2 }}"></div>
+        <div class="ls-field"><label>Address</label><input name="address" value="{{ site.address }}"></div>
+        <div class="ls-field"><label>Address Detail</label><input name="address_detail" value="{{ site.address_detail }}"></div>
+        <div class="ls-field"><label>Working Hours</label><input name="working_hours" value="{{ site.working_hours }}"></div>
+        <div class="ls-field"><label>Sunday Hours</label><input name="sunday_hours" value="{{ site.sunday_hours }}"></div>
+        <div class="ls-field"><label>Emergency Phone</label><input name="emergency_phone" value="{{ site.emergency_phone }}"></div>
+      </div>
+      <hr>
+      <div class="ls-grid-4">
+        <div class="ls-field"><label>Facebook URL</label><input name="facebook_url" value="{{ site.facebook_url }}"></div>
+        <div class="ls-field"><label>Twitter URL</label><input name="twitter_url" value="{{ site.twitter_url }}"></div>
+        <div class="ls-field"><label>Instagram URL</label><input name="instagram_url" value="{{ site.instagram_url }}"></div>
+        <div class="ls-field"><label>YouTube URL</label><input name="youtube_url" value="{{ site.youtube_url }}"></div>
+      </div>
+      <hr>
+      <div class="ls-field"><label>Google Maps Embed URL</label><textarea name="map_embed_url" rows="2">{{ site.map_embed_url }}</textarea></div>
+      <div class="ls-field"><label>Footer About Text</label><textarea name="footer_about" rows="2">{{ site.footer_about }}</textarea></div>
+      <div class="ls-field"><label>Copyright Text</label><input name="copyright_text" value="{{ site.copyright_text }}"></div>
+    </div>
+  </div>
+
+  <!-- HERO SECTION -->
+  <div class="ls-section">
+    <div class="ls-section-header" onclick="toggleSection(this)">Hero Section</div>
+    <div class="ls-section-body">
+      <div class="ls-grid-2">
+        <div class="ls-field"><label>Headline</label><input name="headline" value="{{ hero.headline }}"></div>
+        <div class="ls-field"><label>Subheading</label><input name="subheading" value="{{ hero.subheading }}"></div>
+        <div class="ls-field"><label>Book Appointment Button</label><input name="book_appointment_btn_text" value="{{ hero.book_appointment_btn_text }}"></div>
+        <div class="ls-field"><label>Contact Us Button</label><input name="contact_us_btn_text" value="{{ hero.contact_us_btn_text }}"></div>
+        <div class="ls-field"><label>Staff Login Button</label><input name="staff_login_btn_text" value="{{ hero.staff_login_btn_text }}"></div>
+        <div class="ls-field" style="min-width:60px;"><label><input type="checkbox" name="is_active" {% if hero.is_active %}checked{% endif %}> Active</label></div>
+      </div>
+      <button type="submit" name="action" value="hero" class="ls-btn ls-btn-primary">Save Hero Section</button>
+    </div>
+  </div>
+
+  <!-- SECTION HEADINGS -->
+  <div class="ls-section">
+    <div class="ls-section-header" onclick="toggleSection(this)">Section Headings &amp; Subtitles</div>
+    <div class="ls-section-body">
+      <div class="ls-grid-2">
+        <div class="ls-field"><label>Why Choose Us Heading</label><input name="about_heading" value="{{ site.about_heading }}"></div>
+        <div class="ls-field"><label>Why Choose Us Subtitle</label><textarea name="about_subtitle" rows="2">{{ site.about_subtitle }}</textarea></div>
+        <div class="ls-field"><label>Services Heading</label><input name="services_heading" value="{{ site.services_heading }}"></div>
+        <div class="ls-field"><label>Services Subtitle</label><textarea name="services_subtitle" rows="2">{{ site.services_subtitle }}</textarea></div>
+        <div class="ls-field"><label>Health Education Heading</label><input name="health_heading" value="{{ site.health_heading }}"></div>
+        <div class="ls-field"><label>Health Education Subtitle</label><textarea name="health_subtitle" rows="2">{{ site.health_subtitle }}</textarea></div>
+        <div class="ls-field"><label>Health Search Placeholder</label><input name="health_search_placeholder" value="{{ site.health_search_placeholder }}"></div>
+        <div class="ls-field"><label>Departments Heading</label><input name="departments_heading" value="{{ site.departments_heading }}"></div>
+        <div class="ls-field"><label>Departments Subtitle</label><textarea name="departments_subtitle" rows="2">{{ site.departments_subtitle }}</textarea></div>
+        <div class="ls-field"><label>Doctors Heading</label><input name="doctors_heading" value="{{ site.doctors_heading }}"></div>
+        <div class="ls-field"><label>Doctors Subtitle</label><textarea name="doctors_subtitle" rows="2">{{ site.doctors_subtitle }}</textarea></div>
+        <div class="ls-field"><label>Testimonials Heading</label><input name="testimonials_heading" value="{{ site.testimonials_heading }}"></div>
+        <div class="ls-field"><label>Testimonials Subtitle</label><textarea name="testimonials_subtitle" rows="2">{{ site.testimonials_subtitle }}</textarea></div>
+        <div class="ls-field"><label>Contact Heading</label><input name="contact_heading" value="{{ site.contact_heading }}"></div>
+        <div class="ls-field"><label>Contact Subtitle</label><textarea name="contact_subtitle" rows="2">{{ site.contact_subtitle }}</textarea></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- APPOINTMENT SECTION -->
+  <div class="ls-section">
+    <div class="ls-section-header" onclick="toggleSection(this)">Appointment Booking Section</div>
+    <div class="ls-section-body">
+      <div class="ls-grid-2">
+        <div class="ls-field"><label>Heading</label><input name="appointment_heading" value="{{ site.appointment_heading }}"></div>
+        <div class="ls-field"><label>Subtitle</label><input name="appointment_subtitle" value="{{ site.appointment_subtitle }}"></div>
+        <div class="ls-field"><label>Bullet 1</label><input name="appointment_bullet_1" value="{{ site.appointment_bullet_1 }}"></div>
+        <div class="ls-field"><label>Bullet 2</label><input name="appointment_bullet_2" value="{{ site.appointment_bullet_2 }}"></div>
+        <div class="ls-field"><label>Bullet 3</label><input name="appointment_bullet_3" value="{{ site.appointment_bullet_3 }}"></div>
+        <div class="ls-field"><label>Bullet 4</label><input name="appointment_bullet_4" value="{{ site.appointment_bullet_4 }}"></div>
+        <div class="ls-field"><label>Form Title</label><input name="appointment_form_title" value="{{ site.appointment_form_title }}"></div>
+        <div class="ls-field"><label>Submit Button Text</label><input name="appointment_btn_text" value="{{ site.appointment_btn_text }}"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- GLOBAL SAVE -->
+  <div class="mb-4">
+    <button type="submit" name="action" value="site_settings" class="ls-btn ls-btn-primary" style="padding: 10px 32px; font-size: 1rem;">Save All Site Settings &amp; Section Text</button>
+  </div>
+  </form>
+
+  <!-- WHY CHOOSE ITEMS -->
+  <div class="ls-section">
+    <div class="ls-section-header" onclick="toggleSection(this)">Why Choose Us Items <span class="ls-badge">{{ why_choose_items|length }}</span></div>
+    <div class="ls-section-body">
+      {% for item in why_choose_items %}
+      <form method="post" class="ls-item-row">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="why_choose">
+        <input type="hidden" name="item_id" value="{{ item.id }}">
+        <div class="ls-field" style="min-width:80px;"><label>Icon</label><input name="icon" value="{{ item.icon }}"></div>
+        <div class="ls-field"><label>Title</label><input name="title" value="{{ item.title }}"></div>
+        <div class="ls-field" style="flex:2;"><label>Description</label><input name="description" value="{{ item.description }}"></div>
+        <div class="ls-field" style="min-width:60px;"><label>Order</label><input name="order" value="{{ item.order }}" size="3"></div>
+        <div class="ls-field" style="min-width:60px;"><label><input type="checkbox" name="is_active" {% if item.is_active %}checked{% endif %}> Active</label></div>
+        <button type="submit" class="ls-btn ls-btn-primary ls-btn-sm">Save</button>
+        <button type="submit" name="action" value="delete_why_choose" class="ls-btn ls-btn-danger ls-btn-sm" onclick="return confirm('Delete this item?')">x</button>
+      </form>
+      {% endfor %}
+      <button type="button" class="ls-btn ls-btn-primary ls-btn-sm mt-2" onclick="document.getElementById('whyChooseAdd').classList.toggle('visible')">+ Add Item</button>
+      <form method="post" id="whyChooseAdd" class="ls-add-form">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="why_choose">
+        <input type="hidden" name="new_item" value="1">
+        <div class="ls-grid-3">
+          <input name="new_icon" placeholder="Icon class (bi bi-...)" value="bi bi-heart-fill">
+          <input name="new_title" placeholder="Title" required>
+          <input name="new_description" placeholder="Description" required>
+        </div>
+        <button type="submit" class="ls-btn ls-btn-primary ls-btn-sm mt-2">Add</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- SERVICE CATEGORIES -->
+  <div class="ls-section">
+    <div class="ls-section-header" onclick="toggleSection(this)">Services (Categories &amp; Items) <span class="ls-badge">{{ service_categories|length }}</span></div>
+    <div class="ls-section-body">
+      <div class="ls-sub">Service categories and their items are managed below. Each category can have multiple service items.</div>
+      {% for cat in service_categories %}
+      <div class="service-cat-card mb-3">
+        <div class="d-flex align-items-center gap-2 mb-2">
+          <i class="{{ cat.icon }}"></i>
+          <strong>{{ cat.name }}</strong>
+          <a href="{% url 'admin:dashboard_servicecategory_change' cat.id %}" class="ls-btn ls-btn-primary ls-btn-sm ms-auto">Edit Category</a>
+        </div>
+        <div class="service-list-inline">
+          {% for item in cat.items.all %}
+          <span>{{ item.text }}</span>
+          {% endfor %}
+        </div>
+      </div>
+      {% empty %}
+      <p class="text-muted">No service categories yet.</p>
+      {% endfor %}
+      <a href="{% url 'admin:dashboard_servicecategory_add' %}" class="ls-btn ls-btn-primary ls-btn-sm">+ Add Service Category</a>
+    </div>
+  </div>
+
+  <!-- DEPARTMENTS -->
+  <div class="ls-section">
+    <div class="ls-section-header" onclick="toggleSection(this)">Departments <span class="ls-badge">{{ departments|length }}</span></div>
+    <div class="ls-section-body">
+      {% for dept in departments %}
+      <form method="post" class="ls-item-row">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="department">
+        <input type="hidden" name="item_id" value="{{ dept.id }}">
+        <div class="ls-field" style="min-width:80px;"><label>Icon</label><input name="icon" value="{{ dept.icon }}"></div>
+        <div class="ls-field"><label>Name</label><input name="name" value="{{ dept.name }}"></div>
+        <div class="ls-field" style="min-width:60px;"><label>Order</label><input name="order" value="{{ dept.order }}" size="3"></div>
+        <div class="ls-field" style="min-width:60px;"><label><input type="checkbox" name="is_active" {% if dept.is_active %}checked{% endif %}> Active</label></div>
+        <button type="submit" class="ls-btn ls-btn-primary ls-btn-sm">Save</button>
+        <button type="submit" name="action" value="delete_department" class="ls-btn ls-btn-danger ls-btn-sm" onclick="return confirm('Delete?')">x</button>
+      </form>
+      {% endfor %}
+      <button type="button" class="ls-btn ls-btn-primary ls-btn-sm mt-2" onclick="document.getElementById('deptAdd').classList.toggle('visible')">+ Add Department</button>
+      <form method="post" id="deptAdd" class="ls-add-form">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="department">
+        <input type="hidden" name="new_item" value="1">
+        <div class="ls-grid-3">
+          <input name="new_icon" placeholder="Icon (bi bi-...)" value="bi bi-hospital">
+          <input name="new_name" placeholder="Department name" required>
+        </div>
+        <button type="submit" class="ls-btn ls-btn-primary ls-btn-sm mt-2">Add</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- STATISTICS -->
+  <div class="ls-section">
+    <div class="ls-section-header" onclick="toggleSection(this)">Statistics (Animated Counters) <span class="ls-badge">{{ statistics|length }}</span></div>
+    <div class="ls-section-body">
+      {% for stat in statistics %}
+      <form method="post" class="ls-item-row">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="statistic">
+        <input type="hidden" name="item_id" value="{{ stat.id }}">
+        <div class="ls-field" style="min-width:80px;"><label>Icon</label><input name="icon" value="{{ stat.icon }}"></div>
+        <div class="ls-field"><label>Label</label><input name="label" value="{{ stat.label }}"></div>
+        <div class="ls-field" style="min-width:80px;"><label>Value</label><input name="value" value="{{ stat.value }}" type="number"></div>
+        <div class="ls-field" style="min-width:60px;"><label>Order</label><input name="order" value="{{ stat.order }}" size="3"></div>
+        <div class="ls-field" style="min-width:60px;"><label><input type="checkbox" name="is_active" {% if stat.is_active %}checked{% endif %}> Active</label></div>
+        <button type="submit" class="ls-btn ls-btn-primary ls-btn-sm">Save</button>
+        <button type="submit" name="action" value="delete_statistic" class="ls-btn ls-btn-danger ls-btn-sm" onclick="return confirm('Delete?')">x</button>
+      </form>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- TESTIMONIALS -->
+  <div class="ls-section">
+    <div class="ls-section-header" onclick="toggleSection(this)">Patient Testimonials <span class="ls-badge">{{ testimonials|length }}</span></div>
+    <div class="ls-section-body">
+      {% for t in testimonials %}
+      <form method="post" class="ls-item-row">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="testimonial">
+        <input type="hidden" name="item_id" value="{{ t.id }}">
+        <div class="ls-field"><label>Name</label><input name="patient_name" value="{{ t.patient_name }}"></div>
+        <div class="ls-field" style="flex:2;"><label>Content</label><input name="content" value="{{ t.content }}"></div>
+        <div class="ls-field"><label>Designation</label><input name="designation" value="{{ t.designation }}"></div>
+        <div class="ls-field" style="min-width:80px;"><label>Color</label><select name="avatar_color"><option {% if t.avatar_color == 'primary' %}selected{% endif %}>primary</option><option {% if t.avatar_color == 'success' %}selected{% endif %}>success</option><option {% if t.avatar_color == 'info' %}selected{% endif %}>info</option><option {% if t.avatar_color == 'warning' %}selected{% endif %}>warning</option><option {% if t.avatar_color == 'danger' %}selected{% endif %}>danger</option></select></div>
+        <div class="ls-field" style="min-width:60px;"><label>Order</label><input name="order" value="{{ t.order }}" size="3"></div>
+        <div class="ls-field" style="min-width:60px;"><label><input type="checkbox" name="is_active" {% if t.is_active %}checked{% endif %}> Active</label></div>
+        <button type="submit" class="ls-btn ls-btn-primary ls-btn-sm">Save</button>
+        <button type="submit" name="action" value="delete_testimonial" class="ls-btn ls-btn-danger ls-btn-sm" onclick="return confirm('Delete?')">x</button>
+      </form>
+      {% endfor %}
+      <button type="button" class="ls-btn ls-btn-primary ls-btn-sm mt-2" onclick="document.getElementById('testAdd').classList.toggle('visible')">+ Add Testimonial</button>
+      <form method="post" id="testAdd" class="ls-add-form">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="testimonial">
+        <input type="hidden" name="new_item" value="1">
+        <div class="ls-grid-3">
+          <input name="new_patient_name" placeholder="Patient name" required>
+          <input name="new_content" placeholder="Testimonial text" required>
+          <input name="new_designation" placeholder="Designation" value="Patient">
+        </div>
+        <div class="ls-grid-3 mt-2">
+          <select name="new_avatar_color"><option value="primary">Blue</option><option value="success">Green</option><option value="info">Teal</option><option value="warning">Orange</option></select>
+        </div>
+        <button type="submit" class="ls-btn ls-btn-primary ls-btn-sm mt-2">Add</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- CONTACT INFO -->
+  <div class="ls-section">
+    <div class="ls-section-header" onclick="toggleSection(this)">Contact Info Cards <span class="ls-badge">{{ contact_infos|length }}</span></div>
+    <div class="ls-section-body">
+      {% for info in contact_infos %}
+      <form method="post" class="ls-item-row">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="contact_info">
+        <input type="hidden" name="item_id" value="{{ info.id }}">
+        <div class="ls-field" style="min-width:80px;"><label>Icon</label><input name="icon" value="{{ info.icon }}"></div>
+        <div class="ls-field"><label>Label</label><input name="label" value="{{ info.label }}"></div>
+        <div class="ls-field"><label>Value</label><input name="value" value="{{ info.value }}"></div>
+        <div class="ls-field"><label>Value 2</label><input name="value_2" value="{{ info.value_2 }}"></div>
+        <div class="ls-field" style="min-width:60px;"><label>Order</label><input name="order" value="{{ info.order }}" size="3"></div>
+        <div class="ls-field" style="min-width:60px;"><label><input type="checkbox" name="is_active" {% if info.is_active %}checked{% endif %}> Active</label></div>
+        <button type="submit" class="ls-btn ls-btn-primary ls-btn-sm">Save</button>
+      </form>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- HEALTH ARTICLES -->
+  <div class="ls-section">
+    <div class="ls-section-header" onclick="toggleSection(this)">Health Education Articles <span class="ls-badge">{{ articles|length }}</span></div>
+    <div class="ls-section-body">
+      {% for article in articles %}
+      <form method="post" class="ls-item-row">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="article">
+        <input type="hidden" name="item_id" value="{{ article.id }}">
+        <div class="ls-field" style="min-width:80px;"><label>Icon</label><input name="icon" value="{{ article.icon }}"></div>
+        <div class="ls-field"><label>Title</label><input name="title" value="{{ article.title }}"></div>
+        <div class="ls-field" style="flex:2;"><label>Summary</label><input name="summary" value="{{ article.summary }}"></div>
+        <div class="ls-field" style="min-width:60px;"><label><input type="checkbox" name="is_published" {% if article.is_published %}checked{% endif %}> Published</label></div>
+        <button type="submit" class="ls-btn ls-btn-primary ls-btn-sm">Save</button>
+        <button type="submit" name="action" value="delete_article" class="ls-btn ls-btn-danger ls-btn-sm" onclick="return confirm('Delete?')">x</button>
+      </form>
+      {% endfor %}
+      <button type="button" class="ls-btn ls-btn-primary ls-btn-sm mt-2" onclick="document.getElementById('articleAdd').classList.toggle('visible')">+ Add Article</button>
+      <form method="post" id="articleAdd" class="ls-add-form">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="article">
+        <input type="hidden" name="new_item" value="1">
+        <div class="ls-grid-3">
+          <input name="new_icon" placeholder="Icon (bi bi-...)" value="bi bi-heart-pulse-fill">
+          <input name="new_title" placeholder="Article title" required>
+          <input name="new_summary" placeholder="Short summary" required>
+        </div>
+        <button type="submit" class="ls-btn ls-btn-primary ls-btn-sm mt-2">Add</button>
+      </form>
+    </div>
+  </div>
+
+</div>
+
+<script>
+function toggleSection(header) {
+  var body = header.nextElementSibling;
+  if (body) body.style.display = body.style.display === 'none' ? '' : 'none';
+}
+</script>
+{% endblock %}
