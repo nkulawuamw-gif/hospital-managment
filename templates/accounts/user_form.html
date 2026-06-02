@@ -3,51 +3,87 @@
 {% block page_title %}{% if is_edit %}Edit User{% else %}Add New User{% endif %}{% endblock %}
 
 {% block content %}
-<div class="card shadow-sm border-0" style="max-width: 600px;">
-    <div class="card-body p-4">
-        <form method="post">
-            {% csrf_token %}
-            <div class="mb-3">
-                <label class="form-label small fw-medium">First Name</label>
-                <input type="text" name="first_name" class="form-control" value="{{ edit_user.first_name|default:'' }}" required>
+<div class="row g-4">
+    <div class="col-lg-7">
+        <div class="card shadow-sm border-0">
+            <div class="card-body p-4">
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label class="form-label small fw-medium">First Name</label>
+                        <input type="text" name="first_name" class="form-control" value="{{ edit_user.first_name|default:'' }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-medium">Last Name</label>
+                        <input type="text" name="last_name" class="form-control" value="{{ edit_user.last_name|default:'' }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-medium">Email</label>
+                        <input type="email" name="email" class="form-control" value="{{ edit_user.email|default:'' }}" {% if is_edit %}readonly{% endif %} required>
+                    </div>
+                    {% if not is_edit %}
+                    <div class="mb-3">
+                        <label class="form-label small fw-medium">Password</label>
+                        <input type="password" name="password" class="form-control" required>
+                    </div>
+                    {% endif %}
+                    <div class="mb-3">
+                        <label class="form-label small fw-medium">Role</label>
+                        <select name="role" class="form-select" required>
+                            {% for value, label in roles %}
+                            <option value="{{ value }}" {% if edit_user.role == value %}selected{% endif %}>{{ label }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    {% if is_edit %}
+                    <div class="mb-4">
+                        <div class="form-check">
+                            <input type="checkbox" name="is_active" class="form-check-input" id="isActive" {% if edit_user.is_active %}checked{% endif %}>
+                            <label class="form-check-label small" for="isActive">Active</label>
+                        </div>
+                    </div>
+                    {% endif %}
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-dark">
+                            <i class="bi bi-check-lg me-1"></i>{% if is_edit %}Update{% else %}Create{% endif %}
+                        </button>
+                        <a href="{% url 'accounts:user_list' %}" class="btn btn-outline-secondary">Cancel</a>
+                    </div>
+                </form>
             </div>
-            <div class="mb-3">
-                <label class="form-label small fw-medium">Last Name</label>
-                <input type="text" name="last_name" class="form-control" value="{{ edit_user.last_name|default:'' }}" required>
+        </div>
+    </div>
+    <div class="col-lg-5">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-header bg-dark text-white py-3">
+                <h6 class="mb-0 fw-semibold"><i class="bi bi-info-circle me-2"></i>Role Access Guide</h6>
             </div>
-            <div class="mb-3">
-                <label class="form-label small fw-medium">Email</label>
-                <input type="email" name="email" class="form-control" value="{{ edit_user.email|default:'' }}" {% if is_edit %}readonly{% endif %} required>
+            <div class="card-body p-0" style="max-height: 500px; overflow-y: auto;">
+                <table class="table table-sm table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th class="small py-2 px-3">Role</th>
+                            <th class="small py-2 px-3">Can Access</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td class="px-3 py-2"><span class="badge bg-dark">Super Admin</span></td><td class="px-3 py-2 small">All modules</td></tr>
+                        <tr><td class="px-3 py-2"><span class="badge bg-secondary">Hospital Admin</span></td><td class="px-3 py-2 small">All modules</td></tr>
+                        <tr><td class="px-3 py-2"><span class="badge bg-info text-dark">Doctor</span></td><td class="px-3 py-2 small">Dashboard, Patients, Appointments, EMR, Pharmacy, Laboratory</td></tr>
+                        <tr><td class="px-3 py-2"><span class="badge bg-success">Nurse</span></td><td class="px-3 py-2 small">Dashboard, Patients, Appointments, EMR</td></tr>
+                        <tr><td class="px-3 py-2"><span class="badge bg-primary">Receptionist</span></td><td class="px-3 py-2 small">Dashboard, Patients (registration), Appointments</td></tr>
+                        <tr><td class="px-3 py-2"><span class="badge bg-warning text-dark">Pharmacist</span></td><td class="px-3 py-2 small">Dashboard, Pharmacy</td></tr>
+                        <tr><td class="px-3 py-2"><span class="badge bg-danger">Lab Technician</span></td><td class="px-3 py-2 small">Dashboard, Laboratory</td></tr>
+                        <tr><td class="px-3 py-2"><span class="badge bg-success">Cashier</span></td><td class="px-3 py-2 small">Dashboard, Billing, Insurance</td></tr>
+                        <tr><td class="px-3 py-2"><span class="badge bg-secondary">Accountant</span></td><td class="px-3 py-2 small">Dashboard, Billing, Insurance, Reports</td></tr>
+                        <tr><td class="px-3 py-2"><span class="badge bg-secondary">Patient</span></td><td class="px-3 py-2 small">No system access</td></tr>
+                    </tbody>
+                </table>
             </div>
-            {% if not is_edit %}
-            <div class="mb-3">
-                <label class="form-label small fw-medium">Password</label>
-                <input type="password" name="password" class="form-control" required>
+            <div class="card-footer bg-light small text-muted px-3 py-2">
+                <i class="bi bi-shield-exclamation me-1"></i>Unauthorised access to a module returns a <strong>403</strong> error page.
             </div>
-            {% endif %}
-            <div class="mb-3">
-                <label class="form-label small fw-medium">Role</label>
-                <select name="role" class="form-select" required>
-                    {% for value, label in roles %}
-                    <option value="{{ value }}" {% if edit_user.role == value %}selected{% endif %}>{{ label }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-            {% if is_edit %}
-            <div class="mb-4">
-                <div class="form-check">
-                    <input type="checkbox" name="is_active" class="form-check-input" id="isActive" {% if edit_user.is_active %}checked{% endif %}>
-                    <label class="form-check-label small" for="isActive">Active</label>
-                </div>
-            </div>
-            {% endif %}
-            <div class="d-flex gap-2">
-                <button type="submit" class="btn btn-dark">
-                    <i class="bi bi-check-lg me-1"></i>{% if is_edit %}Update{% else %}Create{% endif %}
-                </button>
-                <a href="{% url 'accounts:user_list' %}" class="btn btn-outline-secondary">Cancel</a>
-            </div>
-        </form>
+        </div>
     </div>
 </div>
 {% endblock %}

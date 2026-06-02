@@ -38,7 +38,7 @@ class User(AbstractUser):
     role = models.CharField(max_length=20, choices=Role.choices, default=Role.PATIENT)
     phone = models.CharField(max_length=20, blank=True)
     profile_picture = models.ImageField(upload_to='profiles/', blank=True, null=True)
-    department = models.CharField(max_length=100, blank=True)
+    department = models.ForeignKey('doctors.Department', on_delete=models.SET_NULL, null=True, blank=True, related_name='staff')
     is_online = models.BooleanField(default=False)
     last_activity = models.DateTimeField(null=True, blank=True)
 
@@ -79,3 +79,31 @@ class UserPermission(models.Model):
 
     def __str__(self):
         return f'Permissions for {self.user.email}'
+
+
+class Module(models.Model):
+    name = models.CharField(max_length=100)
+    codename = models.CharField(max_length=50, unique=True)
+    icon = models.CharField(max_length=50, default='bi bi-circle')
+    url_name = models.CharField(max_length=200, blank=True)
+    section = models.CharField(max_length=50)
+    order = models.IntegerField(default=0)
+
+    class Meta:
+        db_table = 'modules'
+        ordering = ['section', 'order']
+
+    def __str__(self):
+        return self.name
+
+
+class RoleModulePermission(models.Model):
+    role = models.CharField(max_length=20, choices=User.Role.choices, unique=True)
+    modules = models.ManyToManyField(Module)
+
+    class Meta:
+        db_table = 'role_module_permissions'
+        verbose_name = 'Role Module Permission'
+
+    def __str__(self):
+        return dict(User.Role.choices).get(self.role, self.role)

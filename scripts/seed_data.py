@@ -19,12 +19,12 @@ def create_superuser():
     if not User.objects.filter(email='admin@hospital.com').exists():
         User.objects.create_superuser(
             email='admin@hospital.com',
-            password='Admin@123',
+            password='admin123',
             first_name='Super',
             last_name='Admin',
             role=User.Role.SUPER_ADMIN,
         )
-        print('Superuser created: admin@hospital.com / Admin@123')
+        print('Superuser created: admin@hospital.com / admin123')
 
 
 def create_departments():

@@ -2,6 +2,200 @@ from django.db import models
 from django.utils.text import slugify
 
 
+class SiteSetting(models.Model):
+    site_name = models.CharField(max_length=200, default='Hope Medi - Clinic')
+    tagline = models.CharField(max_length=300, blank=True, default='Quality care for all')
+    meta_description = models.TextField(blank=True, default='Providing compassionate, affordable and professional healthcare services for all ages.')
+    meta_keywords = models.CharField(max_length=500, blank=True, default='healthcare, clinic, hospital, OPD, antenatal care, family planning, immunization, laboratory, pharmacy')
+    phone = models.CharField(max_length=50, blank=True, default='+265 999 401 674')
+    phone_2 = models.CharField(max_length=50, blank=True, default='+254 700 100 300')
+    email = models.EmailField(blank=True, default='info@hopeclinic.co.ke')
+    email_2 = models.EmailField(blank=True, default='admin@hopeclinic.co.ke')
+    address = models.CharField(max_length=300, blank=True, default='Chinamwali, Zomba - Malawi')
+    address_detail = models.CharField(max_length=300, blank=True, default='Next to City Hospital')
+    working_hours = models.CharField(max_length=200, blank=True, default='Mon - Sat: 7:00 AM - 8:00 PM')
+    sunday_hours = models.CharField(max_length=200, blank=True, default='Sunday: Closed (Emergencies Only)')
+    emergency_phone = models.CharField(max_length=50, blank=True, default='+254 700 100 300')
+    facebook_url = models.URLField(blank=True, default='#')
+    twitter_url = models.URLField(blank=True, default='#')
+    instagram_url = models.URLField(blank=True, default='#')
+    youtube_url = models.URLField(blank=True, default='#')
+    map_embed_url = models.TextField(blank=True, default='https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15955.000000000!2d36.8219!3d-1.2921!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMcKwMTcnMzEuNyJTIDM2wrA0OScxOC44IkU!5e0!3m2!1sen!2ske!4v1')
+    footer_about = models.TextField(blank=True, default='Providing compassionate, affordable and professional healthcare services for all ages. Your health is our priority.')
+    copyright_text = models.CharField(max_length=300, blank=True, default='All rights reserved. Powered by HMS.')
+    about_heading = models.CharField(max_length=200, blank=True, default='Why Choose {site_name}')
+    about_subtitle = models.TextField(blank=True, default='We are committed to providing the highest standard of medical care with compassion and professionalism.')
+    services_heading = models.CharField(max_length=200, blank=True, default='Our Services')
+    services_subtitle = models.TextField(blank=True, default='Comprehensive healthcare services tailored to meet the needs of our community.')
+    health_heading = models.CharField(max_length=200, blank=True, default='Health Education')
+    health_subtitle = models.TextField(blank=True, default='Empowering our community with knowledge for better health outcomes.')
+    health_search_placeholder = models.CharField(max_length=200, blank=True, default='Search health tips...')
+    departments_heading = models.CharField(max_length=200, blank=True, default='Our Departments')
+    departments_subtitle = models.TextField(blank=True, default='Specialized departments working together for comprehensive healthcare delivery.')
+    doctors_heading = models.CharField(max_length=200, blank=True, default='Our Medical Team')
+    doctors_subtitle = models.TextField(blank=True, default='Meet our dedicated team of healthcare professionals committed to your wellbeing.')
+    appointment_heading = models.CharField(max_length=200, blank=True, default='Book an Appointment')
+    appointment_subtitle = models.CharField(max_length=300, blank=True, default="Schedule your visit today. We'll confirm your appointment promptly.")
+    appointment_bullet_1 = models.CharField(max_length=200, blank=True, default='Same-day appointments available')
+    appointment_bullet_2 = models.CharField(max_length=200, blank=True, default='Minimal waiting time')
+    appointment_bullet_3 = models.CharField(max_length=200, blank=True, default='Professional medical team')
+    appointment_bullet_4 = models.CharField(max_length=200, blank=True, default='Affordable consultation fees')
+    appointment_form_title = models.CharField(max_length=200, blank=True, default='Request Appointment')
+    appointment_btn_text = models.CharField(max_length=200, blank=True, default='Submit Appointment Request')
+    testimonials_heading = models.CharField(max_length=200, blank=True, default='What Our Patients Say')
+    testimonials_subtitle = models.TextField(blank=True, default='Hear from our patients about their experience at {site_name}.')
+    contact_heading = models.CharField(max_length=200, blank=True, default='Contact Us')
+    contact_subtitle = models.TextField(blank=True, default="We'd love to hear from you. Reach out to us through any of the channels below.")
+
+    class Meta:
+        db_table = 'site_settings'
+        verbose_name = 'Site Setting'
+        verbose_name_plural = 'Site Settings'
+
+    def __str__(self):
+        return self.site_name
+
+    @classmethod
+    def get_settings(cls):
+        return cls.objects.first()
+
+
+class HeroSection(models.Model):
+    headline = models.CharField(max_length=300, default='Quality care for all')
+    subheading = models.CharField(max_length=500, default='Providing compassionate, affordable and professional healthcare services for all ages.')
+    background_image = models.ImageField(upload_to='landing/', blank=True, null=True)
+    book_appointment_btn_text = models.CharField(max_length=100, default='Book Appointment')
+    contact_us_btn_text = models.CharField(max_length=100, default='Contact Us')
+    staff_login_btn_text = models.CharField(max_length=100, default='Staff Login')
+    is_active = models.BooleanField(default=True)
+
+    class Meta:
+        db_table = 'hero_sections'
+        verbose_name = 'Hero Section'
+
+    def __str__(self):
+        return self.headline
+
+
+class WhyChooseItem(models.Model):
+    icon = models.CharField(max_length=50, default='bi bi-heart-fill', help_text='Bootstrap icon class')
+    title = models.CharField(max_length=200)
+    description = models.TextField()
+    order = models.PositiveIntegerField(default=0)
+    is_active = models.BooleanField(default=True)
+
+    class Meta:
+        db_table = 'why_choose_items'
+        ordering = ['order']
+        verbose_name = 'Why Choose Item'
+
+    def __str__(self):
+        return self.title
+
+
+class ServiceCategory(models.Model):
+    name = models.CharField(max_length=200)
+    icon = models.CharField(max_length=50, default='bi bi-hospital', help_text='Bootstrap icon class')
+    order = models.PositiveIntegerField(default=0)
+    is_active = models.BooleanField(default=True)
+
+    class Meta:
+        db_table = 'service_categories'
+        ordering = ['order']
+        verbose_name = 'Service Category'
+        verbose_name_plural = 'Service Categories'
+
+    def __str__(self):
+        return self.name
+
+
+class ServiceItem(models.Model):
+    category = models.ForeignKey(ServiceCategory, on_delete=models.CASCADE, related_name='items')
+    text = models.CharField(max_length=300)
+    order = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        db_table = 'service_items'
+        ordering = ['order']
+        verbose_name = 'Service Item'
+
+    def __str__(self):
+        return self.text
+
+
+class Department(models.Model):
+    name = models.CharField(max_length=200)
+    icon = models.CharField(max_length=50, default='bi bi-hospital', help_text='Bootstrap icon class')
+    order = models.PositiveIntegerField(default=0)
+    is_active = models.BooleanField(default=True)
+
+    class Meta:
+        db_table = 'landing_departments'
+        ordering = ['order']
+
+    def __str__(self):
+        return self.name
+
+
+class Testimonial(models.Model):
+    patient_name = models.CharField(max_length=200)
+    content = models.TextField()
+    designation = models.CharField(max_length=200, blank=True, default='Patient')
+    avatar_color = models.CharField(max_length=20, choices=[
+        ('primary', 'Blue'), ('success', 'Green'), ('info', 'Teal'),
+        ('warning', 'Orange'), ('danger', 'Red'), ('secondary', 'Gray'),
+    ], default='primary')
+    order = models.PositiveIntegerField(default=0)
+    is_active = models.BooleanField(default=True)
+
+    class Meta:
+        db_table = 'testimonials'
+        ordering = ['order']
+
+    def __str__(self):
+        return self.patient_name
+
+
+class Statistic(models.Model):
+    label = models.CharField(max_length=200)
+    value = models.PositiveIntegerField(default=0, help_text='Target number for the animated counter')
+    icon = models.CharField(max_length=50, default='bi bi-people-fill', help_text='Bootstrap icon class')
+    order = models.PositiveIntegerField(default=0)
+    is_active = models.BooleanField(default=True)
+
+    class Meta:
+        db_table = 'landing_statistics'
+        ordering = ['order']
+        verbose_name = 'Statistic'
+        verbose_name_plural = 'Statistics'
+
+    def __str__(self):
+        return self.label
+
+
+class ContactInfo(models.Model):
+    INFO_TYPES = [
+        ('phone', 'Phone'), ('email', 'Email'),
+        ('address', 'Address'), ('hours', 'Working Hours'),
+    ]
+    info_type = models.CharField(max_length=20, choices=INFO_TYPES)
+    label = models.CharField(max_length=100)
+    icon = models.CharField(max_length=50, default='bi bi-telephone-fill')
+    value = models.CharField(max_length=300)
+    value_2 = models.CharField(max_length=300, blank=True, help_text='Secondary value (e.g. second phone number)')
+    order = models.PositiveIntegerField(default=0)
+    is_active = models.BooleanField(default=True)
+
+    class Meta:
+        db_table = 'contact_infos'
+        ordering = ['order']
+        verbose_name = 'Contact Info'
+        verbose_name_plural = 'Contact Info'
+
+    def __str__(self):
+        return self.label
+
+
 class HealthArticle(models.Model):
     title = models.CharField(max_length=300)
     slug = models.SlugField(max_length=300, unique=True, blank=True)

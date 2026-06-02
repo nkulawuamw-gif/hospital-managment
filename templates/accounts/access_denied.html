@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% block title %}Access Denied - HMS{% endblock %}
+{% block page_title %}Access Denied{% endblock %}
+
+{% block content %}
+<div class="d-flex align-items-center justify-content-center" style="min-height: 60vh;">
+    <div class="text-center">
+        <i class="bi bi-shield-exclamation display-1 text-danger mb-4 d-block"></i>
+        <h2 class="fw-bold mb-2">Access Denied</h2>
+        <p class="text-muted mb-1">You do not have permission to access the <strong>{{ module_name }}</strong> module.</p>
+        <p class="text-muted mb-4">Contact your administrator if you need access.</p>
+        <a href="{% url 'dashboard:dashboard' %}" class="btn btn-dark rounded-pill px-4">
+            <i class="bi bi-arrow-left me-2"></i>Back to Dashboard
+        </a>
+    </div>
+</div>
+{% endblock %}

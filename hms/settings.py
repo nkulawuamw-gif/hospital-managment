@@ -57,10 +57,14 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'apps.accounts.middleware.ModuleAccessMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'simple_history.middleware.HistoryRequestMiddleware',
 ]
+
+SITE_NAME = 'Hope Medi - Clinic'
+SITE_URL = 'http://localhost:8000'
 
 ROOT_URLCONF = 'hms.urls'
 

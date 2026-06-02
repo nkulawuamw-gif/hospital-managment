@@ -1,12 +1,11 @@
 import re
-from datetime import date
+from datetime import date, timedelta
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.db import models
 from django.db.models import Count, Sum
 from django.utils import timezone
-from datetime import timedelta, date
 
 from apps.accounts.models import User
 from apps.doctors.models import DoctorProfile
@@ -17,10 +16,16 @@ from apps.billing.models import Invoice, Payment
 from apps.pharmacy.models import MedicineBatch
 from apps.laboratory.models import LabRequest
 from apps.notifications.models import Notification
-from .models import HealthArticle
+from .models import (
+    HealthArticle, SiteSetting, HeroSection, WhyChooseItem,
+    ServiceCategory, Department, Testimonial, Statistic, ContactInfo,
+)
 
 
 def landing_view(request):
+    site = SiteSetting.get_settings()
+    hero = HeroSection.objects.first()
+
     doctors_qs = DoctorProfile.objects.filter(
         user__is_active=True, is_available=True
     ).select_related('user').prefetch_related('specializations')[:8]
@@ -41,8 +46,16 @@ def landing_view(request):
     articles = HealthArticle.objects.filter(is_published=True)[:6]
 
     context = {
+        'site': site,
+        'hero': hero,
         'doctors': doctors,
         'health_articles': articles,
+        'why_choose_items': WhyChooseItem.objects.filter(is_active=True).order_by('order'),
+        'service_categories': ServiceCategory.objects.filter(is_active=True).order_by('order').prefetch_related('items'),
+        'departments': Department.objects.filter(is_active=True).order_by('order'),
+        'testimonials': Testimonial.objects.filter(is_active=True).order_by('order'),
+        'statistics': Statistic.objects.filter(is_active=True).order_by('order'),
+        'contact_infos': ContactInfo.objects.filter(is_active=True).order_by('order'),
     }
     return render(request, 'landing/index.html', context)
 

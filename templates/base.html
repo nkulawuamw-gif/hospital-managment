@@ -150,88 +150,26 @@
             <span>HMS Hospital</span>
         </div>
         <nav class="sidebar-nav">
+            {% if user_modules %}
+                {% regroup user_modules by section as section_groups %}
+                {% for group in section_groups %}
+                <div class="nav-section">{{ group.grouper }}</div>
+                {% for module in group.list %}
+                <div class="nav-item">
+                    <a href="{% url module.url_name %}" class="nav-link {% if request.resolver_match.app_name == module.codename %}active{% endif %}">
+                        <i class="{{ module.icon }}"></i> {{ module.name }}
+                    </a>
+                </div>
+                {% endfor %}
+                {% endfor %}
+            {% else %}
             <div class="nav-section">Main</div>
             <div class="nav-item">
                 <a href="{% url 'dashboard:dashboard' %}" class="nav-link {% if request.resolver_match.app_name == 'dashboard' %}active{% endif %}">
                     <i class="bi bi-grid-1x2-fill"></i> Dashboard
                 </a>
             </div>
-            <div class="nav-section">Patient Care</div>
-            <div class="nav-item">
-                <a href="{% url 'patients:list' %}" class="nav-link {% if request.resolver_match.app_name == 'patients' %}active{% endif %}">
-                    <i class="bi bi-people-fill"></i> Patients
-                </a>
-            </div>
-            <div class="nav-item">
-                <a href="{% url 'appointments:list' %}" class="nav-link {% if request.resolver_match.app_name == 'appointments' %}active{% endif %}">
-                    <i class="bi bi-calendar-check-fill"></i> Appointments
-                </a>
-            </div>
-            <div class="nav-item">
-                <a href="{% url 'emr:list' %}" class="nav-link {% if request.resolver_match.app_name == 'emr' %}active{% endif %}">
-                    <i class="bi bi-file-medical-fill"></i> EMR
-                </a>
-            </div>
-            <div class="nav-item">
-                <a href="#" class="nav-link"><i class="bi bi-hospital-fill"></i> Admissions</a>
-            </div>
-            <div class="nav-section">Services</div>
-            <div class="nav-item">
-                <a href="{% url 'pharmacy:medicines' %}" class="nav-link {% if request.resolver_match.app_name == 'pharmacy' %}active{% endif %}">
-                    <i class="bi bi-capsule-fill"></i> Pharmacy
-                </a>
-            </div>
-            <div class="nav-item">
-                <a href="{% url 'laboratory:request_list' %}" class="nav-link {% if request.resolver_match.app_name == 'laboratory' %}active{% endif %}">
-                    <i class="bi bi-flask-fill"></i> Laboratory
-                </a>
-            </div>
-            <div class="nav-section">Finance</div>
-            <div class="nav-item">
-                <a href="{% url 'billing:invoice_list' %}" class="nav-link {% if request.resolver_match.app_name == 'billing' %}active{% endif %}">
-                    <i class="bi bi-currency-dollar"></i> Billing
-                </a>
-            </div>
-            <div class="nav-item">
-                <a href="{% url 'insurance:company_list' %}" class="nav-link {% if request.resolver_match.app_name == 'insurance' %}active{% endif %}">
-                    <i class="bi bi-shield-fill-check"></i> Insurance
-                </a>
-            </div>
-            <div class="nav-section">Administration</div>
-            <div class="nav-item">
-                <a href="{% url 'accounts:user_list' %}" class="nav-link {% if request.resolver_match.url_name == 'user_list' %}active{% endif %}">
-                    <i class="bi bi-person-badge-fill"></i> Users
-                </a>
-            </div>
-            <div class="nav-item">
-                <a href="{% url 'inventory:supply_list' %}" class="nav-link {% if request.resolver_match.app_name == 'inventory' %}active{% endif %}">
-                    <i class="bi bi-box-seam-fill"></i> Inventory
-                </a>
-            </div>
-            <div class="nav-item">
-                <a href="{% url 'hr:employee_list' %}" class="nav-link {% if request.resolver_match.app_name == 'hr' %}active{% endif %}">
-                    <i class="bi bi-person-lines-fill"></i> HR
-                </a>
-            </div>
-            <div class="nav-item">
-                <a href="{% url 'reports:dashboard' %}" class="nav-link {% if request.resolver_match.app_name == 'reports' %}active{% endif %}">
-                    <i class="bi bi-bar-chart-fill"></i> Reports
-                </a>
-            </div>
-            <div class="nav-section">System</div>
-            <div class="nav-item">
-                <a href="{% url 'notifications:list' %}" class="nav-link {% if request.resolver_match.app_name == 'notifications' %}active{% endif %}">
-                    <i class="bi bi-bell-fill"></i> Notifications
-                </a>
-            </div>
-            <div class="nav-item">
-                <a href="{% url 'audit:list' %}" class="nav-link {% if request.resolver_match.app_name == 'audit' %}active{% endif %}">
-                    <i class="bi bi-journal-text"></i> Audit Log
-                </a>
-            </div>
-            <div class="nav-item">
-                <a href="/admin/" class="nav-link"><i class="bi bi-shield-lock-fill"></i> Admin</a>
-            </div>
+            {% endif %}
         </nav>
     </aside>
     {% endif %}
