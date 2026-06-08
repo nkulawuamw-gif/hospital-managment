@@ -12,7 +12,7 @@ services:
     plan: free
     region: ohio
     buildCommand: ./build.sh
-    startCommand: gunicorn hms.wsgi:application --bind 0.0.0.0:$PORT --workers 4 --timeout 120
+    startCommand: ./start.sh
     envVars:
       - key: DJANGO_SECRET_KEY
         generateValue: true
