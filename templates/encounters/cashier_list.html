@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+{% block title %}Cashier - HMS{% endblock %}
+{% block page_title %}Cashier - Patient Bills{% endblock %}
+
+{% block content %}
+<ul class="nav nav-tabs mb-3" id="cashierTabs" role="tablist">
+    <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="pending-tab" data-bs-toggle="tab" data-bs-target="#pending" type="button">
+            Ready for Payment <span class="badge bg-success ms-1">{{ visits|length }}</span>
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="billed-tab" data-bs-toggle="tab" data-bs-target="#billed" type="button">
+            Already Billed <span class="badge bg-secondary ms-1">{{ billed|length }}</span>
+        </button>
+    </li>
+</ul>
+
+<div class="tab-content">
+    <div class="tab-pane fade show active" id="pending">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table datatable table-hover">
+                        <thead>
+                            <tr>
+                                <th>Visit #</th>
+                                <th>Patient</th>
+                                <th>Patient ID</th>
+                                <th>Date</th>
+                                <th>Medications</th>
+                                <th>Total Due</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for visit in visits %}
+                            <tr>
+                                <td><strong>{{ visit.visit_number }}</strong></td>
+                                <td>{{ visit.patient.first_name }} {{ visit.patient.last_name }}</td>
+                                <td>{{ visit.patient.patient_id }}</td>
+                                <td>{{ visit.created_at|date:"d/m/Y" }}</td>
+                                <td><span class="badge bg-info">{{ visit.med_count }}</span></td>
+                                <td><strong class="text-success">${{ visit.total_cost|default:0|floatformat:2 }}</strong></td>
+                                <td>
+                                    <a href="{% url 'encounters:cashier_detail' visit.id %}" class="btn btn-sm btn-primary">
+                                        <i class="bi bi-receipt"></i> View Bill
+                                    </a>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr><td colspan="7" class="text-center text-muted py-4">No visits ready for payment</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="tab-pane fade" id="billed">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Visit #</th>
+                                <th>Patient</th>
+                                <th>Date</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for visit in billed %}
+                            <tr>
+                                <td><strong>{{ visit.visit_number }}</strong></td>
+                                <td>{{ visit.patient.first_name }} {{ visit.patient.last_name }}</td>
+                                <td>{{ visit.created_at|date:"d/m/Y" }}</td>
+                                <td><span class="badge bg-secondary">Billed</span></td>
+                            </tr>
+                            {% empty %}
+                            <tr><td colspan="4" class="text-center text-muted py-4">No billed visits</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

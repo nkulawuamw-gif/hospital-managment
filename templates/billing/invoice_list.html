@@ -29,9 +29,9 @@
                     <td class="fw-medium">{{ inv.invoice_number }}</td>
                     <td><a href="{% url 'patients:detail' inv.patient.pk %}" class="text-decoration-none">{{ inv.patient.full_name }}</a></td>
                     <td>{{ inv.created_at|date:"M d, Y" }}</td>
-                    <td>KES {{ inv.total|floatformat:0 }}</td>
-                    <td>KES {{ inv.amount_paid|floatformat:0 }}</td>
-                    <td>KES {{ inv.balance|floatformat:0 }}</td>
+                    <td>MWK {{ inv.total|floatformat:0 }}</td>
+                    <td>MWK {{ inv.amount_paid|floatformat:0 }}</td>
+                    <td>MWK {{ inv.balance|floatformat:0 }}</td>
                     <td>
                         <span class="badge bg-{% if inv.status == 'paid' %}success{% elif inv.status == 'overdue' %}danger{% elif inv.status == 'partial' %}info{% elif inv.status == 'cancelled' %}secondary{% else %}warning text-dark{% endif %} rounded-pill">{{ inv.get_status_display }}</span>
                     </td>

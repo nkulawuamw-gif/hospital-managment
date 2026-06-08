@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% block title %}Doctor Schedules - HMS{% endblock %}
+{% block page_title %}Doctor Schedules{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+    <form method="get" class="d-flex gap-2 align-items-center">
+        <select name="doctor" class="form-select form-select-sm" style="width:auto;" onchange="this.form.submit()">
+            <option value="">All Doctors</option>
+            {% for d in doctors %}
+            <option value="{{ d.user.pk }}" {% if current_doctor == d.user.pk|stringformat:"s" %}selected{% endif %}>Dr. {{ d.user.get_full_name }}</option>
+            {% endfor %}
+        </select>
+    </form>
+    <div class="d-flex gap-2">
+        <a href="{% url 'doctors:doctors' %}" class="btn btn-sm btn-outline-secondary"><i class="bi bi-person-badge me-1"></i>Doctors</a>
+        <a href="{% url 'doctors:schedule_create' %}" class="btn btn-dark btn-sm"><i class="bi bi-plus-lg me-1"></i>Add Schedule</a>
+    </div>
+</div>
+
+<div class="card shadow-sm border-0">
+    <div class="card-body p-0">
+        <table class="table table-hover datatable mb-0" style="font-size: .875rem;">
+            <thead class="table-light">
+                <tr><th>Doctor</th><th>Date</th><th>From</th><th>To</th><th>Status</th><th>Reason</th><th class="text-end">Actions</th></tr>
+            </thead>
+            <tbody>
+                {% for s in schedules %}
+                <tr>
+                    <td class="fw-medium">Dr. {{ s.doctor.get_full_name }}</td>
+                    <td>{{ s.date|date:"D, M d, Y" }}</td>
+                    <td>{{ s.from_time|time:"H:i" }}</td>
+                    <td>{{ s.to_time|time:"H:i" }}</td>
+                    <td>{% if s.is_available %}<span class="badge bg-success rounded-pill">Available</span>{% else %}<span class="badge bg-danger rounded-pill">Off</span>{% endif %}</td>
+                    <td class="text-muted small">{{ s.reason_unavailable|default:'-'|truncatechars:40 }}</td>
+                    <td class="text-end">
+                        <a href="{% url 'doctors:schedule_delete' s.pk %}" class="btn btn-sm btn-outline-danger btn-icon"><i class="bi bi-trash"></i></a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="7" class="text-center py-4 text-muted">No schedules yet.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

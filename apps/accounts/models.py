@@ -38,7 +38,7 @@ class User(AbstractUser):
     role = models.CharField(max_length=20, choices=Role.choices, default=Role.PATIENT)
     phone = models.CharField(max_length=20, blank=True)
     profile_picture = models.ImageField(upload_to='profiles/', blank=True, null=True)
-    department = models.ForeignKey('doctors.Department', on_delete=models.SET_NULL, null=True, blank=True, related_name='staff')
+    department = models.ForeignKey('doctors.StaffDepartment', on_delete=models.SET_NULL, null=True, blank=True, related_name='staff')
     is_online = models.BooleanField(default=False)
     last_activity = models.DateTimeField(null=True, blank=True)
 

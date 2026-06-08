@@ -22,7 +22,7 @@ REM Start development server
 echo [3/3] Starting server...
 echo.
 echo  Access the application at: http://localhost:8000
-echo  Admin login: admin@hospital.com / Admin@123
+echo  Admin login: admin@hospital.com / admin123
 echo  Press Ctrl+C to stop
 echo ============================================
 echo.

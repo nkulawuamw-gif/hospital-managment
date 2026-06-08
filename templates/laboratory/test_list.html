@@ -26,10 +26,12 @@
                 <tr>
                     <td class="fw-medium">{{ t.name }}</td>
                     <td>{{ t.category.name|default:'-' }}</td>
-                    <td>KES {{ t.price|floatformat:0 }}</td>
+                    <td>MWK {{ t.price|floatformat:0 }}</td>
                     <td>{{ t.turnaround_time|default:'-' }}</td>
                     <td>{% if t.is_active %}<span class="badge bg-success rounded-pill">Active</span>{% else %}<span class="badge bg-danger rounded-pill">Inactive</span>{% endif %}</td>
                 </tr>
+                {% empty %}
+                <tr><td colspan="5" class="text-center text-muted py-4">No lab tests found.</td></tr>
                 {% endfor %}
             </tbody>
         </table>

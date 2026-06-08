@@ -18,6 +18,9 @@ NAMESPACE_MODULE_MAP = {
     'notifications': 'notifications',
     'audit': 'audit',
     'admin': 'admin',
+    'inpatient': 'inpatient',
+    'doctors': 'doctors',
+    'requisitions': 'requisitions',
 }
 
 PUBLIC_NAMESPACES = {

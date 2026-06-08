@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+{% block title %}Requisitions - HMS{% endblock %}
+{% block page_title %}Department Requisitions{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div class="d-flex gap-2">
+        <a href="{% url 'requisitions:requisition_list' %}" class="btn btn-sm btn-outline-secondary {% if not current_status %}active{% endif %}">All</a>
+        <a href="?status=pending" class="btn btn-sm btn-outline-warning {% if current_status == 'pending' %}active{% endif %}">Pending</a>
+        <a href="?status=approved" class="btn btn-sm btn-outline-info {% if current_status == 'approved' %}active{% endif %}">Approved</a>
+        <a href="?status=processing" class="btn btn-sm btn-outline-primary {% if current_status == 'processing' %}active{% endif %}">Processing</a>
+        <a href="?status=dispatched" class="btn btn-sm btn-outline-success {% if current_status == 'dispatched' %}active{% endif %}">Dispatched</a>
+        <a href="?status=rejected" class="btn btn-sm btn-outline-danger {% if current_status == 'rejected' %}active{% endif %}">Rejected</a>
+    </div>
+    <a href="{% url 'requisitions:requisition_create' %}" class="btn btn-dark btn-sm"><i class="bi bi-plus-lg me-1"></i>New Requisition</a>
+</div>
+<div class="card shadow-sm border-0">
+    <div class="card-body p-0">
+        <table class="table table-hover {% if requisitions %}datatable{% endif %} mb-0" style="font-size: .875rem;">
+            <thead class="table-light">
+                <tr>
+                    <th>Request #</th>
+                    <th>Requested By</th>
+                    <th>Department</th>
+                    <th>Items</th>
+                    <th>Date</th>
+                    <th>Status</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for r in requisitions %}
+                <tr>
+                    <td class="fw-medium">{{ r.request_number }}</td>
+                    <td>{{ r.requested_by.get_full_name }}</td>
+                    <td>{{ r.department.name|default:'—' }}</td>
+                    <td>{{ r.items.count }}</td>
+                    <td>{{ r.created_at|date:"M d, Y" }}</td>
+                    <td>
+                        <span class="badge bg-{% if r.status == 'dispatched' %}success{% elif r.status == 'approved' %}info{% elif r.status == 'processing' %}primary{% elif r.status == 'rejected' %}danger{% elif r.status == 'cancelled' %}secondary{% else %}warning text-dark{% endif %} rounded-pill">
+                            {{ r.get_status_display }}
+                        </span>
+                    </td>
+                    <td class="text-end">
+                        <a href="{% url 'requisitions:requisition_detail' r.pk %}" class="btn btn-sm btn-outline-secondary btn-icon"><i class="bi bi-eye"></i></a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="7" class="text-center text-muted py-4">No requisitions found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

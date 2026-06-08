@@ -12,6 +12,7 @@ urlpatterns = [
     path('web/create/', views.patient_create, name='create'),
     path('web/<int:pk>/', views.patient_detail, name='detail'),
     path('web/<int:pk>/edit/', views.patient_edit, name='edit'),
+    path('web/<int:pk>/add-medical-history/', views.patient_add_medical_history, name='add_medical_history'),
 
     # API
     path('', include(router.urls)),

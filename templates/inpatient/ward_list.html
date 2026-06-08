@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+{% block title %}Wards - Inpatient - HMS{% endblock %}
+{% block page_title %}Wards &amp; Beds{% endblock %}
+
+{% block content %}
+<div class="row g-3 mb-3">
+    <div class="col-md-3">
+        <div class="stat-card py-2 px-3 d-flex align-items-center gap-3">
+            <div class="stat-icon" style="width:40px;height:40px;font-size:1rem;background:#e7f1ff;color:#0d6efd;"><i class="bi bi-hospital"></i></div>
+            <div><div class="fw-bold fs-5">{{ wards|length }}</div><div class="text-muted small">Wards</div></div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card py-2 px-3 d-flex align-items-center gap-3">
+            <div class="stat-icon" style="width:40px;height:40px;font-size:1rem;background:#e6f4ea;color:#198754;"><i class="bi bi-grid-3x3"></i></div>
+            <div><div class="fw-bold fs-5">{{ total_capacity }}</div><div class="text-muted small">Total Beds</div></div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card py-2 px-3 d-flex align-items-center gap-3">
+            <div class="stat-icon" style="width:40px;height:40px;font-size:1rem;background:#fff3e0;color:#fd7e14;"><i class="bi bi-person-fill"></i></div>
+            <div><div class="fw-bold fs-5">{{ total_occupied }}</div><div class="text-muted small">Occupied</div></div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card py-2 px-3 d-flex align-items-center gap-3">
+            <div class="stat-icon" style="width:40px;height:40px;font-size:1rem;background:#fce4e4;color:#dc3545;"><i class="bi bi-check2-circle"></i></div>
+            <div><div class="fw-bold fs-5">{{ total_capacity|add:"-"|add:total_occupied|stringformat:"d" }}</div><div class="text-muted small">Available</div></div>
+        </div>
+    </div>
+</div>
+
+<div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+    <div class="d-flex gap-2">
+        <a href="{% url 'inpatient:admissions' %}" class="btn btn-sm btn-outline-secondary"><i class="bi bi-clipboard2-pulse me-1"></i>Admissions</a>
+    </div>
+    <a href="{% url 'inpatient:ward_create' %}" class="btn btn-dark btn-sm"><i class="bi bi-plus-lg me-1"></i>Add Ward</a>
+</div>
+
+<div class="card shadow-sm border-0">
+    <div class="card-body p-0">
+        <table class="table table-hover mb-0" style="font-size: .875rem;">
+            <thead class="table-light">
+                <tr><th>Name</th><th>Type</th><th>Department</th><th>Floor</th><th>Capacity</th><th>Occupied</th><th>Available</th><th>Charge/Day</th><th>Status</th><th class="text-end">Actions</th></tr>
+            </thead>
+            <tbody>
+                {% for w in wards %}
+                <tr>
+                    <td class="fw-medium">{{ w.name }}</td>
+                    <td><span class="badge bg-info text-dark">{{ w.get_type_display }}</span></td>
+                    <td>{{ w.department.name|default:'-' }}</td>
+                    <td>{{ w.floor|default:'-' }}</td>
+                    <td>{{ w.capacity }}</td>
+                    <td>{{ w.beds.all|length|add:0 }}{% with occ=w.beds.all %}{% for b in occ %}{% if b.is_occupied %}1{% endif %}{% endfor %}{% endwith %}</td>
+                    <td class="fw-medium text-success">{{ w.available_beds }}</td>
+                    <td>MWK {{ w.charge_per_day|floatformat:0 }}</td>
+                    <td>{% if w.is_active %}<span class="badge bg-success rounded-pill">Active</span>{% else %}<span class="badge bg-secondary rounded-pill">Inactive</span>{% endif %}</td>
+                    <td class="text-end">
+                        <a href="{% url 'inpatient:ward_edit' w.pk %}" class="btn btn-sm btn-outline-secondary btn-icon"><i class="bi bi-pencil"></i></a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="10" class="text-center py-4 text-muted">No wards yet. <a href="{% url 'inpatient:ward_create' %}">Add the first ward</a>.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

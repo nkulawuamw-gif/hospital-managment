@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+{% block title %}Sales - Pharmacy - HMS{% endblock %}
+{% block page_title %}Pharmacy Sales (POS){% endblock %}
+
+{% block content %}
+<div class="row g-3 mb-3">
+    <div class="col-md-4">
+        <div class="stat-card py-2 px-3 d-flex align-items-center gap-3">
+            <div class="stat-icon" style="width:40px;height:40px;font-size:1rem;background:#e7f3ff;color:#0d6efd;"><i class="bi bi-receipt"></i></div>
+            <div><div class="fw-bold fs-5">{{ sale_count }}</div><div class="text-muted small">Sales in range</div></div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="stat-card py-2 px-3 d-flex align-items-center gap-3">
+            <div class="stat-icon" style="width:40px;height:40px;font-size:1rem;background:#e6f7ec;color:#198754;"><i class="bi bi-cash-coin"></i></div>
+            <div><div class="fw-bold fs-5">MWK {{ grand_total|floatformat:0 }}</div><div class="text-muted small">Revenue (gross)</div></div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="stat-card py-2 px-3 d-flex align-items-center gap-3">
+            <div class="stat-icon" style="width:40px;height:40px;font-size:1rem;background:#fff3e0;color:#fd7e14;"><i class="bi bi-cart-plus"></i></div>
+            <div><div class="fw-bold fs-5">POS</div><div class="text-muted small">Quick checkout</div></div>
+        </div>
+    </div>
+</div>
+
+<div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+    <form method="get" class="d-flex gap-2 align-items-center">
+        <label class="small text-muted">From</label>
+        <input type="date" name="from" value="{{ date_from }}" class="form-control form-control-sm" style="width: auto;">
+        <label class="small text-muted">To</label>
+        <input type="date" name="to" value="{{ date_to }}" class="form-control form-control-sm" style="width: auto;">
+        <button type="submit" class="btn btn-sm btn-outline-secondary">Filter</button>
+    </form>
+    <div class="d-flex gap-2">
+        <a href="{% url 'pharmacy:medicines' %}" class="btn btn-sm btn-outline-secondary"><i class="bi bi-capsule me-1"></i>Inventory</a>
+        <a href="{% url 'pharmacy:prescriptions' %}" class="btn btn-sm btn-outline-secondary"><i class="bi bi-file-text me-1"></i>Prescriptions</a>
+        <a href="{% url 'pharmacy:dispensation_list' %}" class="btn btn-sm btn-outline-secondary"><i class="bi bi-bag-check me-1"></i>Dispensations</a>
+        <a href="{% url 'pharmacy:sale_create' %}" class="btn btn-dark btn-sm"><i class="bi bi-plus-lg me-1"></i>New Sale</a>
+    </div>
+</div>
+
+<div class="card shadow-sm border-0">
+    <div class="card-body p-0">
+        <table class="table table-hover datatable mb-0" style="font-size: .875rem;">
+            <thead class="table-light">
+                <tr><th>#</th><th>Date</th><th>Patient</th><th>Items</th><th>Discount</th><th>Total</th><th>Payment</th><th>Cashier</th><th class="text-end">Action</th></tr>
+            </thead>
+            <tbody>
+                {% for s in sales %}
+                <tr>
+                    <td><code>S{{ s.id|stringformat:"04d" }}</code></td>
+                    <td>{{ s.created_at|date:"M d, Y H:i" }}</td>
+                    <td class="fw-medium">{{ s.patient.full_name }}<br><small class="text-muted">{{ s.patient.patient_id }}</small></td>
+                    <td><span class="badge bg-light text-dark">{{ s.items.count }} item{{ s.items.count|pluralize }}</span></td>
+                    <td>MWK {{ s.discount|floatformat:0 }}</td>
+                    <td class="fw-semibold">MWK {{ s.total_amount|floatformat:0 }}</td>
+                    <td><span class="badge bg-info rounded-pill text-dark">{{ s.get_payment_method_display|default:s.payment_method }}</span></td>
+                    <td class="small">{{ s.sold_by.get_full_name|default:s.sold_by.email|default:'-' }}</td>
+                    <td class="text-end">
+                        <a href="{% url 'pharmacy:sale_detail' s.pk %}" class="btn btn-sm btn-outline-secondary btn-icon"><i class="bi bi-receipt"></i></a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="9" class="text-center text-muted py-4">No sales recorded in this date range</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% block title %}Doctors - HMS{% endblock %}
+{% block page_title %}Doctors Directory{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+    <form method="get" class="d-flex gap-2 align-items-center flex-wrap">
+        <input type="text" name="q" class="form-control form-control-sm" placeholder="Search by name or license..." value="{{ search }}" style="width:220px;">
+        <select name="department" class="form-select form-select-sm" style="width:auto;" onchange="this.form.submit()">
+            <option value="">All Departments</option>
+            {% for d in departments %}
+            <option value="{{ d.pk }}" {% if current_dept == d.pk|stringformat:"s" %}selected{% endif %}>{{ d.name }}</option>
+            {% endfor %}
+        </select>
+        <button type="submit" class="btn btn-sm btn-outline-secondary"><i class="bi bi-search"></i></button>
+    </form>
+    <div class="d-flex gap-2">
+        <a href="{% url 'doctors:departments' %}" class="btn btn-sm btn-outline-secondary"><i class="bi bi-building me-1"></i>Departments</a>
+        <a href="{% url 'doctors:specializations' %}" class="btn btn-sm btn-outline-secondary"><i class="bi bi-stars me-1"></i>Specializations</a>
+        <a href="{% url 'doctors:schedules' %}" class="btn btn-sm btn-outline-secondary"><i class="bi bi-calendar-week me-1"></i>Schedules</a>
+        <a href="{% url 'doctors:doctor_create' %}" class="btn btn-dark btn-sm"><i class="bi bi-plus-lg me-1"></i>Add Doctor</a>
+    </div>
+</div>
+
+<div class="card shadow-sm border-0">
+    <div class="card-body p-0">
+        <table class="table table-hover datatable mb-0" style="font-size: .875rem;">
+            <thead class="table-light">
+                <tr><th>Name</th><th>Department</th><th>Specializations</th><th>License</th><th>Fee</th><th>Available</th><th class="text-end">Actions</th></tr>
+            </thead>
+            <tbody>
+                {% for p in doctors %}
+                <tr>
+                    <td class="fw-medium">Dr. {{ p.user.get_full_name }}</td>
+                    <td>{{ p.department.name|default:'-' }}</td>
+                    <td>{% for s in p.specializations.all %}<span class="badge bg-info text-dark me-1">{{ s.name }}</span>{% empty %}-{% endfor %}</td>
+                    <td>{{ p.license_number }}</td>
+                    <td>MWK {{ p.consultation_fee|floatformat:0 }}</td>
+                    <td>{% if p.is_available %}<span class="badge bg-success rounded-pill">Yes</span>{% else %}<span class="badge bg-secondary rounded-pill">No</span>{% endif %}</td>
+                    <td class="text-end">
+                        <a href="{% url 'doctors:doctor_detail' p.pk %}" class="btn btn-sm btn-outline-secondary btn-icon"><i class="bi bi-eye"></i></a>
+                        <a href="{% url 'doctors:doctor_edit' p.pk %}" class="btn btn-sm btn-outline-secondary btn-icon"><i class="bi bi-pencil"></i></a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="7" class="text-center py-4 text-muted">No doctors yet. <a href="{% url 'doctors:doctor_create' %}">Add the first</a>.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

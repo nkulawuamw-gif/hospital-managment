@@ -212,43 +212,6 @@
                 <p>No services configured yet. Add them in the admin settings.</p>
             </div>
             {% endfor %}
-
-            <div class="col-lg-4 col-md-6" data-aos="fade-up">
-                <div class="service-card h-100"><div class="card-body p-4">
-                    <div class="service-icon"><i class="bi bi-chat-heart-fill"></i></div>
-                    <h4 class="fw-bold">D. Family Planning</h4>
-                    <ul class="list-unstyled mt-3 service-list">
-                        <li><i class="bi bi-check-circle-fill text-primary me-2"></i>Counseling</li>
-                        <li><i class="bi bi-check-circle-fill text-primary me-2"></i>Contraceptive Services</li>
-                        <li><i class="bi bi-check-circle-fill text-primary me-2"></i>Reproductive Health Education</li>
-                    </ul>
-                </div></div>
-            </div>
-
-            <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="100">
-                <div class="service-card h-100"><div class="card-body p-4">
-                    <div class="service-icon"><i class="bi bi-microscope"></i></div>
-                    <h4 class="fw-bold">E. Laboratory Services</h4>
-                    <ul class="list-unstyled mt-3 service-list">
-                        <li><i class="bi bi-check-circle-fill text-primary me-2"></i>Blood Tests</li>
-                        <li><i class="bi bi-check-circle-fill text-primary me-2"></i>Urine Tests</li>
-                        <li><i class="bi bi-check-circle-fill text-primary me-2"></i>Diagnostic Screening</li>
-                    </ul>
-                </div></div>
-            </div>
-
-            <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="200">
-                <div class="service-card h-100"><div class="card-body p-4">
-                    <div class="service-icon"><i class="bi bi-capsule"></i></div>
-                    <h4 class="fw-bold">F. Pharmacy Services</h4>
-                    <ul class="list-unstyled mt-3 service-list">
-                        <li><i class="bi bi-check-circle-fill text-primary me-2"></i>Prescription Dispensing</li>
-                        <li><i class="bi bi-check-circle-fill text-primary me-2"></i>Medication Counseling</li>
-                        <li><i class="bi bi-check-circle-fill text-primary me-2"></i>Stock Management</li>
-                    </ul>
-                </div></div>
-            </div>
-
         </div>
     </div>
 </section>
@@ -335,10 +298,70 @@
         </div>
         <div class="row g-4">
             {% for dept in departments %}
-            <div class="col-lg-2 col-md-4 col-6" data-aos="fade-up" data-aos-delay="{{ forloop.counter0|add:-1|add:50 }}">
-                <div class="dept-card text-center p-4">
+            <div class="col-lg-4 col-md-6" data-aos="fade-up" {% if forloop.counter > 1 %}data-aos-delay="{{ forloop.counter0|add:-1|add:50 }}"{% endif %}>
+                <div class="dept-card p-4 h-100">
                     <div class="dept-icon"><i class="{{ dept.icon }}"></i></div>
-                    <h6 class="mt-3">{{ dept.name }}</h6>
+                    <h5 class="fw-bold">{{ dept.name }}</h5>
+                    {% if dept.description %}<p class="dept-desc">{{ dept.description }}</p>{% endif %}
+
+                    {% if dept.opening_hours %}
+                    <div class="dept-meta">
+                        <i class="bi bi-clock"></i>
+                        <span><strong>Hours:</strong> {{ dept.opening_hours }}</span>
+                    </div>
+                    {% endif %}
+
+                    <div class="small text-uppercase text-muted fw-semibold mb-2">Key Roles</div>
+                    <ul class="dept-roles">
+                        {% for role in dept.roles %}
+                        <li><i class="bi bi-person-badge"></i>{{ role }}</li>
+                        {% endfor %}
+                    </ul>
+
+                    <button class="dept-details-toggle" type="button" data-bs-toggle="collapse" data-bs-target="#dept-{{ dept.id }}" aria-expanded="false" aria-controls="dept-{{ dept.id }}">
+                        <span>View treatments, referrals &amp; client flow</span>
+                        <i class="bi bi-chevron-down chev"></i>
+                    </button>
+
+                    <div class="collapse" id="dept-{{ dept.id }}">
+                        <div class="dept-details">
+                            {% if dept.treatments %}
+                            <div class="dept-section-title"><i class="bi bi-clipboard2-pulse"></i>Treatments &amp; Support Given</div>
+                            <ul class="dept-treatments">
+                                {% for t in dept.treatments %}
+                                <li><i class="bi bi-check2-circle"></i>{{ t }}</li>
+                                {% endfor %}
+                            </ul>
+                            {% endif %}
+
+                            {% if dept.referrals_from %}
+                            <div class="dept-section-title"><i class="bi bi-arrow-down-circle"></i>Receives Referrals From</div>
+                            <ul class="dept-referral-list in">
+                                {% for ref in dept.referrals_from %}
+                                <li><i class="bi bi-arrow-down-short"></i>{{ ref }}</li>
+                                {% endfor %}
+                            </ul>
+                            {% endif %}
+
+                            {% if dept.referrals_to %}
+                            <div class="dept-section-title"><i class="bi bi-arrow-up-circle"></i>Refers Patients To</div>
+                            <ul class="dept-referral-list out">
+                                {% for ref in dept.referrals_to %}
+                                <li><i class="bi bi-arrow-up-short"></i>{{ ref }}</li>
+                                {% endfor %}
+                            </ul>
+                            {% endif %}
+
+                            {% if dept.client_handling_steps %}
+                            <div class="dept-section-title"><i class="bi bi-diagram-3"></i>Client Handling Flow</div>
+                            <ol class="dept-flow">
+                                {% for step in dept.client_handling_steps %}
+                                <li>{{ step }}</li>
+                                {% endfor %}
+                            </ol>
+                            {% endif %}
+                        </div>
+                    </div>
                 </div>
             </div>
             {% empty %}
@@ -350,41 +373,34 @@
     </div>
 </section>
 
-<!-- ==================== DOCTORS ==================== -->
+<!-- ==================== MEDICAL TEAMS ==================== -->
 <section id="doctors" class="section-padding bg-light">
     <div class="container">
         <div class="text-center mb-5" data-aos="fade-up">
             <h2 class="section-title">Our <span class="text-primary">Medical Team</span></h2>
-            <p class="text-muted mx-auto" style="max-width:600px;">Meet our dedicated team of healthcare professionals committed to your wellbeing.</p>
+            <p class="text-muted mx-auto" style="max-width:600px;">Specialized clinical teams working together to deliver safe, patient-centered care across every department.</p>
         </div>
-        <div class="row g-4" id="doctorsContainer">
-            {% if doctors %}
-                {% for doctor in doctors %}
-                <div class="col-lg-3 col-md-6" data-aos="fade-up">
-                    <div class="doctor-card text-center p-4">
-                        {% if doctor.profile_image %}
-                        <img src="{{ doctor.profile_image }}" alt="{{ doctor.full_name }}" class="doctor-img rounded-circle mb-3">
-                        {% else %}
-                        <div class="doctor-img-placeholder rounded-circle mx-auto mb-3 d-flex align-items-center justify-content-center bg-primary text-white">
-                            <i class="bi bi-person-fill fs-1"></i>
-                        </div>
-                        {% endif %}
-                        <h5 class="fw-bold">{{ doctor.full_name }}</h5>
-                        <p class="text-primary mb-1">{{ doctor.specialization }}</p>
-                        <p class="text-muted small">{{ doctor.qualification }}</p>
-                    </div>
+        <div class="row g-4">
+            {% for team in medical_teams %}
+            <div class="col-lg-4 col-md-6" data-aos="fade-up" {% if forloop.counter > 1 %}data-aos-delay="{{ forloop.counter0|add:-1|add:50 }}"{% endif %}>
+                <div class="team-card p-4 h-100">
+                    <div class="team-icon"><i class="{{ team.icon }}"></i></div>
+                    <h5 class="fw-bold">{{ team.name }}</h5>
+                    {% if team.description %}<p class="team-desc">{{ team.description }}</p>{% endif %}
+                    <span class="team-head"><i class="bi bi-star-fill me-1"></i>{{ team.head_title }}</span>
+                    <div class="small text-uppercase text-muted fw-semibold mb-2">Team Composition</div>
+                    <ul class="team-roles">
+                        {% for role in team.roles %}
+                        <li><i class="bi bi-person-check-fill"></i>{{ role }}</li>
+                        {% endfor %}
+                    </ul>
                 </div>
-                {% endfor %}
-            {% else %}
-                <div class="col-12 text-center py-5" data-aos="fade-up">
-                    <div class="doctor-card d-inline-block p-5">
-                        <i class="bi bi-people-fill fs-1 text-primary mb-3 d-block"></i>
-                        <h5>Our Medical Team</h5>
-                        <p class="text-muted">Our team of qualified doctors and healthcare professionals is ready to serve you.</p>
-                        <a href="#appointment" class="btn btn-primary rounded-pill">Book an Appointment</a>
-                    </div>
-                </div>
-            {% endif %}
+            </div>
+            {% empty %}
+            <div class="col-12 text-center py-4 text-muted">
+                <p>No medical teams configured yet. Add them in the admin settings.</p>
+            </div>
+            {% endfor %}
         </div>
     </div>
 </section>
@@ -416,16 +432,9 @@
                                 <div class="col-md-6">
                                     <select name="service" class="form-select" required>
                                         <option value="">Select Service</option>
-                                        <option>General Consultation</option>
-                                        <option>OPD Services</option>
-                                        <option>Under-Five Clinic</option>
-                                        <option>Antenatal Care</option>
-                                        <option>Family Planning</option>
-                                        <option>Laboratory Services</option>
-                                        <option>Pharmacy Services</option>
-                                        <option>Immunization</option>
-                                        <option>HIV Testing and Counseling</option>
-                                        <option>Chronic Disease Management</option>
+                                        {% for cat in service_categories %}
+                                            <option>{{ cat.name }}</option>
+                                        {% endfor %}
                                     </select>
                                 </div>
                                 <div class="col-md-6"><input type="date" name="preferred_date" class="form-control" required></div>
@@ -439,6 +448,63 @@
                             </div>
                         </form>
                         <div id="appointmentResponse" class="mt-3"></div>
+                        <script>
+                        (function() {
+                            var form = document.getElementById('appointmentForm');
+                            var response = document.getElementById('appointmentResponse');
+                            if (!form) return;
+                            form.addEventListener('submit', function(e) {
+                                e.preventDefault();
+                                var btn = form.querySelector('button[type="submit"]');
+                                btn.disabled = true;
+                                var originalHtml = btn.innerHTML;
+                                btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Submitting...';
+                                response.innerHTML = '';
+                                var data = new FormData(form);
+                                fetch(form.action, {
+                                    method: 'POST',
+                                    body: data,
+                                    headers: {'X-Requested-With': 'XMLHttpRequest', 'X-CSRFToken': form.querySelector('[name=csrfmiddlewaretoken]').value}
+                                })
+                                .then(function(r) { return r.json().then(function(j) { return {ok: r.ok, body: j}; }); })
+                                .then(function(res) {
+                                    if (res.ok && res.body.success) {
+                                        response.innerHTML = '<div class="alert alert-success"><i class="bi bi-check-circle-fill me-2"></i>' + res.body.message + '</div>';
+                                        form.reset();
+
+                                        var toastEl = document.getElementById('bookingToast');
+                                        document.getElementById('bookingToastBody').textContent = res.body.message;
+                                        document.getElementById('bookingToastRef').textContent = 'Reference: ' + res.body.reference;
+                                        var toast = bootstrap.Toast.getOrCreateInstance(toastEl, {delay: 8000});
+                                        toast.show();
+
+                                        var bell = document.getElementById('floatingBell');
+                                        document.getElementById('floatingBellText').textContent = 'Request received: ' + res.body.reference;
+                                        bell.style.display = 'block';
+                                        setTimeout(function() { bell.style.display = 'none'; }, 12000);
+                                    } else {
+                                        var errs = (res.body && res.body.errors) || ['Submission failed. Please try again.'];
+                                        response.innerHTML = '<div class="alert alert-danger"><i class="bi bi-exclamation-triangle-fill me-2"></i>' + errs.join('<br>') + '</div>';
+                                        var errToastEl = document.getElementById('bookingToastError');
+                                        document.getElementById('bookingToastErrorBody').textContent = errs.join(' · ');
+                                        var errToast = bootstrap.Toast.getOrCreateInstance(errToastEl, {delay: 6000});
+                                        errToast.show();
+                                    }
+                                })
+                                .catch(function() {
+                                    response.innerHTML = '<div class="alert alert-danger"><i class="bi bi-exclamation-triangle-fill me-2"></i>Network error. Please try again.</div>';
+                                    var errToastEl = document.getElementById('bookingToastError');
+                                    document.getElementById('bookingToastErrorBody').textContent = 'Network error. Please try again.';
+                                    var errToast = bootstrap.Toast.getOrCreateInstance(errToastEl, {delay: 6000});
+                                    errToast.show();
+                                })
+                                .finally(function() {
+                                    btn.disabled = false;
+                                    btn.innerHTML = originalHtml;
+                                });
+                            });
+                        })();
+                        </script>
                     </div>
                 </div>
             </div>
@@ -607,5 +673,45 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 <script src="{% static 'landing/js/landing.js' %}"></script>
+<!-- Toast container for appointment notifications -->
+<div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1100;">
+    <div id="bookingToast" class="toast align-items-center text-bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="8000">
+        <div class="d-flex">
+            <div class="toast-body">
+                <div class="d-flex align-items-center">
+                    <i class="bi bi-check-circle-fill fs-3 me-3"></i>
+                    <div>
+                        <div class="fw-bold">Request Sent Successfully</div>
+                        <div id="bookingToastBody" class="small"></div>
+                        <div id="bookingToastRef" class="small mt-1 opacity-75"></div>
+                    </div>
+                </div>
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+    </div>
+    <div id="bookingToastError" class="toast align-items-center text-bg-danger border-0" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="6000">
+        <div class="d-flex">
+            <div class="toast-body">
+                <div class="d-flex align-items-center">
+                    <i class="bi bi-exclamation-triangle-fill fs-3 me-3"></i>
+                    <div>
+                        <div class="fw-bold">Submission Failed</div>
+                        <div id="bookingToastErrorBody" class="small"></div>
+                    </div>
+                </div>
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+    </div>
+</div>
+
+<!-- In-page bell notification (persistent indicator) -->
+<div id="floatingBell" class="position-fixed" style="bottom: 20px; right: 20px; z-index: 1080; display: none;">
+    <div class="bg-primary text-white rounded-pill shadow-lg px-3 py-2 d-flex align-items-center" style="cursor: pointer;" onclick="document.getElementById('bookingToast').focus()">
+        <i class="bi bi-bell-fill me-2"></i>
+        <span id="floatingBellText" class="small fw-medium">Request received</span>
+    </div>
+</div>
 </body>
 </html>

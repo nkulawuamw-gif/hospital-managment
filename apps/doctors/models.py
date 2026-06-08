@@ -3,7 +3,7 @@ from simple_history.models import HistoricalRecords
 from apps.accounts.models import User
 
 
-class Department(models.Model):
+class StaffDepartment(models.Model):
     name = models.CharField(max_length=200, unique=True)
     description = models.TextField(blank=True)
     location = models.CharField(max_length=200, blank=True)
@@ -13,6 +13,8 @@ class Department(models.Model):
 
     class Meta:
         db_table = 'departments'
+        verbose_name = 'Staff Department'
+        verbose_name_plural = 'Staff Departments'
 
     def __str__(self):
         return self.name
@@ -31,7 +33,7 @@ class Specialization(models.Model):
 
 class DoctorProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='doctor_profile')
-    department = models.ForeignKey(Department, on_delete=models.SET_NULL, null=True, related_name='doctors')
+    department = models.ForeignKey(StaffDepartment, on_delete=models.SET_NULL, null=True, related_name='doctors')
     specializations = models.ManyToManyField(Specialization, related_name='doctors')
     license_number = models.CharField(max_length=100, unique=True)
     consultation_fee = models.DecimalField(max_digits=10, decimal_places=2, default=0)

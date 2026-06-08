@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% block title %}Transfer Patient - HMS{% endblock %}
+{% block page_title %}Transfer Patient{% endblock %}
+
+{% block content %}
+<div class="card shadow-sm border-0" style="max-width: 700px;">
+    <div class="card-body p-4">
+        <p class="text-muted small mb-3">Transferring <strong>{{ admission.patient.full_name }}</strong> from <strong>{{ admission.ward.name|default:'-' }}</strong>{% if admission.bed %} / Bed {{ admission.bed.bed_number }}{% endif %}.</p>
+        <form method="post">
+            {% csrf_token %}
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label small fw-medium">To Ward *</label>
+                    <select name="to_ward" class="form-select" required>
+                        <option value="">-- Select Ward --</option>
+                        {% for w in wards %}
+                        {% if w.pk != admission.ward_id %}
+                        <option value="{{ w.pk }}">{{ w.name }} ({{ w.available_beds }} beds free)</option>
+                        {% endif %}
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-12">
+                    <label class="form-label small fw-medium">Reason for Transfer *</label>
+                    <textarea name="reason" class="form-control" rows="3" required placeholder="e.g. Needs ICU monitoring"></textarea>
+                </div>
+            </div>
+            <div class="d-flex gap-2 mt-4 pt-3 border-top">
+                <button type="submit" class="btn btn-warning"><i class="bi bi-arrow-left-right me-1"></i>Transfer</button>
+                <a href="{% url 'inpatient:admission_detail' admission.pk %}" class="btn btn-outline-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

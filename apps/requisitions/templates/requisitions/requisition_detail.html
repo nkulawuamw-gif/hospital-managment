@@ -1,0 +1,109 @@
+{% extends 'base.html' %}
+{% block title %}Requisition {{ r.request_number }} - HMS{% endblock %}
+{% block page_title %}Requisition {{ r.request_number }}{% endblock %}
+
+{% block content %}
+<div class="row g-3">
+    <div class="col-md-4">
+        <div class="card shadow-sm border-0">
+            <div class="card-body">
+                <dl class="row small mb-0">
+                    <dt class="col-sm-5 text-muted">Request #</dt>
+                    <dd class="col-sm-7 fw-medium">{{ r.request_number }}</dd>
+                    <dt class="col-sm-5 text-muted">Requested By</dt>
+                    <dd class="col-sm-7">{{ r.requested_by.get_full_name }}</dd>
+                    <dt class="col-sm-5 text-muted">Department</dt>
+                    <dd class="col-sm-7">{{ r.department.name|default:'—' }}</dd>
+                    <dt class="col-sm-5 text-muted">Date</dt>
+                    <dd class="col-sm-7">{{ r.created_at|date:"M d, Y H:i" }}</dd>
+                    <dt class="col-sm-5 text-muted">Status</dt>
+                    <dd class="col-sm-7">
+                        <span class="badge bg-{% if r.status == 'dispatched' %}success{% elif r.status == 'approved' %}info{% elif r.status == 'processing' %}primary{% elif r.status == 'rejected' %}danger{% elif r.status == 'cancelled' %}secondary{% else %}warning text-dark{% endif %} rounded-pill">
+                            {{ r.get_status_display }}
+                        </span>
+                    </dd>
+                </dl>
+                {% if r.notes %}<hr><p class="small mb-0"><span class="text-muted">Notes:</span> {{ r.notes }}</p>{% endif %}
+                {% if r.approval_notes %}<hr><p class="small mb-0"><span class="text-muted">Approval Notes:</span> {{ r.approval_notes }}</p>{% endif %}
+                {% if r.dispatch_notes %}<hr><p class="small mb-0"><span class="text-muted">Dispatch Notes:</span> {{ r.dispatch_notes }}</p>{% endif %}
+            </div>
+            <div class="card-footer bg-white border-top-0 d-flex gap-2 flex-wrap">
+                {% if can_approve %}
+                <a href="{% url 'requisitions:requisition_approve' r.pk %}" class="btn btn-dark btn-sm"><i class="bi bi-check-circle me-1"></i>Review & Approve</a>
+                {% endif %}
+                {% if can_process %}
+                <form method="post" action="{% url 'requisitions:requisition_process' r.pk %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-primary btn-sm"><i class="bi bi-gear me-1"></i>Start Processing</button>
+                </form>
+                {% endif %}
+                {% if can_dispatch %}
+                <a href="{% url 'requisitions:requisition_dispatch' r.pk %}" class="btn btn-success btn-sm"><i class="bi bi-truck me-1"></i>Dispatch & Confirm</a>
+                {% endif %}
+            </div>
+        </div>
+
+        {% if r.approved_by %}
+        <div class="card shadow-sm border-0 mt-2">
+            <div class="card-body py-2 small">
+                <i class="bi bi-check-circle text-info me-1"></i> Approved by <span class="fw-medium">{{ r.approved_by.get_full_name }}</span> on {{ r.approved_at|date:"M d, Y H:i" }}
+            </div>
+        </div>
+        {% endif %}
+        {% if r.processed_by %}
+        <div class="card shadow-sm border-0 mt-2">
+            <div class="card-body py-2 small">
+                <i class="bi bi-gear text-primary me-1"></i> Processed by <span class="fw-medium">{{ r.processed_by.get_full_name }}</span> on {{ r.processed_at|date:"M d, Y H:i" }}
+            </div>
+        </div>
+        {% endif %}
+        {% if r.dispatched_by %}
+        <div class="card shadow-sm border-0 mt-2">
+            <div class="card-body py-2 small">
+                <i class="bi bi-truck text-success me-1"></i> Dispatched by <span class="fw-medium">{{ r.dispatched_by.get_full_name }}</span> on {{ r.dispatched_at|date:"M d, Y H:i" }}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="col-md-8">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-white">
+                <h6 class="fw-semibold mb-0"><i class="bi bi-list-check me-2"></i>Requested Items</h6>
+            </div>
+            <div class="card-body p-0">
+                <table class="table mb-0" style="font-size: .875rem;">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Medicine</th>
+                            <th>Requested</th>
+                            <th>Approved</th>
+                            <th>Delivered</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in r.items.all %}
+                        <tr>
+                            <td class="fw-medium">{{ item.medicine.name }} ({{ item.medicine.strength }})</td>
+                            <td>{{ item.quantity_requested }}</td>
+                            <td>{{ item.quantity_approved|default:'—' }}</td>
+                            <td>{{ item.quantity_delivered|default:'—' }}</td>
+                            <td>
+                                {% if item.quantity_delivered %}
+                                <span class="badge bg-success rounded-pill">Delivered</span>
+                                {% elif item.quantity_approved %}
+                                <span class="badge bg-info rounded-pill">Approved</span>
+                                {% else %}
+                                <span class="badge bg-warning text-dark rounded-pill">Pending</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

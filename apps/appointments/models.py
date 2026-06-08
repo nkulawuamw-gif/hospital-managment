@@ -12,6 +12,12 @@ class Appointment(models.Model):
         COMPLETED = 'completed', 'Completed'
         CANCELLED = 'cancelled', 'Cancelled'
 
+    class Source(models.TextChoices):
+        INTERNAL = 'internal', 'Internal (Staff)'
+        WEB = 'web', 'Public Website'
+        PHONE = 'phone', 'Phone Call'
+        WALK_IN = 'walk_in', 'Walk-in'
+
     patient = models.ForeignKey(Patient, on_delete=models.CASCADE, related_name='appointments')
     doctor = models.ForeignKey(User, on_delete=models.CASCADE, related_name='doctor_appointments', limit_choices_to={'role': 'doctor'})
     appointment_date = models.DateField()
@@ -19,6 +25,7 @@ class Appointment(models.Model):
     end_time = models.TimeField(null=True, blank=True)
     reason = models.TextField(blank=True)
     status = models.CharField(max_length=20, choices=Status.choices, default=Status.SCHEDULED)
+    source = models.CharField(max_length=20, choices=Source.choices, default=Source.INTERNAL)
     notes = models.TextField(blank=True)
     created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='created_appointments')
     checked_in_at = models.DateTimeField(null=True, blank=True)
@@ -30,10 +37,12 @@ class Appointment(models.Model):
 
     class Meta:
         db_table = 'appointments'
+        ordering = ['-id']
         indexes = [
             models.Index(fields=['appointment_date']),
             models.Index(fields=['status']),
             models.Index(fields=['doctor', 'appointment_date']),
+            models.Index(fields=['source']),
         ]
 
     def __str__(self):

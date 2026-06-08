@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+{% block title %}Department Queue - HMS{% endblock %}
+{% block page_title %}{{ department.name|default:'All' }} - Patient Queue{% endblock %}
+
+{% block content %}
+<ul class="nav nav-tabs mb-3" id="queueTabs" role="tablist">
+    <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="pending-tab" data-bs-toggle="tab" data-bs-target="#pending" type="button">
+            Pending <span class="badge bg-warning ms-1">{{ pending|length }}</span>
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="inprogress-tab" data-bs-toggle="tab" data-bs-target="#inprogress" type="button">
+            In Progress <span class="badge bg-primary ms-1">{{ in_progress|length }}</span>
+        </button>
+    </li>
+</ul>
+
+<div class="tab-content">
+    <div class="tab-pane fade show active" id="pending">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Visit #</th>
+                                <th>Patient</th>
+                                <th>Referred From</th>
+                                <th>Referred By</th>
+                                <th>Wait Time</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for enc in pending %}
+                            <tr>
+                                <td><strong>{{ enc.visit.visit_number }}</strong></td>
+                                <td>
+                                    <a href="{% url 'patients:detail' enc.visit.patient.id %}">
+                                        {{ enc.visit.patient.first_name }} {{ enc.visit.patient.last_name }}
+                                    </a>
+                                </td>
+                                <td>{{ enc.referred_from.department.name|default:'Registration' }}</td>
+                                <td>{{ enc.referred_by.get_full_name|default:enc.referred_by.email }}</td>
+                                <td>{{ enc.created_at|timesince }}</td>
+                                <td>
+                                    <a href="{% url 'encounters:start_encounter' enc.id %}" class="btn btn-sm btn-success">
+                                        <i class="bi bi-play-fill"></i> Start
+                                    </a>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr><td colspan="6" class="text-center text-muted py-4">No pending patients</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="tab-pane fade" id="inprogress">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Visit #</th>
+                                <th>Patient</th>
+                                <th>Seen By</th>
+                                <th>Started</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for enc in in_progress %}
+                            <tr>
+                                <td><strong>{{ enc.visit.visit_number }}</strong></td>
+                                <td>{{ enc.visit.patient.first_name }} {{ enc.visit.patient.last_name }}</td>
+                                <td>{{ enc.seen_by.get_full_name|default:enc.seen_by.email }}</td>
+                                <td>{{ enc.updated_at|timesince }}</td>
+                                <td>
+                                    <a href="{% url 'encounters:encounter_detail' enc.id %}" class="btn btn-sm btn-primary">
+                                        <i class="bi bi-eye"></i> View
+                                    </a>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr><td colspan="5" class="text-center text-muted py-4">No patients in progress</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

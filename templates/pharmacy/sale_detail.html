@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+{% block title %}Sale #S{{ s.id|stringformat:"04d" }} - Pharmacy - HMS{% endblock %}
+{% block page_title %}Sale Receipt S{{ s.id|stringformat:"04d" }}{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-end mb-3">
+    <button class="btn btn-outline-secondary btn-sm me-2" onclick="window.print()"><i class="bi bi-printer me-1"></i>Print</button>
+    <a href="{% url 'pharmacy:sale_list' %}" class="btn btn-outline-secondary btn-sm"><i class="bi bi-arrow-left me-1"></i>Back</a>
+</div>
+
+<div class="row g-3">
+    <div class="col-md-8">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                <h6 class="fw-semibold mb-0"><i class="bi bi-receipt me-2"></i>Receipt Items</h6>
+                <span class="text-muted small">{{ s.created_at|date:"M d, Y H:i" }}</span>
+            </div>
+            <div class="card-body p-0">
+                <table class="table mb-0" style="font-size: .875rem;">
+                    <thead class="table-light">
+                        <tr><th>Medicine</th><th>Qty</th><th>Unit Price</th><th>Line Total</th></tr>
+                    </thead>
+                    <tbody>
+                        {% for item in s.items.all %}
+                        <tr>
+                            <td class="fw-medium">
+                                {{ item.medicine.name }}
+                                {% if item.medicine.strength %}<small class="text-muted d-block">{{ item.medicine.strength }} - {{ item.medicine.get_unit_display }}</small>{% endif %}
+                            </td>
+                            <td>{{ item.quantity }}</td>
+                            <td>MWK {{ item.unit_price|floatformat:2 }}</td>
+                            <td class="fw-semibold">MWK {{ item.total_price|floatformat:2 }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                    <tfoot>
+                        <tr><td colspan="3" class="text-end">Subtotal</td><td>MWK {{ s.total_amount|floatformat:2 }}</td></tr>
+                        <tr><td colspan="3" class="text-end">Discount</td><td>MWK {{ s.discount|floatformat:2 }}</td></tr>
+                        <tr><td colspan="3" class="text-end fw-bold">Total</td><td class="fw-bold text-success" id="netTotal">MWK 0.00</td></tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card shadow-sm border-0 mb-3">
+            <div class="card-header bg-white"><h6 class="fw-semibold mb-0"><i class="bi bi-person me-2"></i>Customer</h6></div>
+            <div class="card-body">
+                <div class="fw-medium">{{ s.patient.full_name }}</div>
+                <div class="text-muted small">{{ s.patient.patient_id }}</div>
+                {% if s.patient.phone %}<div class="text-muted small">{{ s.patient.phone }}</div>{% endif %}
+            </div>
+        </div>
+        <div class="card shadow-sm border-0 mb-3">
+            <div class="card-header bg-white"><h6 class="fw-semibold mb-0"><i class="bi bi-credit-card me-2"></i>Payment</h6></div>
+            <div class="card-body">
+                <dl class="row small mb-0">
+                    <dt class="col-5 text-muted">Method</dt>
+                    <dd class="col-7"><span class="badge bg-info rounded-pill text-dark">{{ s.get_payment_method_display|default:s.payment_method }}</span></dd>
+                    <dt class="col-5 text-muted">Cashier</dt>
+                    <dd class="col-7">{{ s.sold_by.get_full_name|default:s.sold_by.email|default:'-' }}</dd>
+                    <dt class="col-5 text-muted">Date</dt>
+                    <dd class="col-7">{{ s.created_at|date:"M d, Y H:i" }}</dd>
+                </dl>
+            </div>
+        </div>
+        <div class="card shadow-sm border-0">
+            <div class="card-body text-center">
+                <div class="text-muted small">Net Payable</div>
+                <div class="fw-bold fs-2 text-success" id="netPayable">MWK 0</div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

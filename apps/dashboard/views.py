@@ -1,11 +1,16 @@
 import re
-from datetime import date, timedelta
+import json
+import secrets
+import string
+from datetime import date, timedelta, datetime
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
+from django.http import JsonResponse
 from django.contrib import messages
 from django.db import models
 from django.db.models import Count, Sum
 from django.utils import timezone
+from django.urls import reverse
 
 from apps.accounts.models import User
 from apps.doctors.models import DoctorProfile
@@ -15,10 +20,10 @@ from apps.inpatient.models import Admission
 from apps.billing.models import Invoice, Payment
 from apps.pharmacy.models import MedicineBatch
 from apps.laboratory.models import LabRequest
-from apps.notifications.models import Notification
+from apps.notifications.models import Notification, EmailLog, SMSLog
 from .models import (
     HealthArticle, SiteSetting, HeroSection, WhyChooseItem,
-    ServiceCategory, Department, Testimonial, Statistic, ContactInfo,
+    ServiceCategory, Department, MedicalTeam, Testimonial, Statistic, ContactInfo,
 )
 
 
@@ -53,6 +58,7 @@ def landing_view(request):
         'why_choose_items': WhyChooseItem.objects.filter(is_active=True).order_by('order'),
         'service_categories': ServiceCategory.objects.filter(is_active=True).order_by('order').prefetch_related('items'),
         'departments': Department.objects.filter(is_active=True).order_by('order'),
+        'medical_teams': MedicalTeam.objects.filter(is_active=True).order_by('order'),
         'testimonials': Testimonial.objects.filter(is_active=True).order_by('order'),
         'statistics': Statistic.objects.filter(is_active=True).order_by('order'),
         'contact_infos': ContactInfo.objects.filter(is_active=True).order_by('order'),
@@ -61,7 +67,10 @@ def landing_view(request):
 
 
 def book_appointment_view(request):
+    is_ajax = request.headers.get('x-requested-with') == 'XMLHttpRequest'
     if request.method != 'POST':
+        if is_ajax:
+            return JsonResponse({'success': False, 'errors': ['Invalid request method']}, status=400)
         return redirect('dashboard:home')
 
     full_name = request.POST.get('full_name', '').strip()
@@ -83,6 +92,8 @@ def book_appointment_view(request):
         errors.append('Preferred date is required')
 
     if errors:
+        if is_ajax:
+            return JsonResponse({'success': False, 'errors': errors}, status=400)
         for err in errors:
             messages.error(request, err)
         return redirect('dashboard:home')
@@ -109,6 +120,8 @@ def book_appointment_view(request):
     )
 
     first_doctor = User.objects.filter(role='doctor', is_active=True).first()
+    if first_doctor is None:
+        first_doctor = User.objects.filter(role__in=['super_admin', 'hospital_admin'], is_active=True).first()
 
     appointment = Appointment.objects.create(
         patient=patient,
@@ -117,12 +130,121 @@ def book_appointment_view(request):
         appointment_time=preferred_time or None,
         reason=f'{service}: {message}' if message else service,
         status='scheduled',
+        source=Appointment.Source.WEB,
+        notes=f'Booked via public website by {full_name} ({phone}{", " + email if email else ""}).',
     )
 
-    messages.success(
-        request,
-        f'Appointment request submitted successfully! Your reference: {patient.patient_id}. We will contact you at {phone}.'
+    appointment_detail_url = reverse('appointments:detail', args=[appointment.pk])
+    recipients = User.objects.filter(
+        role__in=['super_admin', 'hospital_admin', 'receptionist'],
+        is_active=True,
     )
+    if first_doctor:
+        recipients = (recipients | User.objects.filter(pk=first_doctor.pk)).distinct()
+    else:
+        recipients = recipients.distinct()
+
+    preferred_time_display = preferred_time if preferred_time else 'any time'
+    note = (f' Notes: {message}' if message else '')
+    for recipient in recipients:
+        Notification.objects.create(
+            recipient=recipient,
+            type=Notification.Type.APPOINTMENT,
+            title=f'New website booking from {full_name}',
+            message=(
+                f'{full_name} ({phone}) requested an appointment for {service} '
+                f'on {preferred_date} at {preferred_time_display}.{note}'
+            ),
+            link=appointment_detail_url,
+        )
+
+    patient_user = None
+    if email:
+        patient_user, user_created = User.objects.get_or_create(
+            email=email,
+            defaults={
+                'first_name': first_name,
+                'last_name': last_name,
+                'role': User.Role.PATIENT,
+                'phone': phone,
+                'is_active': True,
+            },
+        )
+        if user_created:
+            alphabet = string.ascii_letters + string.digits
+            temp_password = ''.join(secrets.choice(alphabet) for _ in range(10))
+            patient_user.set_password(temp_password)
+            patient_user.save()
+            patient_user.temporary_password = temp_password
+        else:
+            patient_user.temporary_password = None
+            if not patient_user.phone:
+                patient_user.phone = phone
+                patient_user.save(update_fields=['phone'])
+
+        Notification.objects.create(
+            recipient=patient_user,
+            type=Notification.Type.APPOINTMENT,
+            title='Your appointment request was received',
+            message=(
+                f'Dear {full_name}, your request for {service} on '
+                f'{preferred_date} at {preferred_time_display} has been received. '
+                f'Reference: {patient.patient_id}. Our team will contact you at {phone} to confirm.'
+            ),
+            link=reverse('appointments:detail', args=[appointment.pk]),
+        )
+
+    email_body = (
+        f'Dear {full_name},\n\n'
+        f'Your appointment request for {service} on {preferred_date} '
+        f'at {preferred_time_display} has been received.\n'
+        f'Reference: {patient.patient_id}\n\n'
+    )
+    if patient_user is not None and getattr(patient_user, 'temporary_password', None):
+        email_body += (
+            f'A patient portal account has been created for you.\n'
+            f'Login: {email}\n'
+            f'Temporary password: {patient_user.temporary_password}\n'
+            f'Please change your password after first login.\n\n'
+        )
+    email_body += 'We will contact you at ' + phone + ' to confirm.\n\n-- Hope Clinic'
+
+    if email:
+        try:
+            EmailLog.objects.create(
+                recipient=email,
+                subject='Hope Clinic - Appointment Request Received',
+                body=email_body,
+                status='sent',
+            )
+        except Exception:
+            pass
+
+    try:
+        SMSLog.objects.create(
+            recipient=phone_clean,
+            message=(
+                f'Hope Clinic: Your appointment request for {service} on '
+                f'{preferred_date} has been received. Ref: {patient.patient_id}. '
+                f'We will call to confirm.'
+            ),
+            status='sent',
+        )
+    except Exception:
+            pass
+
+    success_message = (
+        f'Appointment request submitted successfully! '
+        f'Your reference: {patient.patient_id}. We will contact you at {phone}.'
+    )
+    if is_ajax:
+        return JsonResponse({
+            'success': True,
+            'message': success_message,
+            'reference': patient.patient_id,
+            'appointment_id': appointment.pk,
+        })
+    messages.success(request, success_message)
     return redirect('dashboard:home')
 
 

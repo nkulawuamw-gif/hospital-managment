@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+{% block title %}New Requisition - HMS{% endblock %}
+{% block page_title %}Create Department Requisition{% endblock %}
+
+{% block content %}
+<div class="card shadow-sm border-0">
+    <div class="card-body p-4">
+        <form method="post">
+            {% csrf_token %}
+            <div class="row g-3 mb-4">
+                <div class="col-md-6">
+                    <label class="form-label small fw-medium">Department</label>
+                    <select name="department" class="form-select">
+                        <option value="">— Select Department —</option>
+                        {% for d in departments %}
+                        <option value="{{ d.pk }}">{{ d.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label small fw-medium">Notes / Reason</label>
+                    <textarea name="notes" class="form-control" rows="2" placeholder="Why is this request needed?"></textarea>
+                </div>
+            </div>
+
+            <h6 class="fw-semibold mb-3">Requested Medicines</h6>
+            <table class="table table-bordered" style="font-size: .85rem;" id="itemsTable">
+                <thead class="table-light">
+                    <tr><th style="width:50%">Medicine</th><th style="width:20%">Quantity</th><th style="width:20%">Available Stock</th><th style="width:10%"></th></tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            <select name="medicine[]" class="form-select form-select-sm medicine-select">
+                                <option value="">— Select Medicine —</option>
+                                {% for m in medicines %}
+                                <option value="{{ m.pk }}" data-stock="{{ m.batches.all.0.quantity_remaining|default:0 }}">{{ m.name }} ({{ m.strength }})</option>
+                                {% endfor %}
+                            </select>
+                        </td>
+                        <td><input type="number" name="quantity[]" class="form-control form-control-sm qty" value="1" min="1"></td>
+                        <td><span class="stock-display text-muted small">—</span></td>
+                        <td><button type="button" class="btn btn-sm btn-outline-danger btn-icon remove-row"><i class="bi bi-trash"></i></button></td>
+                    </tr>
+                </tbody>
+            </table>
+            <button type="button" class="btn btn-sm btn-outline-secondary mb-3" id="addRow"><i class="bi bi-plus-lg me-1"></i>Add Item</button>
+
+            <div class="d-flex gap-2 mt-4">
+                <button type="submit" class="btn btn-dark"><i class="bi bi-send me-1"></i>Submit for Approval</button>
+                <a href="{% url 'requisitions:requisition_list' %}" class="btn btn-outline-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+    $('.medicine-select').each(function() { updateStock($(this)); });
+});
+$(document).on('change', '.medicine-select', function() {
+    updateStock($(this));
+});
+function updateStock(el) {
+    var opt = el.find('option:selected');
+    var stock = opt.data('stock');
+    var display = el.closest('tr').find('.stock-display');
+    if (stock !== undefined && stock !== '') {
+        display.text(stock + ' in stock');
+    } else {
+        display.text('—');
+    }
+}
+$('#addRow').click(function() {
+    var t = $('#itemsTable tbody tr:first').clone();
+    t.find('input').val('1');
+    t.find('.stock-display').text('—');
+    t.find('.medicine-select').val('');
+    $('#itemsTable tbody').append(t);
+});
+$(document).on('click', '.remove-row', function() {
+    if ($('#itemsTable tbody tr').length > 1) $(this).closest('tr').remove();
+});
+</script>
+{% endblock %}

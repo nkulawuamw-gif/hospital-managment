@@ -41,7 +41,7 @@
                 <label class="form-label small fw-medium">Tests *</label>
                 <select name="tests" class="form-select select2" multiple required>
                     {% for t in tests %}
-                    <option value="{{ t.pk }}">{{ t.name }} - KES {{ t.price|floatformat:0 }}</option>
+                    <option value="{{ t.pk }}">{{ t.name }} - MWK {{ t.price|floatformat:0 }}</option>
                     {% endfor %}
                 </select>
             </div>

@@ -18,7 +18,7 @@
                 {% for q in quotations %}
                 <tr>
                     <td><a href="{% url 'patients:detail' q.patient.pk %}" class="text-decoration-none fw-medium">{{ q.patient.full_name }}</a></td>
-                    <td class="fw-medium">KES {{ q.total_amount|floatformat:0 }}</td>
+                    <td class="fw-medium">MWK {{ q.total_amount|floatformat:0 }}</td>
                     <td>{{ q.valid_until|date:"M d, Y" }}</td>
                     <td>{{ q.created_at|date:"M d, Y" }}</td>
                     <td>{{ q.created_by.get_full_name|default:'-' }}</td>

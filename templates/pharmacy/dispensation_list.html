@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% block title %}Dispensations - Pharmacy - HMS{% endblock %}
+{% block page_title %}Dispensation History{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+    <form method="get" class="d-flex gap-2 align-items-center">
+        <label class="small text-muted">From</label>
+        <input type="date" name="from" value="{{ date_from }}" class="form-control form-control-sm" style="width: auto;">
+        <label class="small text-muted">To</label>
+        <input type="date" name="to" value="{{ date_to }}" class="form-control form-control-sm" style="width: auto;">
+        <button type="submit" class="btn btn-sm btn-outline-secondary">Filter</button>
+    </form>
+    <div class="d-flex gap-2">
+        <a href="{% url 'pharmacy:medicines' %}" class="btn btn-sm btn-outline-secondary"><i class="bi bi-capsule me-1"></i>Inventory</a>
+        <a href="{% url 'pharmacy:prescriptions' %}" class="btn btn-sm btn-outline-secondary"><i class="bi bi-file-text me-1"></i>Prescriptions</a>
+        <a href="{% url 'pharmacy:sale_list' %}" class="btn btn-sm btn-outline-secondary"><i class="bi bi-receipt me-1"></i>Sales</a>
+    </div>
+</div>
+
+<div class="card shadow-sm border-0">
+    <div class="card-body p-0">
+        <table class="table table-hover datatable mb-0" style="font-size: .875rem;">
+            <thead class="table-light">
+                <tr><th>Date</th><th>Prescription</th><th>Patient</th><th>Items Dispensed</th><th>Pharmacist</th><th>Notes</th></tr>
+            </thead>
+            <tbody>
+                {% for d in dispensations %}
+                <tr>
+                    <td>{{ d.dispensed_at|date:"M d, Y H:i" }}</td>
+                    <td><a href="{% url 'pharmacy:prescription_detail' d.prescription.pk %}" class="text-decoration-none"><code>#RX{{ d.prescription.pk|stringformat:"05d" }}</code></a></td>
+                    <td class="fw-medium">{{ d.prescription.patient.full_name }}<br><small class="text-muted">{{ d.prescription.patient.patient_id }}</small></td>
+                    <td>
+                        {% for item in d.prescription.items.all %}
+                            <span class="badge bg-light text-dark border me-1">{{ item.medicine.name }} x{{ item.quantity }}</span>
+                        {% endfor %}
+                    </td>
+                    <td class="small">{{ d.dispensed_by.get_full_name|default:d.dispensed_by.email|default:'-' }}</td>
+                    <td class="small text-muted">{{ d.notes|truncatechars:60|default:'-' }}</td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="6" class="text-center text-muted py-4">No dispensations in this date range</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

@@ -1,11 +1,12 @@
-from datetime import date
+from datetime import date, datetime
+from decimal import Decimal
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.db.models import Count, Sum, F, Q
 from rest_framework import viewsets
-from .models import MedicineCategory, Medicine, MedicineBatch, Prescription, PrescriptionItem, Dispensation
-from .serializers import MedicineCategorySerializer, MedicineSerializer, MedicineBatchSerializer, PrescriptionSerializer, PrescriptionItemSerializer, DispensationSerializer
+from .models import MedicineCategory, Medicine, MedicineBatch, Prescription, PrescriptionItem, Dispensation, Sale, SaleItem
+from .serializers import MedicineCategorySerializer, MedicineSerializer, MedicineBatchSerializer, PrescriptionSerializer, PrescriptionItemSerializer, DispensationSerializer, SaleSerializer
 from apps.patients.models import Patient
 
 
@@ -40,6 +41,11 @@ class PrescriptionItemViewSet(viewsets.ModelViewSet):
 class DispensationViewSet(viewsets.ModelViewSet):
     queryset = Dispensation.objects.all()
     serializer_class = DispensationSerializer
+
+
+class SaleViewSet(viewsets.ModelViewSet):
+    queryset = Sale.objects.all()
+    serializer_class = SaleSerializer
 
 
 # ------------------ Template Views ------------------
@@ -160,8 +166,103 @@ def prescription_dispense(request, pk):
             dispensed_by=request.user,
             notes=request.POST.get('notes', ''),
         )
+        for item in prescription.items.all():
+            item.is_dispensed = True
+            item.quantity_dispensed = item.quantity
+            item.save()
         prescription.status = Prescription.Status.DISPENSED
         prescription.save()
         messages.success(request, 'Prescription dispensed')
         return redirect('pharmacy:prescription_detail', pk=pk)
     return render(request, 'pharmacy/dispense.html', {'p': prescription})
+
+
+# ------------------ Sale POS ------------------
+
+@login_required
+def sale_list(request):
+    today = date.today()
+    date_from = request.GET.get('from', today.replace(day=1).isoformat())
+    date_to = request.GET.get('to', today.isoformat())
+    sales = Sale.objects.filter(created_at__date__gte=date_from, created_at__date__lte=date_to).select_related('patient', 'sold_by').order_by('-created_at')
+    totals = sales.aggregate(total=Sum('total_amount'), count=Count('id'))
+    return render(request, 'pharmacy/sale_list.html', {
+        'sales': sales,
+        'date_from': date_from,
+        'date_to': date_to,
+        'grand_total': totals['total'] or 0,
+        'sale_count': totals['count'] or 0,
+    })
+
+
+@login_required
+def sale_create(request):
+    patients = Patient.objects.filter(is_active=True).order_by('patient_id')
+    medicines = Medicine.objects.filter(is_active=True).order_by('name')
+    if request.method == 'POST':
+        patient_id = request.POST.get('patient')
+        if not patient_id:
+            messages.error(request, 'Please select a patient')
+            return redirect('pharmacy:sale_create')
+        medicine_ids = request.POST.getlist('medicine_id')
+        quantities = request.POST.getlist('quantity')
+        unit_prices = request.POST.getlist('unit_price')
+        if not medicine_ids:
+            messages.error(request, 'Add at least one medicine')
+            return redirect('pharmacy:sale_create')
+        sale = Sale.objects.create(
+            patient_id=patient_id,
+            discount=request.POST.get('discount', 0) or 0,
+            payment_method=request.POST.get('payment_method', 'cash'),
+            sold_by=request.user,
+        )
+        grand = Decimal('0')
+        for med_id, qty, price in zip(medicine_ids, quantities, unit_prices):
+            if not med_id or not qty:
+                continue
+            qty_i = int(qty)
+            if qty_i <= 0:
+                continue
+            unit_p = Decimal(str(price or 0))
+            total_p = unit_p * qty_i
+            SaleItem.objects.create(
+                sale=sale,
+                medicine_id=med_id,
+                quantity=qty_i,
+                unit_price=unit_p,
+                total_price=total_p,
+            )
+            grand += total_p
+        sale.total_amount = grand
+        sale.discount = Decimal(str(request.POST.get('discount', 0) or 0))
+        sale.save()
+        messages.success(request, f'Sale #{sale.id} created. Total: MWK {sale.total_amount - sale.discount:,.0f}')
+        return redirect('pharmacy:sale_detail', pk=sale.pk)
+    return render(request, 'pharmacy/sale_form.html', {
+        'patients': patients,
+        'medicines': medicines,
+    })
+
+
+@login_required
+def sale_detail(request, pk):
+    sale = get_object_or_404(Sale.objects.select_related('patient', 'sold_by').prefetch_related('items__medicine'), pk=pk)
+    return render(request, 'pharmacy/sale_detail.html', {'s': sale})
+
+
+# ------------------ Dispensation history ------------------
+
+@login_required
+def dispensation_list(request):
+    today = date.today()
+    date_from = request.GET.get('from', today.replace(day=1).isoformat())
+    date_to = request.GET.get('to', today.isoformat())
+    dispensations = Dispensation.objects.filter(
+        dispensed_at__date__gte=date_from,
+        dispensed_at__date__lte=date_to,
+    ).select_related('prescription__patient', 'dispensed_by').order_by('-dispensed_at')
+    return render(request, 'pharmacy/dispensation_list.html', {
+        'dispensations': dispensations,
+        'date_from': date_from,
+        'date_to': date_to,
+    })

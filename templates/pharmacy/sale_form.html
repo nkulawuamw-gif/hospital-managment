@@ -1,0 +1,151 @@
+{% extends 'base.html' %}
+{% block title %}New Sale - Pharmacy - HMS{% endblock %}
+{% block page_title %}Point of Sale{% endblock %}
+
+{% block extra_js %}
+<script>
+const meds = [
+    {% for m in medicines %}
+    {id: {{ m.pk }}, name: "{{ m.name|escapejs }}", price: {{ m.selling_price|default:0 }}, unit: "{{ m.get_unit_display }}", strength: "{{ m.strength|escapejs }}"}{% if not forloop.last %},{% endif %}
+    {% endfor %}
+];
+
+let rowIdx = 0;
+function addRow() {
+    const tbody = document.getElementById('posBody');
+    const tr = document.createElement('tr');
+    tr.dataset.idx = rowIdx;
+    tr.innerHTML = `
+        <td>
+            <input list="medList" class="form-control form-control-sm med-search" placeholder="Type medicine name" data-idx="${rowIdx}" autocomplete="off">
+            <datalist id="medList">${meds.map(m => `<option value="${m.name}" data-id="${m.id}" data-price="${m.price}">${m.strength} - MWK ${m.price}</option>`).join('')}</datalist>
+        </td>
+        <td><span class="unit-label text-muted small">-</span></td>
+        <td><input type="number" min="1" value="1" class="form-control form-control-sm qty" data-idx="${rowIdx}"></td>
+        <td><input type="number" min="0" step="0.01" class="form-control form-control-sm price" data-idx="${rowIdx}"></td>
+        <td class="line-total fw-semibold">0.00</td>
+        <td class="text-end"><button type="button" class="btn btn-sm btn-outline-danger btn-icon rm"><i class="bi bi-trash"></i></button></td>
+    `;
+    tbody.appendChild(tr);
+    rowIdx++;
+    recalc();
+}
+function findMed(name) {
+    const n = (name || '').toLowerCase().trim();
+    return meds.find(m => m.name.toLowerCase() === n) || meds.find(m => m.name.toLowerCase().includes(n));
+}
+function recalc() {
+    let grand = 0;
+    document.querySelectorAll('#posBody tr').forEach(tr => {
+        const idx = tr.dataset.idx;
+        const search = tr.querySelector('.med-search');
+        const qty = parseFloat(tr.querySelector('.qty').value) || 0;
+        const priceInp = tr.querySelector('.price');
+        const med = findMed(search.value);
+        let price = parseFloat(priceInp.value) || 0;
+        if (med) {
+            tr.querySelector('.unit-label').textContent = med.unit + (med.strength ? ' / ' + med.strength : '');
+            if (!priceInp.dataset.touched) { priceInp.value = med.price; price = med.price; }
+            let hid = tr.querySelector('input.med-id');
+            if (!hid) { hid = document.createElement('input'); hid.type = 'hidden'; hid.name = 'medicine_id'; hid.className = 'med-id'; tr.appendChild(hid); }
+            hid.value = med.id;
+        } else {
+            tr.querySelector('.unit-label').textContent = '-';
+            let hid = tr.querySelector('input.med-id');
+            if (hid) hid.value = '';
+        }
+        const lineTotal = qty * price;
+        tr.querySelector('.line-total').textContent = lineTotal.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+        grand += lineTotal;
+    });
+    const disc = parseFloat(document.getElementById('discount').value) || 0;
+    document.getElementById('grandTotal').textContent = (grand - disc).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+    document.getElementById('grandHidden').textContent = (grand - disc).toFixed(2);
+    document.getElementById('grandData').value = (grand - disc).toFixed(2);
+}
+document.addEventListener('input', e => {
+    if (e.target.matches('.med-search, .qty, .price')) {
+        if (e.target.matches('.price')) e.target.dataset.touched = '1';
+        recalc();
+    }
+});
+document.addEventListener('click', e => {
+    if (e.target.closest('.rm')) e.target.closest('tr').remove();
+    if (e.target.closest('#addRowBtn')) addRow();
+    recalc();
+});
+document.getElementById('discount').addEventListener('input', recalc);
+// Pre-populate one row
+addRow();
+</script>
+{% endblock %}
+
+{% block content %}
+<form method="post" id="posForm">
+    {% csrf_token %}
+    <div class="row g-3 mb-3">
+        <div class="col-md-6">
+            <div class="card shadow-sm border-0">
+                <div class="card-body">
+                    <h6 class="fw-semibold mb-3"><i class="bi bi-person me-2"></i>Customer</h6>
+                    <select name="patient" class="form-select select2" required>
+                        <option value="">-- Select Patient --</option>
+                        {% for p in patients %}
+                        <option value="{{ p.pk }}">{{ p.patient_id }} - {{ p.full_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card shadow-sm border-0">
+                <div class="card-body">
+                    <h6 class="fw-semibold mb-3"><i class="bi bi-credit-card me-2"></i>Payment</h6>
+                    <div class="row g-2">
+                        <div class="col-6">
+                            <label class="small text-muted">Method</label>
+                            <select name="payment_method" class="form-select">
+                                <option value="cash">Cash</option>
+                                <option value="mobile_money">Mobile Money</option>
+                                <option value="card">Card</option>
+                                <option value="insurance">Insurance</option>
+                            </select>
+                        </div>
+                        <div class="col-6">
+                            <label class="small text-muted">Discount (MWK)</label>
+                            <input type="number" min="0" step="0.01" name="discount" id="discount" class="form-control" value="0">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow-sm border-0 mb-3">
+        <div class="card-header bg-white d-flex justify-content-between align-items-center">
+            <h6 class="fw-semibold mb-0"><i class="bi bi-cart me-2"></i>Items</h6>
+            <button type="button" id="addRowBtn" class="btn btn-sm btn-outline-primary"><i class="bi bi-plus-lg me-1"></i>Add Item</button>
+        </div>
+        <div class="card-body p-0">
+            <table class="table mb-0" style="font-size: .875rem;">
+                <thead class="table-light">
+                    <tr><th style="width: 45%;">Medicine</th><th>Unit</th><th style="width: 90px;">Qty</th><th style="width: 130px;">Unit Price</th><th>Line Total</th><th></th></tr>
+                </thead>
+                <tbody id="posBody"></tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="4" class="text-end fw-semibold">Grand Total (MWK):</td>
+                        <td colspan="2" class="fw-bold fs-5" id="grandTotal">0.00</td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+
+    <div class="d-flex gap-2">
+        <button type="submit" class="btn btn-dark"><i class="bi bi-check-lg me-1"></i>Complete Sale</button>
+        <a href="{% url 'pharmacy:sale_list' %}" class="btn btn-outline-secondary">Cancel</a>
+    </div>
+    <input type="hidden" name="grand_total" id="grandData" value="0">
+</form>
+{% endblock %}

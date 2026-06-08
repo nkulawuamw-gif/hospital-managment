@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% block title %}New Admission - HMS{% endblock %}
+{% block page_title %}Admit Patient{% endblock %}
+
+{% block content %}
+<div class="card shadow-sm border-0" style="max-width: 800px;">
+    <div class="card-body p-4">
+        <form method="post">
+            {% csrf_token %}
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label small fw-medium">Patient *</label>
+                    <select name="patient" class="form-select select2" required>
+                        <option value="">-- Select Patient --</option>
+                        {% for p in patients %}
+                        <option value="{{ p.pk }}">{{ p.patient_id }} - {{ p.full_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label small fw-medium">Attending Doctor</label>
+                    <select name="doctor" class="form-select select2">
+                        <option value="">-- Not assigned --</option>
+                        {% for d in doctors %}
+                        <option value="{{ d.pk }}">Dr. {{ d.first_name }} {{ d.last_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label small fw-medium">Ward</label>
+                    <select name="ward" class="form-select">
+                        <option value="">-- Select Ward --</option>
+                        {% for w in wards %}
+                        <option value="{{ w.pk }}">{{ w.name }} ({{ w.available_beds }} beds free)</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label small fw-medium">Diagnosis *</label>
+                    <input type="text" name="diagnosis" class="form-control" required placeholder="e.g. Severe malaria, dehydrated">
+                </div>
+                <div class="col-12">
+                    <label class="form-label small fw-medium">Notes</label>
+                    <textarea name="notes" class="form-control" rows="2" placeholder="Optional notes about admission"></textarea>
+                </div>
+            </div>
+            <div class="d-flex gap-2 mt-4 pt-3 border-top">
+                <button type="submit" class="btn btn-dark"><i class="bi bi-check-lg me-1"></i>Admit Patient</button>
+                <a href="{% url 'inpatient:admissions' %}" class="btn btn-outline-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -41,3 +41,17 @@ class DispensationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Dispensation
         fields = '__all__'
+
+
+class SaleItemSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SaleItem
+        fields = '__all__'
+
+
+class SaleSerializer(serializers.ModelSerializer):
+    items = SaleItemSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Sale
+        fields = '__all__'

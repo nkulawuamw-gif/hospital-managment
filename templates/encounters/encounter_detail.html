@@ -1,0 +1,311 @@
+{% extends 'base.html' %}
+{% block title %}Encounter - HMS{% endblock %}
+{% block page_title %}{{ encounter.visit.patient.first_name }} {{ encounter.visit.patient.last_name }} @ {{ encounter.department.name }}{% endblock %}
+
+{% block content %}
+<div class="row g-3">
+    <div class="col-md-5">
+        <div class="card shadow-sm mb-3">
+            <div class="card-body">
+                <h6 class="card-title border-bottom pb-2">Patient Info</h6>
+                <div class="mb-2">
+                    <strong>Name:</strong>
+                    <a href="{% url 'patients:detail' encounter.visit.patient.id %}">
+                        {{ encounter.visit.patient.first_name }} {{ encounter.visit.patient.last_name }}
+                    </a>
+                </div>
+                <div class="mb-2"><strong>ID:</strong> {{ encounter.visit.patient.patient_id }}</div>
+                <div class="mb-2"><strong>Visit #:</strong> {{ encounter.visit.visit_number }}</div>
+                <div class="mb-2"><strong>Gender:</strong> {{ encounter.visit.patient.get_gender_display }}</div>
+                <div class="mb-2"><strong>Age:</strong> {{ encounter.visit.patient.age }}</div>
+                <div class="mb-2"><strong>Phone:</strong> {{ encounter.visit.patient.phone }}</div>
+                {% if encounter.referred_from %}
+                <div class="mb-2">
+                    <strong>Referred From:</strong>
+                    <span class="badge bg-info">{{ encounter.referred_from.department.name }}</span>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-7">
+        <form method="post" action="{% url 'encounters:complete_encounter' encounter.id %}">
+            {% csrf_token %}
+
+            {% if encounter.status == 'pending' %}
+            <div class="alert alert-warning">
+                <i class="bi bi-exclamation-triangle"></i> This encounter has not been started yet.
+                <a href="{% url 'encounters:start_encounter' encounter.id %}" class="btn btn-sm btn-success ms-3">Start Encounter</a>
+            </div>
+            {% endif %}
+
+            {% if encounter.status == 'in_progress' or encounter.status == 'completed' %}
+            <div class="card shadow-sm mb-3">
+                <div class="card-body">
+                    <h6 class="card-title border-bottom pb-2">
+                        <i class="bi bi-chat-dots"></i> Clinical Notes
+                    </h6>
+                    <div class="mb-3">
+                        <label class="form-label">Chief Complaint</label>
+                        <textarea name="chief_complaint" class="form-control" rows="2"
+                            {% if encounter.status == 'completed' %}readonly{% endif %}>{{ encounter.chief_complaint }}</textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Assessment</label>
+                        <textarea name="assessment" class="form-control" rows="3"
+                            {% if encounter.status == 'completed' %}readonly{% endif %}>{{ encounter.assessment }}</textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Intervention Given</label>
+                        <textarea name="intervention" class="form-control" rows="3" placeholder="Describe the treatment, procedure, or intervention given..."
+                            {% if encounter.status == 'completed' %}readonly{% endif %}>{{ encounter.intervention }}</textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Additional Notes</label>
+                        <textarea name="notes" class="form-control" rows="2"
+                            {% if encounter.status == 'completed' %}readonly{% endif %}>{{ encounter.notes }}</textarea>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card shadow-sm mb-3">
+                <div class="card-body">
+                    <h6 class="card-title border-bottom pb-2">
+                        <i class="bi bi-capsule"></i> Medications Prescribed
+                    </h6>
+                    {% if encounter.medications.exists %}
+                    <div class="table-responsive mb-3">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Medicine</th>
+                                    <th>Dosage</th>
+                                    <th>Qty</th>
+                                    <th>Unit Price</th>
+                                    <th>Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for med in encounter.medications.all %}
+                                <tr>
+                                    <td>{{ med.medicine.name }}</td>
+                                    <td>{{ med.dosage }}</td>
+                                    <td>{{ med.quantity }}</td>
+                                    <td>{{ med.unit_price }}</td>
+                                    <td><strong>{{ med.total_price }}</strong></td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                            <tfoot>
+                                <tr class="table-active">
+                                    <th colspan="4" class="text-end">Subtotal:</th>
+                                    <th>{{ encounter.medication_cost }}</th>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                    {% endif %}
+
+                    {% if encounter.status == 'in_progress' %}
+                    <div class="table-responsive mb-2">
+                        <table class="table table-sm table-bordered" id="meds-table">
+                            <thead class="table-light">
+                                <tr>
+                                    <th style="width:32%">Medicine</th>
+                                    <th style="width:15%">Unit</th>
+                                    <th style="width:10%">Dosage</th>
+                                    <th style="width:8%">Qty</th>
+                                    <th style="width:12%">Unit Price</th>
+                                    <th style="width:13%">Line Total</th>
+                                    <th style="width:10%"></th>
+                                </tr>
+                            </thead>
+                            <tbody id="medications-container">
+                                <tr class="medication-row">
+                                    <td>
+                                        <select name="medicine_id[]" class="form-select form-select-sm medicine-select" style="width:100%">
+                                            <option value="">-- Type or select --</option>
+                                        </select>
+                                        <input type="hidden" name="medicine_name[]" class="medicine-name-input">
+                                    </td>
+                                    <td>
+                                        <input type="text" name="unit[]" class="form-control form-control-sm unit-input" placeholder="Unit" readonly>
+                                    </td>
+                                    <td>
+                                        <input type="text" name="dosage[]" class="form-control form-control-sm" placeholder="e.g. 1x2">
+                                    </td>
+                                    <td>
+                                        <input type="number" name="quantity[]" class="form-control form-control-sm qty-input" placeholder="Qty" min="1" value="1">
+                                    </td>
+                                    <td>
+                                        <input type="number" name="unit_price[]" class="form-control form-control-sm price-input" placeholder="0.00" step="0.01" min="0">
+                                    </td>
+                                    <td>
+                                        <input type="text" class="form-control form-control-sm line-total" readonly placeholder="0.00">
+                                    </td>
+                                    <td>
+                                        <button type="button" class="btn btn-outline-danger btn-sm remove-med w-100"><i class="bi bi-x"></i></button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                            <tfoot>
+                                <tr class="table-active">
+                                    <td colspan="5" class="text-end fw-semibold">Grand Total:</td>
+                                    <td class="fw-bold" id="grand-total">0.00</td>
+                                    <td></td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                    <button type="button" class="btn btn-outline-primary btn-sm mb-2" id="add-medicine">
+                        <i class="bi bi-plus-circle"></i> Add Medicine
+                    </button>
+                    {% endif %}
+                </div>
+            </div>
+
+            {% if encounter.status == 'in_progress' %}
+            <div class="card shadow-sm mb-3">
+                <div class="card-body">
+                    <h6 class="card-title border-bottom pb-2">
+                        <i class="bi bi-send"></i> Referral
+                    </h6>
+                    <div class="mb-3">
+                        <label class="form-label">Refer to Department (optional)</label>
+                        <select name="refer_to_department" class="form-select select2">
+                            <option value="">-- No referral --</option>
+                            {% for dept in departments %}
+                            <option value="{{ dept.id }}">{{ dept.name }}</option>
+                            {% endfor %}
+                        </select>
+                        <div class="form-text">Select a department to refer the patient for further care.</div>
+                    </div>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-success btn-lg w-100">
+                <i class="bi bi-check-lg"></i> Complete Encounter
+            </button>
+            {% endif %}
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet">
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script>
+$(document).ready(function() {
+    var medicinesCache = [];
+
+    $.getJSON('/billing/api/medicines/', function(data) {
+        medicinesCache = data;
+    });
+
+    function initMedicineSelect($select) {
+        $select.select2({
+            tags: true,
+            placeholder: '-- Type or select --',
+            allowClear: true,
+            width: '100%',
+            createTag: function(params) {
+                var term = $.trim(params.term);
+                if (term === '') return null;
+                return { id: 'new:' + term, text: term, isNew: true };
+            },
+            ajax: {
+                url: '/billing/api/medicines/',
+                dataType: 'json',
+                delay: 250,
+                data: function(params) {
+                    return { q: params.term };
+                },
+                processResults: function(data) {
+                    var results = data.map(function(m) {
+                        return { id: m.id, text: m.name + ' (' + m.strength + ')', unit: m.unit, price: m.selling_price };
+                    });
+                    return { results: results };
+                },
+                cache: true
+            },
+            minimumInputLength: 0
+        });
+
+        $select.on('change', function() {
+            var $row = $(this).closest('.medication-row');
+            var $nameInput = $row.find('.medicine-name-input');
+            var $unitInput = $row.find('.unit-input');
+            var $priceInput = $row.find('.price-input');
+            var data = $(this).select2('data');
+
+            if (!data || !data.length) {
+                $nameInput.val('');
+                $unitInput.val('').prop('readonly', true);
+                $priceInput.val('').prop('readonly', true);
+                return;
+            }
+
+            var item = data[0];
+            var itemId = item.id ? item.id.toString() : '';
+
+            if (itemId.startsWith('new:')) {
+                $nameInput.val(item.text);
+                $unitInput.prop('readonly', false).val('');
+                $priceInput.prop('readonly', false).val('');
+                return;
+            }
+
+            $nameInput.val('');
+            $unitInput.val(item.unit || '').prop('readonly', true);
+            $priceInput.val(item.price || '').prop('readonly', true);
+            calcRow($row);
+        });
+    }
+
+    function calcRow($row) {
+        var qty = parseFloat($row.find('.qty-input').val()) || 0;
+        var price = parseFloat($row.find('.price-input').val()) || 0;
+        var total = qty * price;
+        $row.find('.line-total').val(total.toFixed(2));
+        calcGrandTotal();
+    }
+
+    function calcGrandTotal() {
+        var grand = 0;
+        $('.line-total').each(function() {
+            grand += parseFloat($(this).val()) || 0;
+        });
+        $('#grand-total').text(grand.toFixed(2));
+    }
+
+    $('.medicine-select').each(function() { initMedicineSelect($(this)); });
+
+    $(document).on('input', '.qty-input, .price-input', function() {
+        calcRow($(this).closest('.medication-row'));
+    });
+
+    $('#add-medicine').click(function() {
+        var $row = $('.medication-row:first').clone();
+        $row.find('input').val('');
+        $row.find('select').val(null).trigger('change');
+        var $newSelect = $row.find('.medicine-select');
+        $newSelect.next('.select2-container').remove();
+        $('#medications-container').append($row);
+        initMedicineSelect($newSelect);
+        calcGrandTotal();
+    });
+
+    $(document).on('click', '.remove-med', function() {
+        if ($('.medication-row').length > 1) {
+            $(this).closest('.medication-row').remove();
+            calcGrandTotal();
+        }
+    });
+});
+</script>
+{% endblock %}

@@ -22,7 +22,7 @@
                     <input type="date" name="due_date" class="form-control">
                 </div>
                 <div class="col-md-3">
-                    <label class="form-label small fw-medium">Discount (KES)</label>
+                    <label class="form-label small fw-medium">Discount (MWK)</label>
                     <input type="number" name="discount" class="form-control" value="0" step="0.01">
                 </div>
             </div>
@@ -30,11 +30,15 @@
             <h6 class="fw-semibold mb-3">Invoice Items</h6>
             <table class="table table-bordered" style="font-size: .875rem;" id="itemsTable">
                 <thead class="table-light">
-                    <tr><th style="width:45%">Description</th><th style="width:15%">Quantity</th><th style="width:20%">Unit Price (KES)</th><th style="width:15%">Total</th><th style="width:5%"></th></tr>
+                    <tr><th style="width:45%">Treatment Given</th><th style="width:15%">Quantity</th><th style="width:20%">Unit Price (MWK)</th><th style="width:15%">Total</th><th style="width:5%"></th></tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td><input type="text" name="description[]" class="form-control form-control-sm" required></td>
+                    <tr class="item-row">
+                        <td>
+                            <input type="text" name="description[]" class="form-control form-control-sm treatment-input" list="medicinesList" autocomplete="off" placeholder="Type to search medicines..." required>
+                            <input type="hidden" name="medicine_id[]" class="medicine-id" value="">
+                            <div class="treatment-meta small text-muted mt-1" style="min-height:1.1em;"></div>
+                        </td>
                         <td><input type="number" name="quantity[]" class="form-control form-control-sm qty" value="1" min="1" required></td>
                         <td><input type="number" name="unit_price[]" class="form-control form-control-sm price" value="0" step="0.01" required></td>
                         <td><span class="row-total fw-medium">0.00</span></td>
@@ -49,6 +53,11 @@
                     </tr>
                 </tfoot>
             </table>
+            <datalist id="medicinesList">
+                {% for m in medicines %}
+                <option value="{{ m.name }}{% if m.strength %} ({{ m.strength }}){% endif %}" data-id="{{ m.id }}" data-price="{{ m.selling_price }}" data-unit="{{ m.get_unit_display }}" data-strength="{{ m.strength }}"></option>
+                {% endfor %}
+            </datalist>
             <button type="button" class="btn btn-sm btn-outline-secondary mb-3" id="addRow"><i class="bi bi-plus-lg me-1"></i>Add Item</button>
 
             <div class="mb-4">
@@ -67,10 +76,57 @@
 
 {% block extra_js %}
 <script>
+const MEDICINES = [
+    {% for m in medicines %}
+    { id: {{ m.id }}, name: "{{ m.name|escapejs }}", strength: "{{ m.strength|escapejs }}", unit: "{{ m.get_unit_display|escapejs }}", price: "{{ m.selling_price }}" }{% if not forloop.last %},{% endif %}
+    {% endfor %}
+];
 function calcRow(row) { const qty = parseFloat(row.find('.qty').val())||0; const price = parseFloat(row.find('.price').val())||0; const total = qty*price; row.find('.row-total').text(total.toFixed(2)); calcGrandTotal(); }
 function calcGrandTotal() { let gt=0; $('.row-total').each(function(){gt+=parseFloat($(this).text())||0}); $('#grandTotal').text(gt.toFixed(2)); }
 $(document).on('input', '.qty, .price', function(){calcRow($(this).closest('tr'))});
-$('#addRow').click(function() { const tpl=$('#itemsTable tbody tr:first').clone(); tpl.find('input').val(''); tpl.find('.row-total').text('0.00'); $('#itemsTable tbody').append(tpl); });
+
+function findMedicineByText(text) {
+    if (!text) return null;
+    const t = text.trim().toLowerCase();
+    return MEDICINES.find(m => {
+        const full = (m.name + (m.strength ? ' (' + m.strength + ')' : '')).toLowerCase();
+        return full === t || m.name.toLowerCase() === t;
+    }) || MEDICINES.find(m => m.name.toLowerCase().startsWith(t)) || null;
+}
+
+function applyMedicineToRow(row) {
+    const input = row.find('.treatment-input');
+    const hidden = row.find('.medicine-id');
+    const meta = row.find('.treatment-meta');
+    const priceField = row.find('.price');
+    const typed = input.val();
+    const med = findMedicineByText(typed);
+    if (med) {
+        hidden.val(med.id);
+        const price = parseFloat(med.price) || 0;
+        if (!priceField.data('touched') || priceField.val() === '' || parseFloat(priceField.val()) === 0) {
+            priceField.val(price.toFixed(2));
+        }
+        meta.html('<i class="bi bi-capsule text-primary"></i> ' + med.name + (med.strength ? ' - ' + med.strength : '') + ' | ' + med.unit + ' | MWK ' + price.toFixed(2));
+    } else {
+        hidden.val('');
+        meta.html(typed ? '<span class="text-warning"><i class="bi bi-pencil"></i> Custom item (no inventory match)</span>' : '');
+    }
+    calcRow(row);
+}
+
+$(document).on('input change blur', '.treatment-input', function() { applyMedicineToRow($(this).closest('tr')); });
+$(document).on('focus', '.price', function() { $(this).data('touched', true); });
+
+$('#addRow').click(function() {
+    const tpl = $('#itemsTable tbody tr:first').clone();
+    tpl.find('input').val('');
+    tpl.find('.price').val('0').data('touched', false);
+    tpl.find('.qty').val('1');
+    tpl.find('.row-total').text('0.00');
+    tpl.find('.treatment-meta').html('');
+    $('#itemsTable tbody').append(tpl);
+});
 $(document).on('click', '.remove-row', function() { if($('#itemsTable tbody tr').length>1) $(this).closest('tr').remove(); calcGrandTotal(); });
 </script>
 {% endblock %}

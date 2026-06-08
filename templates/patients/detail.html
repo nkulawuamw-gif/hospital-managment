@@ -7,9 +7,13 @@
     <div class="col-md-4">
         <div class="card shadow-sm border-0">
             <div class="card-body text-center p-4">
+                {% if patient.photo %}
+                <img src="{{ patient.photo.url }}" class="rounded-circle mx-auto mb-3" style="width: 80px; height: 80px; object-fit: cover;">
+                {% else %}
                 <div class="avatar mx-auto mb-3" style="width: 80px; height: 80px; font-size: 2rem; background: #0d1b2a; color: #fff;">
                     {{ patient.first_name|first|upper }}{{ patient.last_name|first|upper }}
                 </div>
+                {% endif %}
                 <h5 class="fw-semibold">{{ patient.full_name }}</h5>
                 <p class="text-primary fw-medium small mb-2">{{ patient.patient_id }}</p>
                 <span class="badge bg-{% if patient.is_active %}success{% else %}danger{% endif %} rounded-pill mb-3">
@@ -35,11 +39,37 @@
                     <div class="d-flex justify-content-between mb-2">
                         <span class="text-muted">National ID</span><span class="fw-medium">{{ patient.national_id|default:'-' }}</span>
                     </div>
+                    {% if patient.address %}
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted">Address</span><span class="fw-medium text-truncate" style="max-width:140px">{{ patient.address }}</span>
+                    </div>
+                    {% endif %}
+                    {% if patient.emergency_contact_name %}
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted">Emergency</span><span class="fw-medium">{{ patient.emergency_contact_name }} ({{ patient.emergency_contact_phone }})</span>
+                    </div>
+                    {% endif %}
+                    {% if patient.insurance_provider %}
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted">Insurance</span><span class="fw-medium">{{ patient.insurance_provider }} / {{ patient.insurance_policy_number|default:'-' }}</span>
+                    </div>
+                    {% endif %}
                 </div>
                 <hr>
-                <a href="{% url 'patients:edit' patient.pk %}" class="btn btn-outline-dark btn-sm w-100">
-                    <i class="bi bi-pencil me-1"></i>Edit Patient
-                </a>
+                <div class="d-grid gap-2">
+                    <a href="{% url 'patients:edit' patient.pk %}" class="btn btn-outline-dark btn-sm">
+                        <i class="bi bi-pencil me-1"></i>Edit Patient
+                    </a>
+                    <a href="{% url 'appointments:create' %}?patient={{ patient.pk }}" class="btn btn-dark btn-sm">
+                        <i class="bi bi-calendar-plus me-1"></i>Book Appointment
+                    </a>
+                    <a href="{% url 'emr:create' %}?patient={{ patient.pk }}" class="btn btn-outline-primary btn-sm">
+                        <i class="bi bi-file-medical me-1"></i>New Consultation
+                    </a>
+                    <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#startVisitModal">
+                        <i class="bi bi-arrow-right-circle me-1"></i>Start Visit / Refer
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -55,6 +85,7 @@
                     <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-lab" type="button"><i class="bi bi-flask me-1"></i>Lab Results</button></li>
                     <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-billing" type="button"><i class="bi bi-currency-dollar me-1"></i>Billing</button></li>
                     <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-admissions" type="button"><i class="bi bi-hospital me-1"></i>Admissions</button></li>
+                    <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-visits" type="button"><i class="bi bi-arrow-right-circle me-1"></i>Visits</button></li>
                 </ul>
             </div>
             <div class="card-body">
@@ -62,7 +93,7 @@
                     <!-- Medical History -->
                     <div class="tab-pane fade show active" id="tab-medical">
                         {% if medical_histories %}
-                        <div class="list-group list-group-flush">
+                        <div class="list-group list-group-flush mb-3">
                             {% for mh in medical_histories %}
                             <div class="list-group-item px-0">
                                 <div class="fw-semibold">{{ mh.condition }}</div>
@@ -72,8 +103,24 @@
                             {% endfor %}
                         </div>
                         {% else %}
-                        <div class="text-center text-muted py-4"><i class="bi bi-inbox me-2"></i>No medical history recorded</div>
+                        <div class="text-center text-muted py-3"><i class="bi bi-inbox me-2"></i>No medical history recorded</div>
                         {% endif %}
+                        <hr>
+                        <form method="post" action="{% url 'patients:add_medical_history' patient.pk %}" class="row g-2">
+                            {% csrf_token %}
+                            <div class="col-md-5">
+                                <input type="text" name="condition" class="form-control form-control-sm" placeholder="Condition name" required>
+                            </div>
+                            <div class="col-md-3">
+                                <input type="date" name="diagnosed_date" class="form-control form-control-sm">
+                            </div>
+                            <div class="col-md-4">
+                                <button type="submit" class="btn btn-dark btn-sm w-100"><i class="bi bi-plus-lg me-1"></i>Add Record</button>
+                            </div>
+                            <div class="col-12">
+                                <textarea name="notes" class="form-control form-control-sm" rows="1" placeholder="Optional notes"></textarea>
+                            </div>
+                        </form>
                     </div>
 
                     <!-- Appointments -->
@@ -169,9 +216,9 @@
                                 <tr>
                                     <td class="fw-medium">{{ inv.invoice_number }}</td>
                                     <td>{{ inv.created_at|date:"M d, Y" }}</td>
-                                    <td>KES {{ inv.total|floatformat:0 }}</td>
-                                    <td>KES {{ inv.amount_paid|floatformat:0 }}</td>
-                                    <td>KES {{ inv.balance|floatformat:0 }}</td>
+                                    <td>MWK {{ inv.total|floatformat:0 }}</td>
+                                    <td>MWK {{ inv.amount_paid|floatformat:0 }}</td>
+                                    <td>MWK {{ inv.balance|floatformat:0 }}</td>
                                     <td><span class="badge bg-{% if inv.status == 'paid' %}success{% elif inv.status == 'overdue' %}danger{% elif inv.status == 'pending' %}warning text-dark{% else %}secondary{% endif %} rounded-pill">{{ inv.get_status_display }}</span></td>
                                 </tr>
                                 {% endfor %}
@@ -203,6 +250,27 @@
                         <div class="text-center text-muted py-4"><i class="bi bi-inbox me-2"></i>No admissions</div>
                         {% endif %}
                     </div>
+                    <!-- Visits -->
+                    <div class="tab-pane fade" id="tab-visits">
+                        {% if visits %}
+                        <table class="table table-sm datatable mb-0" style="font-size: .85rem;">
+                            <thead><tr><th>Visit #</th><th>Date</th><th>Departments</th><th>Status</th><th>Total</th></tr></thead>
+                            <tbody>
+                                {% for v in visits %}
+                                <tr>
+                                    <td><strong>{{ v.visit_number }}</strong></td>
+                                    <td>{{ v.created_at|date:"M d, Y H:i" }}</td>
+                                    <td>{% for e in v.encounters.all %}<span class="badge bg-info me-1">{{ e.department.name }}</span>{% endfor %}</td>
+                                    <td><span class="badge bg-{% if v.status == 'active' %}warning text-dark{% elif v.status == 'completed' %}success{% else %}secondary{% endif %}">{{ v.get_status_display }}</span></td>
+                                    <td>${{ v.total_medication_cost|floatformat:2 }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                        {% else %}
+                        <div class="text-center text-muted py-4"><i class="bi bi-inbox me-2"></i>No visits</div>
+                        {% endif %}
+                    </div>
                 </div>
             </div>
         </div>
@@ -215,6 +283,38 @@
             </div>
         </div>
         {% endif %}
+    </div>
+</div>
+
+<div class="modal fade" id="startVisitModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="post" action="{% url 'encounters:start_visit' patient.id %}">
+                {% csrf_token %}
+                <div class="modal-header">
+                    <h5 class="modal-title">Start Visit - {{ patient.full_name }}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="text-muted">Refer this patient to a department to begin their visit.</p>
+                    <div class="mb-3">
+                        <label class="form-label">Refer to Department</label>
+                        <select name="department" class="form-select" required>
+                            <option value="">-- Select Department --</option>
+                            {% for dept in departments %}
+                            <option value="{{ dept.id }}">{{ dept.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-success">
+                        <i class="bi bi-arrow-right-circle"></i> Start Visit
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
 {% endblock %}

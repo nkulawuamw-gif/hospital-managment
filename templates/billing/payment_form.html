@@ -14,11 +14,11 @@
                     <dt class="col-sm-5 text-muted">Patient</dt>
                     <dd class="col-sm-7">{{ inv.patient.full_name }}</dd>
                     <dt class="col-sm-5 text-muted">Total</dt>
-                    <dd class="col-sm-7 fw-bold">KES {{ inv.total|floatformat:0 }}</dd>
+                    <dd class="col-sm-7 fw-bold">MWK {{ inv.total|floatformat:0 }}</dd>
                     <dt class="col-sm-5 text-muted">Paid</dt>
-                    <dd class="col-sm-7 text-success">KES {{ inv.amount_paid|floatformat:0 }}</dd>
+                    <dd class="col-sm-7 text-success">MWK {{ inv.amount_paid|floatformat:0 }}</dd>
                     <dt class="col-sm-5 text-muted">Balance Due</dt>
-                    <dd class="col-sm-7 text-danger fw-bold">KES {{ inv.balance|floatformat:0 }}</dd>
+                    <dd class="col-sm-7 text-danger fw-bold">MWK {{ inv.balance|floatformat:0 }}</dd>
                 </dl>
             </div>
         </div>
@@ -29,9 +29,9 @@
                 <form method="post">
                     {% csrf_token %}
                     <div class="mb-3">
-                        <label class="form-label small fw-medium">Amount (KES) *</label>
+                        <label class="form-label small fw-medium">Amount (MWK) *</label>
                         <input type="number" name="amount" class="form-control form-control-lg" step="0.01" max="{{ inv.balance }}" required>
-                        <div class="form-text">Balance: KES {{ inv.balance|floatformat:0 }}</div>
+                        <div class="form-text">Balance: MWK {{ inv.balance|floatformat:0 }}</div>
                     </div>
                     <div class="mb-3">
                         <label class="form-label small fw-medium">Payment Method *</label>

@@ -1,7 +1,7 @@
 from django.contrib import admin
-from .models import Department, Specialization, DoctorProfile, DoctorSchedule
+from .models import StaffDepartment, Specialization, DoctorProfile, DoctorSchedule
 
-@admin.register(Department)
+@admin.register(StaffDepartment)
 class DepartmentAdmin(admin.ModelAdmin):
     list_display = ['name', 'location', 'is_active']
 

@@ -34,7 +34,7 @@
                     <td>{{ s.get_unit_display }}</td>
                     <td>{{ s.current_stock }}</td>
                     <td>{{ s.reorder_level }}</td>
-                    <td>KES {{ s.unit_price|floatformat:0 }}</td>
+                    <td>MWK {{ s.unit_price|floatformat:0 }}</td>
                     <td>
                         {% if s.current_stock <= 0 %}<span class="badge bg-danger rounded-pill">Out of Stock</span>
                         {% elif s.current_stock <= s.reorder_level %}<span class="badge bg-warning text-dark rounded-pill">Low</span>
@@ -44,6 +44,8 @@
                         <a href="{% url 'inventory:supply_edit' s.pk %}" class="btn btn-sm btn-outline-secondary btn-icon"><i class="bi bi-pencil"></i></a>
                     </td>
                 </tr>
+                {% empty %}
+                <tr><td colspan="8" class="text-center text-muted py-4">No supplies found.</td></tr>
                 {% endfor %}
             </tbody>
         </table>

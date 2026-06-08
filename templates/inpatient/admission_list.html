@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% block title %}Admissions - Inpatient - HMS{% endblock %}
+{% block page_title %}Patient Admissions{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+    <div class="btn-group" role="group">
+        <a href="?status=all" class="btn btn-sm {% if current_status == 'all' %}btn-dark{% else %}btn-outline-secondary{% endif %}">All ({{ counts.all }})</a>
+        <a href="?status=admitted" class="btn btn-sm {% if current_status == 'admitted' or not current_status %}btn-dark{% else %}btn-outline-secondary{% endif %}">Admitted ({{ counts.admitted }})</a>
+        <a href="?status=transferred" class="btn btn-sm {% if current_status == 'transferred' %}btn-dark{% else %}btn-outline-secondary{% endif %}">Transferred ({{ counts.transferred }})</a>
+        <a href="?status=discharged" class="btn btn-sm {% if current_status == 'discharged' %}btn-dark{% else %}btn-outline-secondary{% endif %}">Discharged ({{ counts.discharged }})</a>
+    </div>
+    <div class="d-flex gap-2">
+        <a href="{% url 'inpatient:wards' %}" class="btn btn-sm btn-outline-secondary"><i class="bi bi-hospital me-1"></i>Wards</a>
+        <a href="{% url 'inpatient:admission_create' %}" class="btn btn-dark btn-sm"><i class="bi bi-plus-lg me-1"></i>Admit Patient</a>
+    </div>
+</div>
+
+<div class="card shadow-sm border-0">
+    <div class="card-body p-0">
+        <table class="table table-hover datatable mb-0" style="font-size: .875rem;">
+            <thead class="table-light">
+                <tr><th>Patient</th><th>Ward</th><th>Bed</th><th>Doctor</th><th>Diagnosis</th><th>Admitted</th><th>Status</th><th class="text-end">Actions</th></tr>
+            </thead>
+            <tbody>
+                {% for a in admissions %}
+                <tr>
+                    <td>
+                        <div class="fw-medium">{{ a.patient.full_name }}</div>
+                        <div class="text-muted" style="font-size:.75rem;">{{ a.patient.patient_id }}</div>
+                    </td>
+                    <td>{{ a.ward.name|default:'-' }}</td>
+                    <td>{{ a.bed.bed_number|default:'-' }}</td>
+                    <td>{% if a.doctor %}Dr. {{ a.doctor.last_name }}{% else %}-{% endif %}</td>
+                    <td><div style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="{{ a.diagnosis }}">{{ a.diagnosis|default:'-' }}</div></td>
+                    <td>{{ a.admission_date|date:"M d, Y H:i" }}</td>
+                    <td>{% if a.status == 'admitted' %}<span class="badge bg-primary rounded-pill">Admitted</span>{% elif a.status == 'discharged' %}<span class="badge bg-success rounded-pill">Discharged</span>{% else %}<span class="badge bg-warning text-dark rounded-pill">Transferred</span>{% endif %}</td>
+                    <td class="text-end">
+                        <a href="{% url 'inpatient:admission_detail' a.pk %}" class="btn btn-sm btn-outline-secondary btn-icon" title="View"><i class="bi bi-eye"></i></a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="8" class="text-center py-4 text-muted">No admissions yet. <a href="{% url 'inpatient:admission_create' %}">Admit the first patient</a>.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

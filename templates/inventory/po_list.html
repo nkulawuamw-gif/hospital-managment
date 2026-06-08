@@ -26,7 +26,7 @@
                     <td>{{ po.supplier.name }}</td>
                     <td>{{ po.created_at|date:"M d, Y" }}</td>
                     <td>{{ po.items.count }}</td>
-                    <td>KES {{ po.total_amount|floatformat:0 }}</td>
+                    <td>MWK {{ po.total_amount|floatformat:0 }}</td>
                     <td><span class="badge bg-{% if po.status == 'received' %}success{% elif po.status == 'approved' %}info{% elif po.status == 'cancelled' %}danger{% else %}warning text-dark{% endif %} rounded-pill">{{ po.get_status_display }}</span></td>
                     <td class="text-end">
                         <a href="{% url 'inventory:po_detail' po.pk %}" class="btn btn-sm btn-outline-secondary btn-icon"><i class="bi bi-eye"></i></a>
@@ -35,6 +35,8 @@
                         {% endif %}
                     </td>
                 </tr>
+                {% empty %}
+                <tr><td colspan="7" class="text-center text-muted py-4">No purchase orders found.</td></tr>
                 {% endfor %}
             </tbody>
         </table>

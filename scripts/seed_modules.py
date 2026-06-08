@@ -15,6 +15,8 @@ MODULES = [
     ('Patients', 'patients', 'bi bi-people-fill', 'patients:list', 'Patient Care', 1),
     ('Appointments', 'appointments', 'bi bi-calendar-check-fill', 'appointments:list', 'Patient Care', 2),
     ('EMR', 'emr', 'bi bi-file-medical-fill', 'emr:list', 'Patient Care', 3),
+    ('Inpatient', 'inpatient', 'bi bi-hospital-fill', 'inpatient:admissions', 'Patient Care', 4),
+    ('Doctors', 'doctors', 'bi bi-person-badge-fill', 'doctors:doctors', 'Administration', 0),
     ('Pharmacy', 'pharmacy', 'bi bi-capsule-fill', 'pharmacy:medicines', 'Services', 1),
     ('Laboratory', 'laboratory', 'bi bi-flask-fill', 'laboratory:request_list', 'Services', 2),
     ('Billing', 'billing', 'bi bi-currency-dollar', 'billing:invoice_list', 'Finance', 1),
@@ -27,15 +29,16 @@ MODULES = [
     ('Audit Log', 'audit', 'bi bi-journal-text', 'audit:list', 'System', 2),
     ('Admin', 'admin', 'bi bi-shield-lock-fill', 'admin:index', 'System', 3),
     ('Landing Settings', 'landing_settings', 'bi bi-layout-three-columns', 'dashboard:landing_settings', 'Administration', 5),
+    ('Requisitions', 'requisitions', 'bi bi-cart-plus', 'requisitions:requisition_list', 'Services', 3),
 ]
 
 ROLE_MODULES = {
     'super_admin': [m[1] for m in MODULES],
     'hospital_admin': [m[1] for m in MODULES],
-    'doctor': ['dashboard', 'patients', 'appointments', 'emr', 'pharmacy', 'laboratory'],
-    'nurse': ['dashboard', 'patients', 'appointments', 'emr'],
+    'doctor': ['dashboard', 'patients', 'appointments', 'emr', 'pharmacy', 'laboratory', 'requisitions'],
+    'nurse': ['dashboard', 'patients', 'appointments', 'emr', 'requisitions'],
     'receptionist': ['dashboard', 'patients', 'appointments'],
-    'pharmacist': ['dashboard', 'pharmacy'],
+    'pharmacist': ['dashboard', 'pharmacy', 'requisitions'],
     'lab_technician': ['dashboard', 'laboratory'],
     'cashier': ['dashboard', 'billing', 'insurance'],
     'accountant': ['dashboard', 'billing', 'insurance', 'reports'],

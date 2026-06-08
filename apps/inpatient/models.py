@@ -2,7 +2,7 @@ from django.db import models
 from simple_history.models import HistoricalRecords
 from apps.accounts.models import User
 from apps.patients.models import Patient
-from apps.doctors.models import Department
+from apps.doctors.models import StaffDepartment
 
 
 class Ward(models.Model):
@@ -16,7 +16,7 @@ class Ward(models.Model):
 
     name = models.CharField(max_length=100)
     type = models.CharField(max_length=20, choices=Type.choices, default=Type.GENERAL)
-    department = models.ForeignKey(Department, on_delete=models.SET_NULL, null=True)
+    department = models.ForeignKey(StaffDepartment, on_delete=models.SET_NULL, null=True)
     floor = models.CharField(max_length=50, blank=True)
     capacity = models.IntegerField(default=10)
     charge_per_day = models.DecimalField(max_digits=10, decimal_places=2, default=0)

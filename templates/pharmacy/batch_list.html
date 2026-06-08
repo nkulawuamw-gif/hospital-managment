@@ -32,6 +32,8 @@
                         {% else %}<span class="badge bg-success rounded-pill">In Stock</span>{% endif %}
                     </td>
                 </tr>
+                {% empty %}
+                <tr><td colspan="7" class="text-center text-muted py-4">No batches found.</td></tr>
                 {% endfor %}
             </tbody>
         </table>

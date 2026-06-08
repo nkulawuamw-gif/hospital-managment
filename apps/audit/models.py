@@ -24,6 +24,7 @@ class AuditLog(models.Model):
 
     class Meta:
         db_table = 'audit_logs'
+        ordering = ['-id']
         indexes = [
             models.Index(fields=['user']),
             models.Index(fields=['action']),

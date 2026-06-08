@@ -64,7 +64,7 @@
                     <i class="bi bi-cash-stack"></i>
                 </div>
                 <div>
-                    <p class="stat-value">KES {{ revenue_today|floatformat:0 }}</p>
+                    <p class="stat-value">MWK {{ revenue_today|floatformat:0 }}</p>
                     <p class="stat-label">Revenue Today</p>
                 </div>
             </div>
@@ -77,7 +77,7 @@
                     <i class="bi bi-cash-coin"></i>
                 </div>
                 <div>
-                    <p class="stat-value">KES {{ revenue_month|floatformat:0 }}</p>
+                    <p class="stat-value">MWK {{ revenue_month|floatformat:0 }}</p>
                     <p class="stat-label">Revenue This Month</p>
                 </div>
             </div>
@@ -189,7 +189,7 @@ new Chart(document.getElementById('revenueChart'), {
     data: {
         labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
         datasets: [{
-            label: 'Revenue (KES)',
+            label: 'Revenue (MWK)',
             data: [12000, 19000, 15000, {{ revenue_month|floatformat:0 }}],
             borderColor: '#0d6efd',
             backgroundColor: 'rgba(13,110,253,.1)',

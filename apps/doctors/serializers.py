@@ -1,10 +1,10 @@
 from rest_framework import serializers
-from .models import Department, Specialization, DoctorProfile, DoctorSchedule
+from .models import StaffDepartment, Specialization, DoctorProfile, DoctorSchedule
 
 
 class DepartmentSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Department
+        model = StaffDepartment
         fields = '__all__'
 
 

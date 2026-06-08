@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% block title %}Specializations - HMS{% endblock %}
+{% block page_title %}Doctor Specializations{% endblock %}
+
+{% block content %}
+<div class="row g-3">
+    <div class="col-md-5">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-white"><h6 class="fw-semibold mb-0"><i class="bi bi-plus-circle me-2"></i>Add Specialization</h6></div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label class="form-label small fw-medium">Name *</label>
+                        <input type="text" name="name" class="form-control" required placeholder="e.g. Cardiology">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-medium">Description</label>
+                        <textarea name="description" class="form-control" rows="2"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-dark"><i class="bi bi-check-lg me-1"></i>Add</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-7">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-white"><h6 class="fw-semibold mb-0"><i class="bi bi-stars me-2"></i>Existing Specializations ({{ specializations|length }})</h6></div>
+            <ul class="list-group list-group-flush">
+                {% for s in specializations %}
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="fw-medium">{{ s.name }}</div>
+                        {% if s.description %}<div class="text-muted small">{{ s.description }}</div>{% endif %}
+                    </div>
+                    <span class="badge bg-primary rounded-pill">{{ s.doctors.count }} doctors</span>
+                </li>
+                {% empty %}
+                <li class="list-group-item text-center text-muted py-4">No specializations yet</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}

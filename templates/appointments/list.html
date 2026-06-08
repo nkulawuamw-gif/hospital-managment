@@ -18,6 +18,19 @@
     </div>
 </div>
 
+<div class="card shadow-sm border-0 mb-3">
+    <div class="card-body py-2 px-3">
+        <div class="d-flex align-items-center gap-2 flex-wrap">
+            <span class="small text-uppercase text-muted fw-semibold me-1">Source:</span>
+            <a href="{% url 'appointments:list' %}" class="btn btn-sm btn-outline-secondary {% if not current_source %}active{% endif %}">All <span class="badge bg-secondary ms-1">{{ source_stats.internal|add:source_stats.web|add:source_stats.phone|add:source_stats.walk_in|default:0 }}</span></a>
+            <a href="?source=web" class="btn btn-sm btn-outline-primary {% if current_source == 'web' %}active{% endif %}"><i class="bi bi-globe me-1"></i>Website <span class="badge bg-primary ms-1">{{ source_stats.web|default:0 }}</span></a>
+            <a href="?source=internal" class="btn btn-sm btn-outline-secondary {% if current_source == 'internal' %}active{% endif %}"><i class="bi bi-building me-1"></i>Internal <span class="badge bg-secondary ms-1">{{ source_stats.internal|default:0 }}</span></a>
+            <a href="?source=phone" class="btn btn-sm btn-outline-secondary {% if current_source == 'phone' %}active{% endif %}"><i class="bi bi-telephone me-1"></i>Phone <span class="badge bg-secondary ms-1">{{ source_stats.phone|default:0 }}</span></a>
+            <a href="?source=walk_in" class="btn btn-sm btn-outline-secondary {% if current_source == 'walk_in' %}active{% endif %}"><i class="bi bi-person-walking me-1"></i>Walk-in <span class="badge bg-secondary ms-1">{{ source_stats.walk_in|default:0 }}</span></a>
+        </div>
+    </div>
+</div>
+
 <div class="card shadow-sm border-0">
     <div class="card-body p-0">
         <table class="table table-hover datatable mb-0" style="font-size: .875rem;">
@@ -28,13 +41,14 @@
                     <th>Date</th>
                     <th>Time</th>
                     <th>Reason</th>
+                    <th>Source</th>
                     <th>Status</th>
                     <th class="text-end">Actions</th>
                 </tr>
             </thead>
             <tbody>
                 {% for apt in appointments %}
-                <tr>
+                <tr {% if apt.source == 'web' %}class="table-primary" style="--bs-table-bg: rgba(13,110,253,.06);"{% endif %}>
                     <td>
                         <a href="{% url 'patients:detail' apt.patient.pk %}" class="text-decoration-none fw-medium">{{ apt.patient.full_name }}</a>
                         <div class="text-muted" style="font-size: .75rem;">{{ apt.patient.patient_id }}</div>
@@ -43,6 +57,17 @@
                     <td>{{ apt.appointment_date|date:"M d, Y" }}</td>
                     <td>{{ apt.appointment_time|time:"H:i" }}</td>
                     <td>{{ apt.reason|truncatechars:30|default:'-' }}</td>
+                    <td>
+                        {% if apt.source == 'web' %}
+                            <span class="badge bg-primary rounded-pill"><i class="bi bi-globe me-1"></i>Website</span>
+                        {% elif apt.source == 'phone' %}
+                            <span class="badge bg-info text-dark rounded-pill"><i class="bi bi-telephone me-1"></i>Phone</span>
+                        {% elif apt.source == 'walk_in' %}
+                            <span class="badge bg-warning text-dark rounded-pill"><i class="bi bi-person-walking me-1"></i>Walk-in</span>
+                        {% else %}
+                            <span class="badge bg-light text-dark rounded-pill"><i class="bi bi-building me-1"></i>Internal</span>
+                        {% endif %}
+                    </td>
                     <td>
                         <span class="badge bg-{% if apt.status == 'completed' %}success{% elif apt.status == 'cancelled' %}danger{% elif apt.status == 'in_progress' %}primary{% elif apt.status == 'confirmed' %}info{% else %}warning text-dark{% endif %} rounded-pill">
                             {{ apt.get_status_display }}
@@ -60,6 +85,8 @@
                         {% endif %}
                     </td>
                 </tr>
+                {% empty %}
+                <tr><td colspan="8" class="text-center text-muted py-4">No appointments match the current filters.</td></tr>
                 {% endfor %}
             </tbody>
         </table>

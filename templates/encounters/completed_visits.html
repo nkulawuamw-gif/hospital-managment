@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% block title %}Completed Visits - HMS{% endblock %}
+{% block page_title %}Completed Visits{% endblock %}
+
+{% block content %}
+<div class="card shadow-sm">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table datatable table-hover">
+                <thead>
+                    <tr>
+                        <th>Visit #</th>
+                        <th>Patient</th>
+                        <th>Patient ID</th>
+                        <th>Date</th>
+                        <th>Status</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for visit in visits %}
+                    <tr>
+                        <td><strong>{{ visit.visit_number }}</strong></td>
+                        <td>
+                            <a href="{% url 'patients:detail' visit.patient.id %}">
+                                {{ visit.patient.first_name }} {{ visit.patient.last_name }}
+                            </a>
+                        </td>
+                        <td>{{ visit.patient.patient_id }}</td>
+                        <td>{{ visit.created_at|date:"d/m/Y H:i" }}</td>
+                        <td><span class="badge {% if visit.status == 'billed' %}bg-secondary{% else %}bg-success{% endif %}">{{ visit.get_status_display }}</span></td>
+                        <td>${{ visit.total_medication_cost|floatformat:2 }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="6" class="text-center text-muted py-4">No completed visits</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

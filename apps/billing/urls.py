@@ -17,4 +17,5 @@ urlpatterns = [
     path('web/<int:pk>/pay/', views.record_payment, name='record_payment'),
     path('web/quotations/', views.quotation_list, name='quotation_list'),
     path('web/quotations/create/', views.quotation_create, name='quotation_create'),
+    path('api/medicines/', views.medicines_api, name='medicines_api'),
 ]

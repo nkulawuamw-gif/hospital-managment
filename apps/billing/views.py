@@ -1,11 +1,14 @@
 from decimal import Decimal
 from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
+from django.views.decorators.http import require_GET
 from rest_framework import viewsets
 from .models import Invoice, InvoiceItem, Payment, Quotation
 from .serializers import InvoiceSerializer, InvoiceItemSerializer, PaymentSerializer, QuotationSerializer
 from apps.patients.models import Patient
+from apps.pharmacy.models import Medicine
 from apps.api.utils import generate_invoice_number
 
 
@@ -29,6 +32,33 @@ class PaymentViewSet(viewsets.ModelViewSet):
 class QuotationViewSet(viewsets.ModelViewSet):
     queryset = Quotation.objects.all()
     serializer_class = QuotationSerializer
+
+
+# ------------------ JSON Helpers ------------------
+
+@require_GET
+@login_required
+def medicines_api(request):
+    """Return active medicines for the invoice/quotation line-item autocomplete.
+
+    Supports ?q=<text> for typeahead filtering; returns the full list if no q is given.
+    """
+    q = (request.GET.get('q') or '').strip()
+    qs = Medicine.objects.filter(is_active=True).order_by('name')
+    if q:
+        qs = qs.filter(name__icontains=q)
+    data = [
+        {
+            'id': m.id,
+            'name': m.name,
+            'label': f'{m.name} ({m.strength})'.strip(),
+            'strength': m.strength,
+            'unit': m.get_unit_display(),
+            'selling_price': str(m.selling_price),
+        }
+        for m in qs[:200]
+    ]
+    return JsonResponse({'results': data, 'count': qs.count()})
 
 
 # ------------------ Template Views ------------------
@@ -58,15 +88,18 @@ def invoice_create(request):
         descriptions = request.POST.getlist('description[]')
         quantities = request.POST.getlist('quantity[]')
         prices = request.POST.getlist('unit_price[]')
+        medicine_ids = request.POST.getlist('medicine_id[]')
         subtotal = Decimal('0.00')
         for i in range(len(descriptions)):
             if descriptions[i] and quantities[i] and prices[i]:
                 qty = int(quantities[i])
                 price = Decimal(prices[i])
                 total = qty * price
+                med_id = medicine_ids[i] if i < len(medicine_ids) else None
                 InvoiceItem.objects.create(
                     invoice=invoice,
                     description=descriptions[i],
+                    medicine_id=med_id or None,
                     quantity=qty,
                     unit_price=price,
                     total_price=total,
@@ -82,7 +115,10 @@ def invoice_create(request):
         invoice.save()
         messages.success(request, f'Invoice {invoice.invoice_number} created')
         return redirect('billing:invoice_detail', pk=invoice.pk)
-    return render(request, 'billing/invoice_form.html', {'patients': patients})
+    return render(request, 'billing/invoice_form.html', {
+        'patients': patients,
+        'medicines': Medicine.objects.filter(is_active=True).order_by('name'),
+    })
 
 
 @login_required
@@ -112,7 +148,7 @@ def record_payment(request, pk):
         elif invoice.amount_paid > 0:
             invoice.status = Invoice.Status.PARTIAL
         invoice.save()
-        messages.success(request, f'Payment of KES {amount} recorded')
+        messages.success(request, f'Payment of MWK {amount} recorded')
         return redirect('billing:invoice_detail', pk=pk)
     return render(request, 'billing/payment_form.html', {'inv': invoice})
 
@@ -147,4 +183,7 @@ def quotation_create(request):
         )
         messages.success(request, 'Quotation created')
         return redirect('billing:quotation_list')
-    return render(request, 'billing/quotation_form.html', {'patients': patients})
+    return render(request, 'billing/quotation_form.html', {
+        'patients': patients,
+        'medicines': Medicine.objects.filter(is_active=True).order_by('name'),
+    })

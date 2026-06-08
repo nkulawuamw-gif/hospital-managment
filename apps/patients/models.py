@@ -45,6 +45,7 @@ class Patient(models.Model):
 
     class Meta:
         db_table = 'patients'
+        ordering = ['-id']
         indexes = [
             models.Index(fields=['patient_id']),
             models.Index(fields=['first_name', 'last_name']),

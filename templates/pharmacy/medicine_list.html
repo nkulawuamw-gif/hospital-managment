@@ -30,6 +30,8 @@
     <div class="d-flex gap-2">
         <a href="{% url 'pharmacy:batches' %}" class="btn btn-sm btn-outline-secondary"><i class="bi bi-boxes me-1"></i>Batches</a>
         <a href="{% url 'pharmacy:prescriptions' %}" class="btn btn-sm btn-outline-secondary"><i class="bi bi-file-text me-1"></i>Prescriptions</a>
+        <a href="{% url 'pharmacy:dispensation_list' %}" class="btn btn-sm btn-outline-secondary"><i class="bi bi-bag-check me-1"></i>Dispensations</a>
+        <a href="{% url 'pharmacy:sale_list' %}" class="btn btn-sm btn-outline-secondary"><i class="bi bi-receipt me-1"></i>Sales</a>
         <a href="{% url 'pharmacy:medicine_create' %}" class="btn btn-dark btn-sm"><i class="bi bi-plus-lg me-1"></i>Add Medicine</a>
     </div>
 </div>
@@ -47,13 +49,15 @@
                     <td>{{ med.category.name|default:'-' }}</td>
                     <td>{{ med.get_unit_display }}</td>
                     <td>{{ med.strength|default:'-' }}</td>
-                    <td>KES {{ med.selling_price|floatformat:0 }}</td>
+                    <td>MWK {{ med.selling_price|floatformat:0 }}</td>
                     <td>{{ med.reorder_level }}</td>
                     <td>{% if med.is_active %}<span class="badge bg-success rounded-pill">Active</span>{% else %}<span class="badge bg-danger rounded-pill">Inactive</span>{% endif %}</td>
                     <td class="text-end">
                         <a href="{% url 'pharmacy:medicine_edit' med.pk %}" class="btn btn-sm btn-outline-secondary btn-icon"><i class="bi bi-pencil"></i></a>
                     </td>
                 </tr>
+                {% empty %}
+                <tr><td colspan="8" class="text-center text-muted py-4">No medicines found.</td></tr>
                 {% endfor %}
             </tbody>
         </table>

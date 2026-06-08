@@ -105,11 +105,140 @@
     border-radius: 12px;
     box-shadow: 0 2px 15px rgba(0,0,0,.06);
     transition: transform .3s, box-shadow .3s;
-    cursor: default;
+    height: 100%;
 }
-.dept-card:hover { transform: translateY(-5px); box-shadow: 0 8px 25px rgba(13,110,253,.15); }
-.dept-icon { font-size: 2rem; color: var(--primary); }
-.dept-card h6 { font-weight: 600; color: #2c3e50; margin: 0; }
+.dept-card:hover { transform: translateY(-5px); box-shadow: 0 8px 30px rgba(13,110,253,.12); }
+.dept-icon {
+    width: 55px; height: 55px;
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.4rem; color: #fff;
+    margin-bottom: 1rem;
+}
+.dept-card h5 { font-weight: 700; color: #2c3e50; margin-bottom: .25rem; }
+.dept-card .dept-desc { color: #6c757d; font-size: .9rem; margin-bottom: 1rem; }
+.dept-card .dept-roles { margin: 0; padding: 0; list-style: none; }
+.dept-card .dept-roles li {
+    font-size: .875rem;
+    padding: .25rem 0;
+    color: #495057;
+    border-bottom: 1px dashed rgba(0,0,0,.06);
+}
+.dept-card .dept-roles li:last-child { border-bottom: none; }
+.dept-card .dept-roles li i { color: var(--primary); margin-right: .5rem; }
+.dept-card .dept-details-toggle {
+    font-size: .8rem; font-weight: 600; color: var(--primary);
+    background: none; border: 0; padding: .25rem 0; margin-top: .75rem;
+    display: inline-flex; align-items: center; gap: .35rem;
+    cursor: pointer; transition: color .2s;
+}
+.dept-card .dept-details-toggle:hover { color: #0a58ca; }
+.dept-card .dept-details-toggle .chev { transition: transform .25s; }
+.dept-card .dept-details-toggle[aria-expanded="true"] .chev { transform: rotate(180deg); }
+.dept-card .dept-details {
+    margin-top: .5rem; padding-top: .85rem;
+    border-top: 1px dashed rgba(0,0,0,.08);
+    font-size: .85rem;
+}
+.dept-card .dept-meta {
+    display: flex; align-items: flex-start; gap: .5rem;
+    color: #495057; margin-bottom: .75rem;
+}
+.dept-card .dept-meta i { color: var(--primary); margin-top: 2px; flex-shrink: 0; }
+.dept-card .dept-meta strong { color: #2c3e50; }
+.dept-card .dept-section-title {
+    font-size: .72rem; text-transform: uppercase; letter-spacing: .5px;
+    color: #6c757d; font-weight: 700; margin: .85rem 0 .35rem;
+    display: flex; align-items: center; gap: .35rem;
+}
+.dept-card .dept-section-title i { color: var(--primary); }
+.dept-card .dept-referral-list {
+    list-style: none; margin: 0; padding: 0;
+}
+.dept-card .dept-referral-list li {
+    font-size: .82rem; color: #495057; padding: .15rem 0;
+    display: flex; align-items: center; gap: .4rem;
+}
+.dept-card .dept-referral-list li i { font-size: .9rem; flex-shrink: 0; }
+.dept-card .dept-referral-list.in li i { color: #198754; }
+.dept-card .dept-referral-list.out li i { color: #fd7e14; }
+.dept-card .dept-flow {
+    list-style: none; margin: 0; padding: 0; counter-reset: step;
+}
+.dept-card .dept-flow li {
+    font-size: .82rem; color: #495057;
+    padding: .25rem 0 .25rem 1.7rem; position: relative;
+    border-bottom: 1px dotted rgba(0,0,0,.05);
+}
+.dept-card .dept-flow li:last-child { border-bottom: none; }
+.dept-card .dept-flow li::before {
+    counter-increment: step; content: counter(step);
+    position: absolute; left: 0; top: .28rem;
+    width: 1.25rem; height: 1.25rem; border-radius: 50%;
+    background: var(--primary); color: #fff;
+    font-size: .7rem; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+}
+.dept-card .dept-treatments {
+    list-style: none; margin: 0; padding: 0;
+    background: #f8fafc; border-radius: 8px;
+    border: 1px solid rgba(13,110,253,.08);
+    padding: .5rem .75rem;
+}
+.dept-card .dept-treatments li {
+    font-size: .82rem; color: #344054;
+    padding: .25rem 0 .25rem 1.5rem;
+    position: relative; line-height: 1.35;
+    border-bottom: 1px dotted rgba(0,0,0,.04);
+}
+.dept-card .dept-treatments li:last-child { border-bottom: none; }
+.dept-card .dept-treatments li i {
+    color: #198754; position: absolute; left: 0; top: .32rem;
+    font-size: .95rem;
+}
+
+/* MEDICAL TEAMS */
+.team-card {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 15px rgba(0,0,0,.06);
+    transition: transform .3s, box-shadow .3s;
+    height: 100%;
+    border-top: 4px solid var(--primary);
+}
+.team-card:hover { transform: translateY(-5px); box-shadow: 0 8px 30px rgba(13,110,253,.12); }
+.team-icon {
+    width: 60px; height: 60px;
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.5rem; color: #fff;
+    margin-bottom: 1rem;
+}
+.team-card h5 { font-weight: 700; color: #2c3e50; margin-bottom: .25rem; }
+.team-card .team-desc { color: #6c757d; font-size: .9rem; margin-bottom: .75rem; }
+.team-card .team-head {
+    display: inline-block;
+    background: rgba(13,110,253,.08);
+    color: var(--primary);
+    font-size: .75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .03em;
+    padding: .2rem .65rem;
+    border-radius: 20px;
+    margin-bottom: .85rem;
+}
+.team-card .team-roles { margin: 0; padding: 0; list-style: none; }
+.team-card .team-roles li {
+    font-size: .875rem;
+    padding: .25rem 0;
+    color: #495057;
+    border-bottom: 1px dashed rgba(0,0,0,.06);
+}
+.team-card .team-roles li:last-child { border-bottom: none; }
+.team-card .team-roles li i { color: var(--primary); margin-right: .5rem; }
 
 /* DOCTORS */
 .doctor-card {

@@ -104,36 +104,76 @@ def user_list_view(request):
 
 @login_required
 def user_create_view(request):
+    if request.user.role not in ('super_admin', 'hospital_admin'):
+        messages.error(request, 'You do not have permission to add users.')
+        return redirect('dashboard:dashboard')
     roles = User.Role.choices
     if request.method == 'POST':
-        email = request.POST.get('email')
-        first_name = request.POST.get('first_name')
-        last_name = request.POST.get('last_name')
-        role = request.POST.get('role')
-        password = request.POST.get('password')
-        if User.objects.filter(email=email).exists():
-            messages.error(request, 'Email already exists')
+        email = (request.POST.get('email') or '').strip().lower()
+        first_name = (request.POST.get('first_name') or '').strip()
+        last_name = (request.POST.get('last_name') or '').strip()
+        role = request.POST.get('role') or ''
+        password = request.POST.get('password') or ''
+        password_confirm = request.POST.get('password_confirm') or ''
+        phone = (request.POST.get('phone') or '').strip()
+
+        valid_roles = [r[0] for r in User.Role.choices]
+        if not email or not first_name or not last_name:
+            messages.error(request, 'First name, last name, and email are required.')
+        elif role not in valid_roles:
+            messages.error(request, 'Invalid role selected.')
+        elif len(password) < 8:
+            messages.error(request, 'Password must be at least 8 characters long.')
+        elif password != password_confirm:
+            messages.error(request, 'Passwords do not match.')
+        elif User.objects.filter(email__iexact=email).exists():
+            messages.error(request, f'A user with email {email} already exists.')
         else:
+            is_admin_role = role in ('super_admin', 'hospital_admin')
             user = User.objects.create_user(
-                email=email, password=password,
-                first_name=first_name, last_name=last_name,
-                role=role
+                email=email,
+                password=password,
+                first_name=first_name,
+                last_name=last_name,
+                role=role,
+                phone=phone,
+                is_staff=is_admin_role,
+                is_superuser=(role == 'super_admin'),
             )
-            messages.success(request, f'User {user.email} created successfully')
+            messages.success(
+                request,
+                f'User {user.get_full_name()} ({user.get_role_display()}) created successfully.'
+            )
             return redirect('accounts:user_list')
     return render(request, 'accounts/user_form.html', {'roles': roles, 'is_edit': False})
 
 
 @login_required
 def user_edit_view(request, pk):
+    if request.user.role not in ('super_admin', 'hospital_admin'):
+        messages.error(request, 'You do not have permission to edit users.')
+        return redirect('dashboard:dashboard')
     user = User.objects.get(pk=pk)
     roles = User.Role.choices
     if request.method == 'POST':
-        user.first_name = request.POST.get('first_name')
-        user.last_name = request.POST.get('last_name')
-        user.role = request.POST.get('role')
+        user.first_name = (request.POST.get('first_name') or '').strip()
+        user.last_name = (request.POST.get('last_name') or '').strip()
+        new_role = request.POST.get('role') or user.role
+        if new_role in [r[0] for r in User.Role.choices]:
+            user.role = new_role
+        user.phone = (request.POST.get('phone') or '').strip()
         user.is_active = request.POST.get('is_active') == 'on'
+        if user.role in ('super_admin', 'hospital_admin'):
+            user.is_staff = True
+        if user.role == 'super_admin':
+            user.is_superuser = True
+        new_password = request.POST.get('password') or ''
+        if new_password:
+            if len(new_password) < 8:
+                messages.error(request, 'Password must be at least 8 characters long.')
+                return render(request, 'accounts/user_form.html', {'edit_user': user, 'roles': roles, 'is_edit': True})
+            user.set_password(new_password)
         user.save()
-        messages.success(request, 'User updated')
+        messages.success(request, f'User {user.get_full_name()} updated successfully.')
         return redirect('accounts:user_list')
     return render(request, 'accounts/user_form.html', {'edit_user': user, 'roles': roles, 'is_edit': True})

@@ -60,22 +60,33 @@ def appointment_list(request):
     today = date.today()
     status_filter = request.GET.get('status', '')
     date_filter = request.GET.get('date', '')
+    source_filter = request.GET.get('source', '')
 
     appointments = Appointment.objects.all().order_by('-appointment_date', '-appointment_time')
     if status_filter:
         appointments = appointments.filter(status=status_filter)
     if date_filter:
         appointments = appointments.filter(appointment_date=date_filter)
+    if source_filter:
+        appointments = appointments.filter(source=source_filter)
 
     status_counts = Appointment.objects.values('status').annotate(count=Count('id'))
     stats = {s['status']: s['count'] for s in status_counts}
 
+    source_counts = dict(
+        Appointment.objects.values_list('source').annotate(count=Count('id')).order_by()
+    )
+    source_stats = {s: source_counts.get(s, 0) for s, _ in Appointment.Source.choices}
+
     context = {
         'appointments': appointments,
         'stats': stats,
+        'source_stats': source_stats,
+        'source_choices': Appointment.Source.choices,
         'today': today,
         'current_status': status_filter,
         'current_date': date_filter,
+        'current_source': source_filter,
     }
     return render(request, 'appointments/list.html', context)
 

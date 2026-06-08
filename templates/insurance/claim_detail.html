@@ -30,13 +30,13 @@
                     <div class="col-6">
                         <div class="p-3 bg-light rounded-3 text-center">
                             <div class="text-muted small">Amount Claimed</div>
-                            <div class="fw-bold fs-5">KES {{ claim.amount_claimed|floatformat:0 }}</div>
+                            <div class="fw-bold fs-5">MWK {{ claim.amount_claimed|floatformat:0 }}</div>
                         </div>
                     </div>
                     <div class="col-6">
                         <div class="p-3 bg-light rounded-3 text-center">
                             <div class="text-muted small">Amount Approved</div>
-                            <div class="fw-bold fs-5">{% if claim.amount_approved %}KES {{ claim.amount_approved|floatformat:0 }}{% else %}<span class="text-muted">-</span>{% endif %}</div>
+                            <div class="fw-bold fs-5">{% if claim.amount_approved %}MWK {{ claim.amount_approved|floatformat:0 }}{% else %}<span class="text-muted">-</span>{% endif %}</div>
                         </div>
                     </div>
                 </div>

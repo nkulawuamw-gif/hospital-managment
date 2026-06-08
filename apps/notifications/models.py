@@ -21,6 +21,7 @@ class Notification(models.Model):
 
     class Meta:
         db_table = 'notifications'
+        ordering = ['-id']
         indexes = [
             models.Index(fields=['recipient', 'is_read']),
         ]

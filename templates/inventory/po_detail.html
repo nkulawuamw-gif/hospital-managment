@@ -17,7 +17,7 @@
                     <dt class="col-sm-5 text-muted">Status</dt>
                     <dd class="col-sm-7"><span class="badge bg-{% if po.status == 'received' %}success{% elif po.status == 'approved' %}info{% elif po.status == 'cancelled' %}danger{% else %}warning text-dark{% endif %} rounded-pill">{{ po.get_status_display }}</span></dd>
                     <dt class="col-sm-5 text-muted">Total</dt>
-                    <dd class="col-sm-7 fw-bold">KES {{ po.total_amount|floatformat:0 }}</dd>
+                    <dd class="col-sm-7 fw-bold">MWK {{ po.total_amount|floatformat:0 }}</dd>
                 </dl>
                 {% if po.notes %}<hr><p class="small mb-0">{{ po.notes }}</p>{% endif %}
                 <hr>
@@ -41,8 +41,8 @@
                             <td class="fw-medium">{{ item.supply.name }}</td>
                             <td>{{ item.quantity_ordered }}</td>
                             <td>{{ item.quantity_received }}</td>
-                            <td>KES {{ item.unit_price|floatformat:0 }}</td>
-                            <td class="text-end fw-medium">KES {{ item.total_price|floatformat:0 }}</td>
+                            <td>MWK {{ item.unit_price|floatformat:0 }}</td>
+                            <td class="text-end fw-medium">MWK {{ item.total_price|floatformat:0 }}</td>
                         </tr>
                         {% endfor %}
                     </tbody>

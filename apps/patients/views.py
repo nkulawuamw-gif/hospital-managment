@@ -5,6 +5,7 @@ from rest_framework import viewsets, filters
 from django_filters.rest_framework import DjangoFilterBackend
 from .models import Patient, MedicalHistory
 from .serializers import PatientListSerializer, PatientDetailSerializer, PatientCreateSerializer, MedicalHistorySerializer
+from apps.doctors.models import StaffDepartment
 from apps.api.utils import generate_patient_id
 
 
@@ -59,6 +60,7 @@ def patient_create(request):
             allergies=request.POST.get('allergies', ''),
             insurance_provider=request.POST.get('insurance_provider', ''),
             insurance_policy_number=request.POST.get('insurance_policy_number', ''),
+            photo=request.FILES.get('photo'),
             registered_by=request.user,
         )
         patient.save()
@@ -77,6 +79,8 @@ def patient_detail(request, pk):
     lab_requests = patient.lab_requests.all().order_by('-created_at')[:10]
     admissions = patient.admissions.all().order_by('-admission_date')[:10]
     medical_histories = patient.medical_histories.all()
+    visits = patient.visits.all().order_by('-created_at')[:10]
+    departments = StaffDepartment.objects.filter(is_active=True)
 
     context = {
         'patient': patient,
@@ -87,6 +91,8 @@ def patient_detail(request, pk):
         'lab_requests': lab_requests,
         'admissions': admissions,
         'medical_histories': medical_histories,
+        'visits': visits,
+        'departments': departments,
     }
     return render(request, 'patients/detail.html', context)
 
@@ -109,7 +115,27 @@ def patient_edit(request, pk):
         patient.allergies = request.POST.get('allergies', '')
         patient.insurance_provider = request.POST.get('insurance_provider', '')
         patient.insurance_policy_number = request.POST.get('insurance_policy_number', '')
+        patient.is_active = request.POST.get('is_active') == 'on'
+        if request.FILES.get('photo'):
+            patient.photo = request.FILES.get('photo')
         patient.save()
         messages.success(request, 'Patient updated')
         return redirect('patients:detail', pk=patient.pk)
     return render(request, 'patients/form.html', {'patient': patient, 'is_edit': True})
+
+
+@login_required
+def patient_add_medical_history(request, pk):
+    patient = get_object_or_404(Patient, pk=pk)
+    if request.method == 'POST':
+        condition = request.POST.get('condition')
+        diagnosed_date = request.POST.get('diagnosed_date') or None
+        notes = request.POST.get('notes', '')
+        MedicalHistory.objects.create(
+            patient=patient,
+            condition=condition,
+            diagnosed_date=diagnosed_date,
+            notes=notes,
+        )
+        messages.success(request, 'Medical history added')
+    return redirect('patients:detail', pk=patient.pk)

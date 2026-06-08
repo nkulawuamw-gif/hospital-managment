@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+{% block title %}{% if is_edit %}Edit Ward{% else %}Add Ward{% endif %} - HMS{% endblock %}
+{% block page_title %}{% if is_edit %}Edit Ward: {{ ward.name }}{% else %}Add New Ward{% endif %}{% endblock %}
+
+{% block content %}
+<div class="card shadow-sm border-0" style="max-width: 800px;">
+    <div class="card-body p-4">
+        <form method="post">
+            {% csrf_token %}
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label small fw-medium">Ward Name *</label>
+                    <input type="text" name="name" class="form-control" value="{{ ward.name|default:'' }}" required placeholder="e.g. General Ward A">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label small fw-medium">Type *</label>
+                    <select name="type" class="form-select">
+                        <option value="general" {% if ward.type == 'general' %}selected{% endif %}>General Ward</option>
+                        <option value="private" {% if ward.type == 'private' %}selected{% endif %}>Private Room</option>
+                        <option value="icu" {% if ward.type == 'icu' %}selected{% endif %}>ICU</option>
+                        <option value="maternity" {% if ward.type == 'maternity' %}selected{% endif %}>Maternity</option>
+                        <option value="pediatric" {% if ward.type == 'pediatric' %}selected{% endif %}>Pediatric</option>
+                        <option value="emergency" {% if ward.type == 'emergency' %}selected{% endif %}>Emergency</option>
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label small fw-medium">Department</label>
+                    <select name="department" class="form-select">
+                        <option value="">-- None --</option>
+                        {% for d in departments %}
+                        <option value="{{ d.pk }}" {% if ward.department_id == d.pk %}selected{% endif %}>{{ d.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label small fw-medium">Floor / Location</label>
+                    <input type="text" name="floor" class="form-control" value="{{ ward.floor|default:'' }}" placeholder="e.g. 1st Floor East Wing">
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label small fw-medium">Capacity (Beds) *</label>
+                    <input type="number" name="capacity" class="form-control" value="{{ ward.capacity|default:'10' }}" min="0" required>
+                </div>
+                {% if not is_edit %}
+                <div class="col-md-4">
+                    <label class="form-label small fw-medium">Beds to Auto-Create</label>
+                    <input type="number" name="bed_count" class="form-control" value="{{ ward.capacity|default:'10' }}" min="0" placeholder="Same as capacity">
+                    <div class="form-text">Beds will be numbered B01, B02, ...</div>
+                </div>
+                {% endif %}
+                <div class="col-md-4">
+                    <label class="form-label small fw-medium">Charge per Day (MWK)</label>
+                    <input type="number" name="charge_per_day" class="form-control" value="{{ ward.charge_per_day|default:'0' }}" step="0.01">
+                </div>
+                <div class="col-12">
+                    <div class="form-check">
+                        <input type="checkbox" name="is_active" class="form-check-input" id="active" {% if ward.is_active or not is_edit %}checked{% endif %}>
+                        <label class="form-check-label small" for="active">Active (admit patients to this ward)</label>
+                    </div>
+                </div>
+            </div>
+            <div class="d-flex gap-2 mt-4 pt-3 border-top">
+                <button type="submit" class="btn btn-dark"><i class="bi bi-check-lg me-1"></i>{% if is_edit %}Update{% else %}Create{% endif %} Ward</button>
+                <a href="{% url 'inpatient:wards' %}" class="btn btn-outline-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

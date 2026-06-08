@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% block title %}Dispatch Requisition {{ r.request_number }} - HMS{% endblock %}
+{% block page_title %}Dispatch Requisition {{ r.request_number }}{% endblock %}
+
+{% block content %}
+<div class="row g-3">
+    <div class="col-md-12">
+        <form method="post">
+            {% csrf_token %}
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-white">
+                    <h6 class="fw-semibold mb-0"><i class="bi bi-truck me-2"></i>Confirm Dispatch — Enter Delivered Quantities</h6>
+                </div>
+                <div class="card-body p-0">
+                    <table class="table mb-0" style="font-size: .85rem;">
+                        <thead class="table-light">
+                            <tr><th>Medicine</th><th>Requested</th><th>Approved</th><th style="width:130px">Delivered Qty</th></tr>
+                        </thead>
+                        <tbody>
+                            {% for item in r.items.all %}
+                            <tr>
+                                <td class="fw-medium">{{ item.medicine.name }} ({{ item.medicine.strength }})</td>
+                                <td>{{ item.quantity_requested }}</td>
+                                <td>{{ item.quantity_approved|default:item.quantity_requested }}</td>
+                                <td>
+                                    <input type="number" name="delivered_qty_{{ item.pk }}" value="{{ item.quantity_approved|default:item.quantity_requested }}" class="form-control form-control-sm" min="0">
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label small fw-medium">Dispatch Notes</label>
+                        <textarea name="dispatch_notes" class="form-control" rows="2" placeholder="Any notes about the dispatch..."></textarea>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-success"><i class="bi bi-check2-circle me-1"></i>Confirm Dispatch</button>
+                        <a href="{% url 'requisitions:requisition_detail' r.pk %}" class="btn btn-outline-secondary">Cancel</a>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

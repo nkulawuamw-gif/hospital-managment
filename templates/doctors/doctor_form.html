@@ -1,0 +1,99 @@
+{% extends 'base.html' %}
+{% block title %}{% if is_edit %}Edit{% else %}Add{% endif %} Doctor - HMS{% endblock %}
+{% block page_title %}{% if is_edit %}Edit Dr. {{ profile.user.get_full_name }}{% else %}Add New Doctor{% endif %}{% endblock %}
+
+{% block content %}
+<div class="card shadow-sm border-0" style="max-width: 900px;">
+    <div class="card-body p-4">
+        <form method="post">
+            {% csrf_token %}
+            <h6 class="fw-semibold mb-3 text-muted">Account Information</h6>
+            <div class="row g-3 mb-4">
+                <div class="col-md-6">
+                    <label class="form-label small fw-medium">First Name *</label>
+                    <input type="text" name="first_name" class="form-control" value="{{ profile.user.first_name|default:'' }}" required>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label small fw-medium">Last Name *</label>
+                    <input type="text" name="last_name" class="form-control" value="{{ profile.user.last_name|default:'' }}" required>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label small fw-medium">Email *</label>
+                    <input type="email" name="email" class="form-control" value="{{ profile.user.email|default:'' }}" {% if is_edit %}readonly{% else %}required{% endif %}>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label small fw-medium">Phone</label>
+                    <input type="text" name="phone" class="form-control" value="{{ profile.user.phone|default:'' }}" placeholder="+265...">
+                </div>
+                {% if not is_edit %}
+                <div class="col-md-6">
+                    <label class="form-label small fw-medium">Default Password</label>
+                    <input type="text" name="password" class="form-control" value="changeme123">
+                    <div class="form-text">Doctor should change this on first login.</div>
+                </div>
+                {% endif %}
+            </div>
+
+            <h6 class="fw-semibold mb-3 text-muted">Professional Information</h6>
+            <div class="row g-3 mb-4">
+                <div class="col-md-6">
+                    <label class="form-label small fw-medium">Department</label>
+                    <select name="department" class="form-select">
+                        <option value="">-- None --</option>
+                        {% for d in departments %}
+                        <option value="{{ d.pk }}" {% if profile.department_id == d.pk %}selected{% endif %}>{{ d.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label small fw-medium">License Number *</label>
+                    <input type="text" name="license_number" class="form-control" value="{{ profile.license_number|default:'' }}" required>
+                </div>
+                <div class="col-12">
+                    <label class="form-label small fw-medium">Specializations (Ctrl+click to select multiple)</label>
+                    <select name="specializations" class="form-select" multiple size="5">
+                        {% for s in specializations %}
+                        <option value="{{ s.pk }}" {% if s in profile.specializations.all %}selected{% endif %}>{{ s.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label small fw-medium">Consultation Fee (MWK)</label>
+                    <input type="number" name="consultation_fee" class="form-control" value="{{ profile.consultation_fee|default:'0' }}" step="0.01">
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label small fw-medium">Max Patients / Day</label>
+                    <input type="number" name="max_patients_per_day" class="form-control" value="{{ profile.max_patients_per_day|default:'20' }}">
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label small fw-medium">From</label>
+                    <input type="time" name="available_from" class="form-control" value="{{ profile.available_from|default:'08:00'|time:'H:i' }}">
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label small fw-medium">To</label>
+                    <input type="time" name="available_to" class="form-control" value="{{ profile.available_to|default:'17:00'|time:'H:i' }}">
+                </div>
+                <div class="col-12">
+                    <label class="form-label small fw-medium">Available Days</label>
+                    <input type="text" name="available_days" class="form-control" value="{{ profile.available_days|default:'Monday,Tuesday,Wednesday,Thursday,Friday' }}" placeholder="Monday,Tuesday,Wednesday,Thursday,Friday">
+                </div>
+                <div class="col-12">
+                    <label class="form-label small fw-medium">Qualifications</label>
+                    <textarea name="qualifications" class="form-control" rows="2" placeholder="e.g. MBBS, MMed (Surgery)">{{ profile.qualifications|default:'' }}</textarea>
+                </div>
+                <div class="col-12">
+                    <div class="form-check">
+                        <input type="checkbox" name="is_available" class="form-check-input" id="avail" {% if profile.is_available or not is_edit %}checked{% endif %}>
+                        <label class="form-check-label small" for="avail">Available for appointments</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="d-flex gap-2 mt-4 pt-3 border-top">
+                <button type="submit" class="btn btn-dark"><i class="bi bi-check-lg me-1"></i>{% if is_edit %}Update{% else %}Create{% endif %}</button>
+                <a href="{% if is_edit %}{% url 'doctors:doctor_detail' profile.pk %}{% else %}{% url 'doctors:doctors' %}{% endif %}" class="btn btn-outline-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -126,12 +126,38 @@ class ServiceItem(models.Model):
 class Department(models.Model):
     name = models.CharField(max_length=200)
     icon = models.CharField(max_length=50, default='bi bi-hospital', help_text='Bootstrap icon class')
+    description = models.CharField(max_length=300, blank=True, default='', help_text='Short tagline shown on the landing page')
+    roles = models.JSONField(default=list, blank=True, help_text='List of job roles / professionals in this department')
+    treatments = models.JSONField(default=list, blank=True, help_text='List of treatments or support services typically given to patients in this department')
+    referrals_from = models.JSONField(default=list, blank=True, help_text='Departments / entry points that typically refer patients INTO this one (entry points)')
+    referrals_to = models.JSONField(default=list, blank=True, help_text='Departments / specialists that patients are referred OUT TO from this one (exit points)')
+    opening_hours = models.CharField(max_length=200, blank=True, default='Mon - Fri: 07:30 - 17:00 | Sat: 08:00 - 12:00 | Sun & Holidays: Closed', help_text='Service hours shown to the public')
+    client_handling_steps = models.JSONField(default=list, blank=True, help_text='Step-by-step flow of how a client is received and discharged')
     order = models.PositiveIntegerField(default=0)
     is_active = models.BooleanField(default=True)
 
     class Meta:
         db_table = 'landing_departments'
         ordering = ['order']
+
+    def __str__(self):
+        return self.name
+
+
+class MedicalTeam(models.Model):
+    name = models.CharField(max_length=200)
+    icon = models.CharField(max_length=50, default='bi bi-people-fill', help_text='Bootstrap icon class')
+    description = models.CharField(max_length=300, blank=True, default='', help_text='Short tagline shown on the landing page')
+    head_title = models.CharField(max_length=100, default='Team Lead', help_text='e.g. "Lead Physician", "Head Nurse"')
+    roles = models.JSONField(default=list, blank=True, help_text='List of roles / professionals in the team')
+    order = models.PositiveIntegerField(default=0)
+    is_active = models.BooleanField(default=True)
+
+    class Meta:
+        db_table = 'landing_medical_teams'
+        ordering = ['order']
+        verbose_name = 'Medical Team'
+        verbose_name_plural = 'Medical Teams'
 
     def __str__(self):
         return self.name

@@ -5,7 +5,7 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'hms.settings')
 django.setup()
 
 from django.contrib.auth import get_user_model
-from apps.doctors.models import Department, Specialization
+from apps.doctors.models import StaffDepartment, Specialization
 from apps.laboratory.models import LabTestCategory, LabTest
 from apps.pharmacy.models import MedicineCategory, Medicine
 from apps.inventory.models import SupplyCategory, Supply
@@ -34,7 +34,7 @@ def create_departments():
         'Obstetrics & Gynecology', 'Ophthalmology', 'ENT', 'Psychiatry',
     ]
     for name in departments:
-        Department.objects.get_or_create(name=name)
+        StaffDepartment.objects.get_or_create(name=name)
     print(f'{len(departments)} departments created')
 
 
