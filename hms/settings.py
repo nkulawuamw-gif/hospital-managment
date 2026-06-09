@@ -106,6 +106,9 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'hms.wsgi.application'
 
+DB_DIR = BASE_DIR / "local"
+DB_DIR.mkdir(parents=True, exist_ok=True)
+
 DATABASE_URL = config('DATABASE_URL', default='')
 if DATABASE_URL:
     import dj_database_url
@@ -115,7 +118,7 @@ else:
     DATABASES = {
         'default': {
             'ENGINE': config('DB_ENGINE', default='django.db.backends.sqlite3'),
-            'NAME': config('DB_NAME', default=BASE_DIR / 'local' / 'db.sqlite3'),
+            'NAME': DB_DIR / "db.sqlite3",
             'USER': config('DB_USER', default=''),
             'PASSWORD': config('DB_PASSWORD', default=''),
             'HOST': config('DB_HOST', default=''),
