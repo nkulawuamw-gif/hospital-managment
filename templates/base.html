@@ -281,14 +281,28 @@
             {% if user_modules %}
                 {% regroup user_modules by section as section_groups %}
                 {% for group in section_groups %}
-                <div class="nav-section">{{ group.grouper }}</div>
-                {% for module in group.list %}
-                <div class="nav-item">
-                    <a href="{% url module.url_name %}" class="nav-link {% if request.resolver_match.app_name == module.codename %}active{% endif %}">
-                        <i class="{{ module.icon }}"></i> {{ module.name }}
-                    </a>
-                </div>
+                    {% if group.grouper == 'Main' %}
+                    <div class="nav-section">Main</div>
+                    {% for module in group.list %}
+                    <div class="nav-item">
+                        <a href="{% url module.url_name %}" class="nav-link {% if request.resolver_match.app_name == module.codename %}active{% endif %}">
+                            <i class="{{ module.icon }}"></i> {{ module.name }}
+                        </a>
+                    </div>
+                    {% endfor %}
+                    {% endif %}
                 {% endfor %}
+                {% for group in section_groups %}
+                    {% if group.grouper != 'Main' %}
+                    <div class="nav-section">{{ group.grouper }}</div>
+                    {% for module in group.list %}
+                    <div class="nav-item">
+                        <a href="{% url module.url_name %}" class="nav-link {% if request.resolver_match.app_name == module.codename %}active{% endif %}">
+                            <i class="{{ module.icon }}"></i> {{ module.name }}
+                        </a>
+                    </div>
+                    {% endfor %}
+                    {% endif %}
                 {% endfor %}
             {% else %}
             <div class="nav-section">Main</div>
