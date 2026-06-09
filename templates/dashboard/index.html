@@ -1,14 +1,35 @@
 {% extends 'base.html' %}
 {% load static %}
-{% block title %}Dashboard - HMS{% endblock %}
+{% block title %}Dashboard - Hope Medi{% endblock %}
 {% block page_title %}Dashboard{% endblock %}
 
 {% block content %}
+<div class="welcome-section mb-4">
+    <div class="d-flex flex-wrap justify-content-between align-items-center">
+        <div>
+            <h2 class="fw-bold mb-1" style="color: #0f172a;">
+                Welcome back, {{ user.first_name|default:"Staff" }} 👋
+            </h2>
+            <p class="text-muted mb-0" style="font-size: .9rem;">
+                <i class="bi bi-calendar3 me-1"></i> {% now "l, F d, Y" %}
+            </p>
+        </div>
+        <div class="d-flex gap-2 mt-2 mt-sm-0">
+            <a href="{% url 'patients:list' %}" class="btn btn-sm rounded-pill px-3" style="background: #0d9488; color: #fff; font-weight: 500;">
+                <i class="bi bi-plus-lg me-1"></i>New Patient
+            </a>
+            <a href="{% url 'appointments:list' %}" class="btn btn-sm rounded-pill px-3" style="background: #f1f5f9; color: #475569; font-weight: 500;">
+                <i class="bi bi-calendar-plus me-1"></i>Book Appointment
+            </a>
+        </div>
+    </div>
+</div>
+
 <div class="row g-3 mb-4">
     <div class="col-6 col-md-4 col-lg-3">
-        <div class="stat-card">
+        <div class="stat-card" data-count="{{ patient_count }}">
             <div class="d-flex align-items-center gap-3">
-                <div class="stat-icon" style="background: linear-gradient(135deg, #0d9488, #14b8a6); color: #fff; box-shadow: 0 4px 12px rgba(13,148,136,.3);">
+                <div class="stat-icon" style="background: linear-gradient(135deg, #0d9488, #14b8a6); color: #fff; box-shadow: 0 6px 16px rgba(13,148,136,.3);">
                     <i class="bi bi-people-fill"></i>
                 </div>
                 <div>
@@ -21,7 +42,7 @@
     <div class="col-6 col-md-4 col-lg-3">
         <div class="stat-card">
             <div class="d-flex align-items-center gap-3">
-                <div class="stat-icon" style="background: linear-gradient(135deg, #10b981, #34d399); color: #fff; box-shadow: 0 4px 12px rgba(16,185,129,.3);">
+                <div class="stat-icon" style="background: linear-gradient(135deg, #10b981, #34d399); color: #fff; box-shadow: 0 6px 16px rgba(16,185,129,.3);">
                     <i class="bi bi-calendar-check-fill"></i>
                 </div>
                 <div>
@@ -34,7 +55,7 @@
     <div class="col-6 col-md-4 col-lg-3">
         <div class="stat-card">
             <div class="d-flex align-items-center gap-3">
-                <div class="stat-icon" style="background: linear-gradient(135deg, #f59e0b, #fbbf24); color: #fff; box-shadow: 0 4px 12px rgba(245,158,11,.3);">
+                <div class="stat-icon" style="background: linear-gradient(135deg, #f59e0b, #fbbf24); color: #fff; box-shadow: 0 6px 16px rgba(245,158,11,.3);">
                     <i class="bi bi-hospital-fill"></i>
                 </div>
                 <div>
@@ -47,7 +68,7 @@
     <div class="col-6 col-md-4 col-lg-3">
         <div class="stat-card">
             <div class="d-flex align-items-center gap-3">
-                <div class="stat-icon" style="background: linear-gradient(135deg, #8b5cf6, #a78bfa); color: #fff; box-shadow: 0 4px 12px rgba(139,92,246,.3);">
+                <div class="stat-icon" style="background: linear-gradient(135deg, #8b5cf6, #a78bfa); color: #fff; box-shadow: 0 6px 16px rgba(139,92,246,.3);">
                     <i class="bi bi-house-check-fill"></i>
                 </div>
                 <div>
@@ -60,7 +81,7 @@
     <div class="col-6 col-md-4 col-lg-3">
         <div class="stat-card">
             <div class="d-flex align-items-center gap-3">
-                <div class="stat-icon" style="background: linear-gradient(135deg, #0d9488, #14b8a6); color: #fff; box-shadow: 0 4px 12px rgba(13,148,136,.3);">
+                <div class="stat-icon" style="background: linear-gradient(135deg, #0d9488, #14b8a6); color: #fff; box-shadow: 0 6px 16px rgba(13,148,136,.3);">
                     <i class="bi bi-cash-stack"></i>
                 </div>
                 <div>
@@ -73,7 +94,7 @@
     <div class="col-6 col-md-4 col-lg-3">
         <div class="stat-card">
             <div class="d-flex align-items-center gap-3">
-                <div class="stat-icon" style="background: linear-gradient(135deg, #3b82f6, #60a5fa); color: #fff; box-shadow: 0 4px 12px rgba(59,130,246,.3);">
+                <div class="stat-icon" style="background: linear-gradient(135deg, #3b82f6, #60a5fa); color: #fff; box-shadow: 0 6px 16px rgba(59,130,246,.3);">
                     <i class="bi bi-cash-coin"></i>
                 </div>
                 <div>
@@ -86,7 +107,7 @@
     <div class="col-6 col-md-4 col-lg-3">
         <div class="stat-card">
             <div class="d-flex align-items-center gap-3">
-                <div class="stat-icon" style="background: linear-gradient(135deg, #ef4444, #f87171); color: #fff; box-shadow: 0 4px 12px rgba(239,68,68,.3);">
+                <div class="stat-icon" style="background: linear-gradient(135deg, #ef4444, #f87171); color: #fff; box-shadow: 0 6px 16px rgba(239,68,68,.3);">
                     <i class="bi bi-exclamation-triangle-fill"></i>
                 </div>
                 <div>
@@ -99,7 +120,7 @@
     <div class="col-6 col-md-4 col-lg-3">
         <div class="stat-card">
             <div class="d-flex align-items-center gap-3">
-                <div class="stat-icon" style="background: linear-gradient(135deg, #f59e0b, #fbbf24); color: #fff; box-shadow: 0 4px 12px rgba(245,158,11,.3);">
+                <div class="stat-icon" style="background: linear-gradient(135deg, #f59e0b, #fbbf24); color: #fff; box-shadow: 0 6px 16px rgba(245,158,11,.3);">
                     <i class="bi bi-flask-fill"></i>
                 </div>
                 <div>
@@ -113,9 +134,10 @@
 
 <div class="row g-3">
     <div class="col-lg-8">
-        <div class="card shadow-sm border-0">
-            <div class="card-header bg-white border-bottom-0 pt-3 pb-0">
-                <h6 class="fw-semibold mb-0"><i class="bi bi-graph-up me-2"></i>Revenue Trends</h6>
+        <div class="card border-0 h-100">
+            <div class="card-header d-flex justify-content-between align-items-center flex-wrap">
+                <h6 class="fw-bold mb-0" style="color: #0f172a;"><i class="bi bi-graph-up me-2" style="color: #0d9488;"></i>Revenue Trends</h6>
+                <span class="badge rounded-pill" style="background: #ecfdf5; color: #0d9488; font-size: .75rem;">This Month</span>
             </div>
             <div class="card-body">
                 <canvas id="revenueChart" height="200"></canvas>
@@ -123,23 +145,24 @@
         </div>
     </div>
     <div class="col-lg-4">
-        <div class="card shadow-sm border-0">
-            <div class="card-header bg-white border-bottom-0 pt-3 pb-0">
-                <h6 class="fw-semibold mb-0"><i class="bi bi-calendar-event me-2"></i>Upcoming Appointments</h6>
+        <div class="card border-0 h-100">
+            <div class="card-header">
+                <h6 class="fw-bold mb-0" style="color: #0f172a;"><i class="bi bi-calendar-event me-2" style="color: #f59e0b;"></i>Upcoming Appointments</h6>
             </div>
             <div class="card-body p-0">
                 {% if upcoming_appointments %}
                 <ul class="list-group list-group-flush">
                     {% for apt in upcoming_appointments %}
-                    <li class="list-group-item px-3 py-2">
+                    <li class="list-group-item px-3 py-3 border-start border-0 border-3" style="border-left-color: {% if apt.status == 'scheduled' %}#f59e0b{% else %}#0d9488{% endif %} !important;">
                         <div class="d-flex justify-content-between align-items-center">
                             <div>
-                                <div class="fw-semibold small">{{ apt.patient.full_name }}</div>
-                                <div class="text-muted" style="font-size: .75rem;">
-                                    {{ apt.appointment_date|date:"M d" }} at {{ apt.appointment_time|time:"H:i" }}
+                                <div class="fw-semibold small" style="color: #0f172a;">{{ apt.patient.full_name }}</div>
+                                <div class="text-muted d-flex align-items-center gap-2 mt-1" style="font-size: .75rem;">
+                                    <i class="bi bi-calendar3"></i> {{ apt.appointment_date|date:"M d" }}
+                                    <i class="bi bi-clock ms-1"></i> {{ apt.appointment_time|time:"H:i" }}
                                 </div>
                             </div>
-                            <span class="badge bg-{% if apt.status == 'scheduled' %}warning{% else %}info{% endif %} rounded-pill" style="font-size: .7rem;">
+                            <span class="badge rounded-pill" style="background: {% if apt.status == 'scheduled' %}#fef3c7; color: #92400e{% else %}#ecfdf5; color: #0d9488{% endif %}; font-size: .65rem; font-weight: 500;">
                                 {{ apt.get_status_display }}
                             </span>
                         </div>
@@ -147,18 +170,22 @@
                     {% endfor %}
                 </ul>
                 {% else %}
-                <div class="text-center text-muted py-4 small">No upcoming appointments</div>
+                <div class="text-center text-muted py-5 small">
+                    <i class="bi bi-calendar-check" style="font-size: 2rem; display: block; margin-bottom: .5rem; opacity: .4;"></i>
+                    No upcoming appointments
+                </div>
                 {% endif %}
             </div>
         </div>
     </div>
 </div>
 
-<div class="row g-3 mt-2">
+<div class="row g-3 mt-3">
     <div class="col-lg-6">
-        <div class="card shadow-sm border-0">
-            <div class="card-header bg-white border-bottom-0 pt-3 pb-0">
-                <h6 class="fw-semibold mb-0"><i class="bi bi-people-fill me-2"></i>Patient Trends</h6>
+        <div class="card border-0">
+            <div class="card-header d-flex justify-content-between align-items-center flex-wrap">
+                <h6 class="fw-bold mb-0" style="color: #0f172a;"><i class="bi bi-people-fill me-2" style="color: #0d9488;"></i>Patient Trends</h6>
+                <span class="badge rounded-pill" style="background: #ecfdf5; color: #0d9488; font-size: .75rem;">Last 6 Months</span>
             </div>
             <div class="card-body">
                 <canvas id="patientChart" height="180"></canvas>
@@ -166,9 +193,9 @@
         </div>
     </div>
     <div class="col-lg-6">
-        <div class="card shadow-sm border-0">
-            <div class="card-header bg-white border-bottom-0 pt-3 pb-0">
-                <h6 class="fw-semibold mb-0"><i class="bi bi-pie-chart-fill me-2"></i>Admissions Statistics</h6>
+        <div class="card border-0">
+            <div class="card-header d-flex justify-content-between align-items-center flex-wrap">
+                <h6 class="fw-bold mb-0" style="color: #0f172a;"><i class="bi bi-pie-chart-fill me-2" style="color: #8b5cf6;"></i>Admissions Statistics</h6>
             </div>
             <div class="card-body">
                 <canvas id="admissionChart" height="180"></canvas>
@@ -181,7 +208,7 @@
 {% block extra_js %}
 <script>
 const isDark = document.documentElement.getAttribute('data-bs-theme') === 'dark';
-const textColor = isDark ? '#e9ecef' : '#6c757d';
+const textColor = isDark ? '#e2e8f0' : '#64748b';
 const gridColor = isDark ? 'rgba(255,255,255,.05)' : 'rgba(0,0,0,.06)';
 
 new Chart(document.getElementById('revenueChart'), {
@@ -192,14 +219,18 @@ new Chart(document.getElementById('revenueChart'), {
             label: 'Revenue (MWK)',
             data: [12000, 19000, 15000, {{ revenue_month|floatformat:0 }}],
             borderColor: '#0d9488',
-            backgroundColor: 'rgba(13,148,136,.1)',
+            backgroundColor: 'rgba(13,148,136,.08)',
             fill: true,
-            tension: .4
+            tension: .4,
+            pointBackgroundColor: '#0d9488',
+            pointBorderColor: '#fff',
+            pointBorderWidth: 2,
+            pointRadius: 4,
         }]
     },
     options: {
         responsive: true,
-        plugins: { legend: { labels: { color: textColor } } },
+        plugins: { legend: { display: false } },
         scales: { y: { beginAtZero: true, ticks: { color: textColor }, grid: { color: gridColor } }, x: { ticks: { color: textColor }, grid: { display: false } } }
     }
 });
@@ -210,13 +241,15 @@ new Chart(document.getElementById('patientChart'), {
         labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
         datasets: [{
             label: 'New Patients',
-            data: [65, 78, 82, 94, 88, {{ patient_count|slice:':3'|length|default:20 }}],
-            backgroundColor: '#0d9488'
+            data: [65, 78, 82, 94, 88, {{ patient_count }}],
+            backgroundColor: ['rgba(13,148,136,.6)', 'rgba(13,148,136,.6)', 'rgba(13,148,136,.6)', 'rgba(13,148,136,.6)', 'rgba(13,148,136,.6)', '#0d9488'],
+            borderRadius: 6,
+            borderSkipped: false,
         }]
     },
     options: {
         responsive: true,
-        plugins: { legend: { labels: { color: textColor } } },
+        plugins: { legend: { display: false } },
         scales: { y: { beginAtZero: true, ticks: { color: textColor }, grid: { color: gridColor } }, x: { ticks: { color: textColor }, grid: { display: false } } }
     }
 });
@@ -224,15 +257,19 @@ new Chart(document.getElementById('patientChart'), {
 new Chart(document.getElementById('admissionChart'), {
     type: 'doughnut',
     data: {
-        labels: ['Admitted', 'Discharged'],
+        labels: ['Currently Admitted', 'Discharged'],
         datasets: [{
             data: [{{ admitted }}, {{ discharged }}],
-            backgroundColor: ['#f59e0b', '#0d9488']
+            backgroundColor: ['#f59e0b', '#0d9488'],
+            borderWidth: 0,
         }]
     },
     options: {
         responsive: true,
-        plugins: { legend: { position: 'bottom', labels: { color: textColor } } }
+        cutout: '70%',
+        plugins: {
+            legend: { position: 'bottom', labels: { padding: 16, color: textColor, usePointStyle: true, pointStyle: 'circle' } }
+        }
     }
 });
 </script>
