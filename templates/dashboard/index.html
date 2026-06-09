@@ -86,7 +86,8 @@
                 </div>
                 <div>
                     <p class="stat-value">MWK {{ revenue_today|floatformat:0 }}</p>
-                    <p class="stat-label">Revenue Today</p>
+                    <p class="stat-label mb-0">Revenue Today</p>
+                    {% if not show_revenue %}<span class="small" style="color: #94a3b8; font-size: .65rem;"><i class="bi bi-lock-fill me-1"></i>For finance team only</span>{% endif %}
                 </div>
             </div>
         </div>
@@ -99,7 +100,8 @@
                 </div>
                 <div>
                     <p class="stat-value">MWK {{ revenue_month|floatformat:0 }}</p>
-                    <p class="stat-label">Revenue This Month</p>
+                    <p class="stat-label mb-0">Revenue This Month</p>
+                    {% if not show_revenue %}<span class="small" style="color: #94a3b8; font-size: .65rem;"><i class="bi bi-lock-fill me-1"></i>For finance team only</span>{% endif %}
                 </div>
             </div>
         </div>
