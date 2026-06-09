@@ -113,8 +113,27 @@ def create_insurance_companies():
     print(f'{len(companies)} insurance companies created')
 
 
+def create_users():
+    users = [
+        ('admin@hopeclinic.com', 'admin123', 'Admin', 'Hope', User.Role.HOSPITAL_ADMIN),
+        ('receptionist@hospital.com', 'reception123', 'Clinic', 'Reception', User.Role.RECEPTIONIST),
+        ('dr.banda@hospital.com', 'doctor123', 'Dr.', 'Banda', User.Role.DOCTOR),
+    ]
+    for email, password, first, last, role in users:
+        if not User.objects.filter(email=email).exists():
+            User.objects.create_user(
+                email=email,
+                password=password,
+                first_name=first,
+                last_name=last,
+                role=role,
+            )
+            print(f'User created: {email} / {password}')
+
+
 def run():
     create_superuser()
+    create_users()
     create_departments()
     create_specializations()
     create_lab_categories()
