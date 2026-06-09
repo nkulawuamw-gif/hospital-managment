@@ -278,6 +278,8 @@ def dashboard_view(request):
         status__in=['scheduled', 'confirmed']
     ).order_by('appointment_date', 'appointment_time')[:10]
 
+    show_revenue = request.user.role in ['super_admin', 'hospital_admin', 'accountant']
+
     unread_notifications = Notification.objects.filter(
         recipient=request.user, is_read=False
     ).count()
@@ -287,8 +289,9 @@ def dashboard_view(request):
         'today_appointments': today_appointments,
         'admitted': admitted,
         'discharged': discharged,
-        'revenue_today': revenue_today,
-        'revenue_month': revenue_month,
+        'revenue_today': revenue_today if show_revenue else 0,
+        'revenue_month': revenue_month if show_revenue else 0,
+        'show_revenue': show_revenue,
         'low_stock': low_stock,
         'pending_lab': pending_lab,
         'upcoming_appointments': upcoming,
