@@ -17,5 +17,6 @@ if [ "$MIGRATED" = false ]; then
 fi
 
 python scripts/seed_data.py
+python scripts/seed_modules.py
 
 gunicorn hms.wsgi:application --bind 0.0.0.0:$PORT --workers 4 --timeout 120 --access-logfile - --error-logfile -
