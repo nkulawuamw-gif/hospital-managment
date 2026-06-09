@@ -1,6 +1,9 @@
 import os
+import sys
 import django
 
+# Ensure the project root is on sys.path so 'hms.settings' can be found
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'hms.settings')
 django.setup()
 
