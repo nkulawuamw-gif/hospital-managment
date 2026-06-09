@@ -12,6 +12,4 @@ COPY . .
 
 RUN python manage.py collectstatic --noinput
 
-CMD echo "DATABASE_URL set: ${DATABASE_URL:+yes}" && \
-    python manage.py migrate --noinput && \
-    gunicorn hms.wsgi:application --bind 0.0.0.0:$PORT --workers 4 --timeout 120 --access-logfile - --error-logfile -
+CMD ["sh", "-c", "python manage.py migrate --noinput && gunicorn hms.wsgi:application --bind 0.0.0.0:$PORT --workers 4 --timeout 120 --access-logfile - --error-logfile -"]
