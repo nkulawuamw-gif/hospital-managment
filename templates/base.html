@@ -399,7 +399,7 @@
             }
         }
 
-        $(document).ready(function() {
+$(document).ready(function() {
             $('.datatable').each(function() { initDataTable($(this)); });
             $('button[data-bs-toggle="tab"], a[data-bs-toggle="tab"]').on('shown.bs.tab', function() {
                 var target = $(this).attr('data-bs-target');
@@ -414,5 +414,184 @@
         });
     </script>
     {% block extra_js %}{% endblock %}
+
+<div class="modal fade" id="confirmModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="border: none; border-radius: 1.25rem; box-shadow: 0 32px 80px rgba(0,0,0,.2); overflow: hidden;">
+            <div class="modal-body text-center p-4 pb-3">
+                <div class="confirm-icon mx-auto mb-3 d-flex align-items-center justify-content-center" id="confirmIcon" style="width: 64px; height: 64px; border-radius: 16px; font-size: 1.75rem; transition: all .3s;">
+                    <i class="bi bi-question-lg"></i>
+                </div>
+                <h5 class="fw-bold mb-2" id="confirmTitle" style="color: #0f172a;">Are you sure?</h5>
+                <p class="text-muted mb-0 small" id="confirmMessage" style="max-width: 320px; margin: 0 auto;">This action cannot be undone.</p>
+            </div>
+            <div class="modal-footer border-0 pt-0 pb-4 px-4 d-flex gap-2 justify-content-center">
+                <button type="button" class="btn px-4 rounded-pill" data-bs-dismiss="modal" id="confirmCancelBtn" style="background: #f1f5f9; color: #475569; font-weight: 600; font-size: .875rem; min-width: 120px;">
+                    <i class="bi bi-x-lg me-1"></i> Cancel
+                </button>
+                <button type="button" class="btn px-4 rounded-pill" id="confirmOkBtn" style="font-weight: 600; font-size: .875rem; min-width: 120px; transition: all .2s;">
+                    <i class="bi bi-check-lg me-1"></i> <span id="confirmOkText">Confirm</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.modal-backdrop.show {
+    backdrop-filter: blur(4px);
+    background: rgba(15, 23, 42, .5);
+}
+#confirmModal .modal-content {
+    animation: confirmPop .3s ease-out;
+}
+@keyframes confirmPop {
+    0% { transform: scale(.85); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+}
+.confirm-icon i { transition: transform .3s; }
+.confirm-icon:hover i { transform: scale(1.1); }
+[data-bs-theme="dark"] #confirmTitle { color: #f1f5f9 !important; }
+[data-bs-theme="dark"] #confirmModal .modal-content { background: #1e293b; }
+[data-bs-theme="dark"] #confirmCancelBtn { background: #334155; color: #e2e8f0; }
+</style>
+
+<script>
+function showConfirmDialog(options) {
+    return new Promise(function(resolve) {
+        var title = options.title || 'Are you sure?';
+        var message = options.message || 'This action cannot be undone.';
+        var confirmText = options.confirmText || 'Confirm';
+        var type = options.type || 'warning';
+        var icon, iconBg, btnBg;
+
+        if (type === 'delete') {
+            icon = 'bi bi-trash-fill';
+            iconBg = 'linear-gradient(135deg, #ef4444, #f87171)';
+            btnBg = 'linear-gradient(135deg, #ef4444, #dc2626)';
+        } else if (type === 'save') {
+            icon = 'bi bi-check-circle-fill';
+            iconBg = 'linear-gradient(135deg, #0d9488, #14b8a6)';
+            btnBg = 'linear-gradient(135deg, #0d9488, #14b8a6)';
+        } else if (type === 'danger') {
+            icon = 'bi bi-exclamation-triangle-fill';
+            iconBg = 'linear-gradient(135deg, #f59e0b, #fbbf24)';
+            btnBg = 'linear-gradient(135deg, #f59e0b, #d97706)';
+        } else {
+            icon = 'bi bi-question-lg';
+            iconBg = 'linear-gradient(135deg, #3b82f6, #60a5fa)';
+            btnBg = 'linear-gradient(135deg, #3b82f6, #2563eb)';
+        }
+
+        document.getElementById('confirmIcon').style.background = iconBg;
+        document.getElementById('confirmIcon').innerHTML = '<i class="' + icon + '" style="color: #fff;"></i>';
+        document.getElementById('confirmTitle').textContent = title;
+        document.getElementById('confirmMessage').textContent = message;
+        document.getElementById('confirmOkText').textContent = confirmText;
+        document.getElementById('confirmOkBtn').style.background = btnBg;
+        document.getElementById('confirmOkBtn').style.color = '#fff';
+        document.getElementById('confirmOkBtn').onmouseover = function() {
+            this.style.transform = 'translateY(-1px)';
+            this.style.boxShadow = '0 8px 24px ' + (type === 'delete' ? 'rgba(239,68,68,.35)' : type === 'save' ? 'rgba(13,148,136,.35)' : 'rgba(59,130,246,.35)');
+        };
+        document.getElementById('confirmOkBtn').onmouseout = function() {
+            this.style.transform = 'none';
+            this.style.boxShadow = 'none';
+        };
+
+        var modal = new bootstrap.Modal(document.getElementById('confirmModal'));
+        modal.show();
+
+        document.getElementById('confirmOkBtn').onclick = function() {
+            modal.hide();
+            resolve(true);
+        };
+        document.getElementById('confirmCancelBtn').onclick = function() {
+            modal.hide();
+            resolve(false);
+        };
+        document.getElementById('confirmModal').addEventListener('hidden.bs.modal', function() {
+            resolve(false);
+        }, { once: true });
+    });
+}
+
+$(document).ready(function() {
+    $('form[data-confirm]').on('submit', function(e) {
+        e.preventDefault();
+        var $form = $(this);
+        var msg = $form.data('confirm') || 'Are you sure you want to proceed?';
+        var type = $form.data('confirm-type') || 'warning';
+        showConfirmDialog({
+            title: 'Confirm Action',
+            message: msg,
+            confirmText: 'Yes, Proceed',
+            type: type
+        }).then(function(confirmed) {
+            if (confirmed) {
+                $form.off('submit').submit();
+            }
+        });
+    });
+
+    $('[data-confirm-delete]').on('click', function(e) {
+        e.preventDefault();
+        var $el = $(this);
+        var msg = $el.data('confirm-delete') || 'Delete this item permanently?';
+        showConfirmDialog({
+            title: 'Delete Item',
+            message: msg,
+            confirmText: 'Yes, Delete',
+            type: 'delete'
+        }).then(function(confirmed) {
+            if (confirmed) {
+                if ($el.is('a')) {
+                    window.location.href = $el.attr('href');
+                } else if ($el.is('button') && $el.attr('form')) {
+                    $('#' + $el.attr('form')).off('submit').submit();
+                } else {
+                    $el.closest('form').off('submit').submit();
+                }
+            }
+        });
+    });
+
+    $('[data-confirm-save]').on('click', function(e) {
+        e.preventDefault();
+        var $el = $(this);
+        var msg = $el.data('confirm-save') || 'Save these changes?';
+        showConfirmDialog({
+            title: 'Save Changes',
+            message: msg,
+            confirmText: 'Yes, Save',
+            type: 'save'
+        }).then(function(confirmed) {
+            if (confirmed) {
+                if ($el.is('button') && $el.attr('form')) {
+                    $('#' + $el.attr('form')).off('submit').submit();
+                } else {
+                    $el.closest('form').off('submit').submit();
+                }
+            }
+        });
+    });
+
+    $('form[data-confirm-save]').on('submit', function(e) {
+        e.preventDefault();
+        var $form = $(this);
+        var msg = $form.data('confirm-save') || 'Save these changes?';
+        showConfirmDialog({
+            title: 'Save Changes',
+            message: msg,
+            confirmText: 'Yes, Save',
+            type: 'save'
+        }).then(function(confirmed) {
+            if (confirmed) {
+                $form.off('submit').submit();
+            }
+        });
+    });
+});
+</script>
 </body>
 </html>
