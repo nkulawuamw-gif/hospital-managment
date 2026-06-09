@@ -79,21 +79,42 @@
             height: var(--topbar-height);
             display: flex;
             align-items: center;
+            gap: .75rem;
             padding: 0 1.25rem;
             color: #fff;
-            font-size: 1.2rem;
+            font-size: 1.15rem;
             font-weight: 800;
             letter-spacing: 0.3px;
             border-bottom: 1px solid rgba(255,255,255,.06);
             background: rgba(13, 148, 136, 0.08);
         }
-        .sidebar-brand i {
-            font-size: 1.6rem;
-            margin-right: .75rem;
-            color: var(--primary-light);
-            background: rgba(13, 148, 136, 0.15);
-            padding: 6px;
+        .sidebar-brand .sidebar-logo {
+            width: 36px; height: 36px;
+            background: #fff;
             border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        .sidebar-brand .sidebar-logo .redcross-mini {
+            position: relative;
+            width: 20px; height: 20px;
+        }
+        .sidebar-brand .sidebar-logo .redcross-mini::before,
+        .sidebar-brand .sidebar-logo .redcross-mini::after {
+            content: '';
+            position: absolute;
+            background: #dc2626;
+            border-radius: 3px;
+        }
+        .sidebar-brand .sidebar-logo .redcross-mini::before {
+            width: 100%; height: 32%;
+            top: 34%; left: 0;
+        }
+        .sidebar-brand .sidebar-logo .redcross-mini::after {
+            width: 32%; height: 100%;
+            top: 0; left: 34%;
         }
         .sidebar-nav { padding: 1rem 0; }
         .sidebar-nav .nav-item { padding: 0 .65rem; }
@@ -251,8 +272,10 @@
     {% if user.is_authenticated %}
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-brand">
-            <i class="bi bi-plus-lg"></i>
-            <span>Hope Medi - Clinic</span>
+            <div class="sidebar-logo">
+                <div class="redcross-mini"></div>
+            </div>
+            <span>Hope Medi-Clinic</span>
         </div>
         <nav class="sidebar-nav">
             {% if user_modules %}
