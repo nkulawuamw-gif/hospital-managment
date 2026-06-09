@@ -1,0 +1,206 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Theme Settings - Hope Medi{% endblock %}
+{% block page_title %}Theme Settings{% endblock %}
+
+{% block content %}
+<form method="post">
+    {% csrf_token %}
+
+    <div class="row g-4">
+        <div class="col-12">
+            <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+                <p class="text-muted mb-0">Customize the look and feel of the entire system.</p>
+                <button type="submit" class="btn rounded-pill px-4" style="background: linear-gradient(135deg, #0d9488, #14b8a6); color: #fff; font-weight: 600; border: none;">
+                    <i class="bi bi-check2-circle me-1"></i> Save Theme
+                </button>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card border-0 h-100">
+                <div class="card-body p-4">
+                    <h6 class="fw-bold mb-3" style="color: #0f172a;"><i class="bi bi-palette me-2" style="color: #0d9488;"></i>Brand Colors</h6>
+                    <div class="row g-3">
+                        <div class="col-6">
+                            <label class="form-label small fw-semibold">Primary Color</label>
+                            <div class="d-flex align-items-center gap-2">
+                                <input type="color" name="primary_color" value="{{ site.primary_color|default:'#0d9488' }}" class="form-control form-control-color p-1" style="width: 44px; height: 44px; border-radius: .6rem; cursor: pointer;">
+                                <input type="text" class="form-control form-control-sm" value="{{ site.primary_color|default:'#0d9488' }}" style="font-family: monospace; border-radius: .6rem;">
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label small fw-semibold">Primary (Light)</label>
+                            <div class="d-flex align-items-center gap-2">
+                                <input type="color" name="primary_light" value="{{ site.primary_light|default:'#14b8a6' }}" class="form-control form-control-color p-1" style="width: 44px; height: 44px; border-radius: .6rem; cursor: pointer;">
+                                <input type="text" class="form-control form-control-sm" value="{{ site.primary_light|default:'#14b8a6' }}" style="font-family: monospace; border-radius: .6rem;">
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label small fw-semibold">Primary (Dark)</label>
+                            <div class="d-flex align-items-center gap-2">
+                                <input type="color" name="primary_dark" value="{{ site.primary_dark|default:'#0f766e' }}" class="form-control form-control-color p-1" style="width: 44px; height: 44px; border-radius: .6rem; cursor: pointer;">
+                                <input type="text" class="form-control form-control-sm" value="{{ site.primary_dark|default:'#0f766e' }}" style="font-family: monospace; border-radius: .6rem;">
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label small fw-semibold">Accent Color</label>
+                            <div class="d-flex align-items-center gap-2">
+                                <input type="color" name="accent_color" value="{{ site.accent_color|default:'#f59e0b' }}" class="form-control form-control-color p-1" style="width: 44px; height: 44px; border-radius: .6rem; cursor: pointer;">
+                                <input type="text" class="form-control form-control-sm" value="{{ site.accent_color|default:'#f59e0b' }}" style="font-family: monospace; border-radius: .6rem;">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card border-0 h-100">
+                <div class="card-body p-4">
+                    <h6 class="fw-bold mb-3" style="color: #0f172a;"><i class="bi bi-layout-sidebar me-2" style="color: #0d9488;"></i>Sidebar Colors</h6>
+                    <div class="row g-3">
+                        <div class="col-6">
+                            <label class="form-label small fw-semibold">Sidebar (Start)</label>
+                            <div class="d-flex align-items-center gap-2">
+                                <input type="color" name="sidebar_bg_start" value="{{ site.sidebar_bg_start|default:'#0f172a' }}" class="form-control form-control-color p-1" style="width: 44px; height: 44px; border-radius: .6rem; cursor: pointer;">
+                                <input type="text" class="form-control form-control-sm" value="{{ site.sidebar_bg_start|default:'#0f172a' }}" style="font-family: monospace; border-radius: .6rem;">
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label small fw-semibold">Sidebar (End)</label>
+                            <div class="d-flex align-items-center gap-2">
+                                <input type="color" name="sidebar_bg_end" value="{{ site.sidebar_bg_end|default:'#1e293b' }}" class="form-control form-control-color p-1" style="width: 44px; height: 44px; border-radius: .6rem; cursor: pointer;">
+                                <input type="text" class="form-control form-control-sm" value="{{ site.sidebar_bg_end|default:'#1e293b' }}" style="font-family: monospace; border-radius: .6rem;">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card border-0 h-100">
+                <div class="card-body p-4">
+                    <h6 class="fw-bold mb-3" style="color: #0f172a;"><i class="bi bi-brush me-2" style="color: #0d9488;"></i>Card & Body Colors</h6>
+                    <div class="row g-3">
+                        <div class="col-6">
+                            <label class="form-label small fw-semibold">Card Background</label>
+                            <input type="color" name="card_bg" value="{{ site.card_bg|default:'#ffffff' }}" class="form-control form-control-color p-1" style="width: 44px; height: 44px; border-radius: .6rem; cursor: pointer;">
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label small fw-semibold">Card Border</label>
+                            <input type="color" name="card_border" value="{{ site.card_border|default:'#e2e8f0' }}" class="form-control form-control-color p-1" style="width: 44px; height: 44px; border-radius: .6rem; cursor: pointer;">
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label small fw-semibold">Body Background</label>
+                            <input type="color" name="body_bg" value="{{ site.body_bg|default:'#f8fafc' }}" class="form-control form-control-color p-1" style="width: 44px; height: 44px; border-radius: .6rem; cursor: pointer;">
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label small fw-semibold">Topbar Background</label>
+                            <input type="color" name="topbar_bg" value="{{ site.topbar_bg|default:'#ffffff' }}" class="form-control form-control-color p-1" style="width: 44px; height: 44px; border-radius: .6rem; cursor: pointer;">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card border-0 h-100">
+                <div class="card-body p-4">
+                    <h6 class="fw-bold mb-3" style="color: #0f172a;"><i class="bi bi-type me-2" style="color: #0d9488;"></i>Text Colors</h6>
+                    <div class="row g-3">
+                        <div class="col-6">
+                            <label class="form-label small fw-semibold">Primary Text</label>
+                            <input type="color" name="text_primary" value="{{ site.text_primary|default:'#0f172a' }}" class="form-control form-control-color p-1" style="width: 44px; height: 44px; border-radius: .6rem; cursor: pointer;">
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label small fw-semibold">Muted Text</label>
+                            <input type="color" name="text_muted" value="{{ site.text_muted|default:'#94a3b8' }}" class="form-control form-control-color p-1" style="width: 44px; height: 44px; border-radius: .6rem; cursor: pointer;">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12">
+            <div class="card border-0">
+                <div class="card-body p-4">
+                    <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+                        <div>
+                            <h6 class="fw-bold mb-1" style="color: #0f172a;"><i class="bi bi-circle-half me-2" style="color: #0d9488;"></i>Theme Mode</h6>
+                            <p class="text-muted small mb-0">Switch between light and dark appearance.</p>
+                        </div>
+                        <div class="d-flex gap-3">
+                            <label class="d-flex align-items-center gap-2" style="cursor: pointer;">
+                                <input type="radio" name="theme_mode" value="light" {% if site.theme_mode == 'light' %}checked{% endif %}>
+                                <span class="fw-semibold small">☀️ Light</span>
+                            </label>
+                            <label class="d-flex align-items-center gap-2" style="cursor: pointer;">
+                                <input type="radio" name="theme_mode" value="dark" {% if site.theme_mode == 'dark' %}checked{% endif %}>
+                                <span class="fw-semibold small">🌙 Dark</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+<div class="mt-4">
+    <div class="card border-0">
+        <div class="card-body p-4">
+            <h6 class="fw-bold mb-3" style="color: #0f172a;"><i class="bi bi-eye me-2" style="color: #0d9488;"></i>Live Preview</h6>
+            <div id="themePreview" style="border-radius: 1rem; padding: 2rem; background: {{ site.body_bg|default:'#f8fafc' }}; border: 2px dashed {{ site.primary_color|default:'#0d9488' }}40;">
+                <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                    <div style="flex: 1; min-width: 200px; background: {{ site.card_bg|default:'#ffffff' }}; border-radius: .8rem; padding: 1.25rem; border: 1px solid {{ site.card_border|default:'#e2e8f0' }};">
+                        <div style="width: 40px; height: 40px; border-radius: 10px; background: {{ site.primary_color|default:'#0d9488' }}; margin-bottom: .75rem;"></div>
+                        <div style="height: 10px; width: 70%; background: {{ site.text_primary|default:'#0f172a' }}; border-radius: 4px; margin-bottom: .5rem; opacity: .8;"></div>
+                        <div style="height: 8px; width: 50%; background: {{ site.text_muted|default:'#94a3b8' }}; border-radius: 4px;"></div>
+                    </div>
+                    <div style="flex: 1; min-width: 200px; background: {{ site.card_bg|default:'#ffffff' }}; border-radius: .8rem; padding: 1.25rem; border: 1px solid {{ site.card_border|default:'#e2e8f0' }};">
+                        <div style="width: 40px; height: 40px; border-radius: 10px; background: {{ site.accent_color|default:'#f59e0b' }}; margin-bottom: .75rem;"></div>
+                        <div style="height: 10px; width: 60%; background: {{ site.text_primary|default:'#0f172a' }}; border-radius: 4px; margin-bottom: .5rem; opacity: .8;"></div>
+                        <div style="height: 8px; width: 40%; background: {{ site.text_muted|default:'#94a3b8' }}; border-radius: 4px;"></div>
+                    </div>
+                    <div style="width: 120px; background: linear-gradient(180deg, {{ site.sidebar_bg_start|default:'#0f172a' }}, {{ site.sidebar_bg_end|default:'#1e293b' }}); border-radius: .8rem; padding: 1rem;">
+                        <div style="width: 24px; height: 24px; border-radius: 6px; background: {{ site.primary_color|default:'#0d9488' }}; margin-bottom: .5rem;"></div>
+                        <div style="height: 6px; width: 80%; background: rgba(255,255,255,.3); border-radius: 3px; margin-bottom: .35rem;"></div>
+                        <div style="height: 6px; width: 60%; background: rgba(255,255,255,.2); border-radius: 3px;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    input[type="color"] { padding: 2px !important; }
+    input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
+    input[type="color"]::-webkit-color-swatch { border: none; border-radius: .5rem; }
+    .card h6 { color: #0f172a; }
+    [data-bs-theme="dark"] .card h6 { color: #f1f5f9 !important; }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.querySelectorAll('input[type="color"]').forEach(function(picker) {
+    picker.addEventListener('input', function() {
+        var textInput = this.closest('.d-flex').querySelector('input[type="text"]');
+        if (textInput) { textInput.value = this.value; }
+    });
+});
+document.querySelectorAll('input[type="text"]').forEach(function(textInput) {
+    textInput.addEventListener('input', function() {
+        var colorInput = this.closest('.d-flex').querySelector('input[type="color"]');
+        if (colorInput && /^#[0-9a-f]{6}$/i.test(this.value)) {
+            colorInput.value = this.value;
+        }
+    });
+});
+</script>
+{% endblock %}

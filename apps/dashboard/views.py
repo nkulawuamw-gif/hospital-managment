@@ -304,3 +304,25 @@ def dashboard_view(request):
 @staff_member_required
 def settings_view(request):
     return render(request, 'dashboard/settings.html')
+
+
+@login_required
+@staff_member_required
+def theme_settings_view(request):
+    site = SiteSetting.get_settings()
+    if site is None:
+        site = SiteSetting.objects.create()
+
+    if request.method == 'POST':
+        for field in ['theme_mode', 'primary_color', 'primary_light', 'primary_dark',
+                      'accent_color', 'sidebar_bg_start', 'sidebar_bg_end',
+                      'card_bg', 'card_border', 'body_bg',
+                      'text_primary', 'text_muted', 'topbar_bg']:
+            val = request.POST.get(field)
+            if val is not None:
+                setattr(site, field, val)
+        site.save()
+        messages.success(request, 'Theme settings saved successfully.')
+        return redirect('dashboard:theme_settings')
+
+    return render(request, 'dashboard/theme_settings.html', {'site': site})

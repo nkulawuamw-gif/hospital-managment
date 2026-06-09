@@ -47,6 +47,20 @@ class SiteSetting(models.Model):
     contact_heading = models.CharField(max_length=200, blank=True, default='Contact Us')
     contact_subtitle = models.TextField(blank=True, default="We'd love to hear from you. Reach out to us through any of the channels below.")
 
+    theme_mode = models.CharField(max_length=10, choices=[('light', 'Light'), ('dark', 'Dark')], default='light')
+    primary_color = models.CharField(max_length=7, default='#0d9488', help_text='Main brand color (e.g. #0d9488)')
+    primary_light = models.CharField(max_length=7, default='#14b8a6', help_text='Lighter primary variant')
+    primary_dark = models.CharField(max_length=7, default='#0f766e', help_text='Darker primary variant')
+    accent_color = models.CharField(max_length=7, default='#f59e0b', help_text='Accent / warning color')
+    sidebar_bg_start = models.CharField(max_length=7, default='#0f172a', help_text='Sidebar gradient start color')
+    sidebar_bg_end = models.CharField(max_length=7, default='#1e293b', help_text='Sidebar gradient end color')
+    card_bg = models.CharField(max_length=7, default='#ffffff', help_text='Card background color')
+    card_border = models.CharField(max_length=7, default='rgba(0,0,0,.04)', help_text='Card border color')
+    body_bg = models.CharField(max_length=7, default='#f8fafc', help_text='Page body background color')
+    text_primary = models.CharField(max_length=7, default='#0f172a', help_text='Primary text color')
+    text_muted = models.CharField(max_length=7, default='#94a3b8', help_text='Muted text color')
+    topbar_bg = models.CharField(max_length=7, default='rgba(255,255,255,.85)', help_text='Topbar background')
+
     class Meta:
         db_table = 'site_settings'
         verbose_name = 'Site Setting'
