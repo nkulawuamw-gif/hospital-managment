@@ -107,11 +107,29 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'hms.wsgi.application'
 
-DATABASES = {
-    "default": dj_database_url.parse(
-        config("DATABASE_URL")
-    )
-}
+# Database Configuration
+DB_DIR = BASE_DIR / "local"
+DB_DIR.mkdir(parents=True, exist_ok=True)
+
+DATABASE_URL = config("DATABASE_URL", default="")
+
+if DATABASE_URL:
+    DATABASES = {
+        "default": dj_database_url.parse(
+            DATABASE_URL,
+            conn_max_age=600,
+            ssl_require=False
+        )
+    }
+    print("Using PostgreSQL database")
+else:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": DB_DIR / "db.sqlite3",
+        }
+    }
+    print("Using SQLite database")
 
 AUTH_USER_MODEL = 'accounts.User'
 
