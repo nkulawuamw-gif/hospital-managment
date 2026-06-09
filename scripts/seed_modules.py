@@ -28,6 +28,7 @@ MODULES = [
     ('Notifications', 'notifications', 'bi bi-bell-fill', 'notifications:list', 'System', 1),
     ('Audit Log', 'audit', 'bi bi-journal-text', 'audit:list', 'System', 2),
     ('Admin', 'admin', 'bi bi-shield-lock-fill', 'admin:index', 'System', 3),
+    ('Settings', 'settings', 'bi bi-gear-fill', 'dashboard:settings', 'System', 4),
     ('Landing Settings', 'landing_settings', 'bi bi-layout-three-columns', 'dashboard:landing_settings', 'Administration', 5),
     ('Requisitions', 'requisitions', 'bi bi-cart-plus', 'requisitions:requisition_list', 'Services', 3),
 ]

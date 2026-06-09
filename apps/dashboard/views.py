@@ -4,6 +4,7 @@ import secrets
 import string
 from datetime import date, timedelta, datetime
 from django.contrib.auth.decorators import login_required
+from django.contrib.admin.views.decorators import staff_member_required
 from django.shortcuts import render, redirect
 from django.http import JsonResponse
 from django.contrib import messages
@@ -294,3 +295,9 @@ def dashboard_view(request):
         'unread_notifications': unread_notifications,
     }
     return render(request, 'dashboard/index.html', context)
+
+
+@login_required
+@staff_member_required
+def settings_view(request):
+    return render(request, 'dashboard/settings.html')

@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
-from .models import User, UserPermission
+from .models import User, UserPermission, Module, RoleModulePermission
 
 
 @admin.register(User)
@@ -25,4 +25,24 @@ class UserAdmin(BaseUserAdmin):
 
 @admin.register(UserPermission)
 class UserPermissionAdmin(admin.ModelAdmin):
-    list_display = ['user', 'can_manage_patients', 'can_manage_billing']
+    list_display = ['user', 'can_manage_patients', 'can_manage_billing', 'can_manage_settings']
+
+
+class ModuleAdmin(admin.ModelAdmin):
+    list_display = ['name', 'codename', 'section', 'order']
+    list_filter = ['section']
+    search_fields = ['name', 'codename']
+    ordering = ['section', 'order']
+
+
+class RoleModulePermissionAdmin(admin.ModelAdmin):
+    list_display = ['role', 'module_count']
+    filter_horizontal = ['modules']
+
+    def module_count(self, obj):
+        return obj.modules.count()
+    module_count.short_description = 'Modules'
+
+
+admin.site.register(Module, ModuleAdmin)
+admin.site.register(RoleModulePermission, RoleModulePermissionAdmin)

@@ -2,7 +2,7 @@ from django.contrib import admin
 from .models import (
     HealthArticle, ServiceCategory, ServiceItem, Department,
     Testimonial, Statistic, ContactInfo, WhyChooseItem,
-    SiteSetting, HeroSection,
+    SiteSetting, HeroSection, MedicalTeam,
 )
 
 
@@ -85,6 +85,13 @@ class SiteSettingAdmin(admin.ModelAdmin):
 @admin.register(HeroSection)
 class HeroSectionAdmin(admin.ModelAdmin):
     list_display = ['headline', 'is_active']
+
+
+@admin.register(MedicalTeam)
+class MedicalTeamAdmin(admin.ModelAdmin):
+    list_display = ['name', 'head_title', 'order', 'is_active']
+    list_editable = ['order', 'is_active']
+    search_fields = ['name', 'description', 'head_title']
 
 
 @admin.register(HealthArticle)

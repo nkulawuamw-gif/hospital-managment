@@ -1,0 +1,137 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}System Settings - Hope Medi{% endblock %}
+{% block page_title %}System Settings{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+    <div class="col-12">
+        <p class="text-muted mb-0">Manage all system configuration from one place.</p>
+    </div>
+
+    <div class="col-md-6 col-lg-4">
+        <a href="{% url 'dashboard:landing_settings' %}" class="text-decoration-none">
+            <div class="card border-0 h-100" style="border-radius: 1rem; transition: all .25s; cursor: pointer;">
+                <div class="card-body p-4">
+                    <div class="d-flex align-items-center gap-3 mb-3">
+                        <div style="width: 48px; height: 48px; background: linear-gradient(135deg, #0d9488, #14b8a6); border-radius: 12px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(13,148,136,.25);">
+                            <i class="bi bi-globe2 text-white" style="font-size: 1.3rem;"></i>
+                        </div>
+                        <div>
+                            <h6 class="fw-bold mb-1" style="color: #0f172a;">Landing Page Settings</h6>
+                            <span class="small text-muted">Branding, hero, sections, SEO</span>
+                        </div>
+                    </div>
+                    <p class="small text-muted mb-0">Configure site name, contact info, social links, hero section, services, departments, doctors, testimonials, and all public-facing content.</p>
+                </div>
+            </div>
+        </a>
+    </div>
+
+    <div class="col-md-6 col-lg-4">
+        <a href="{% url 'admin:accounts_module_changelist' %}" class="text-decoration-none">
+            <div class="card border-0 h-100" style="border-radius: 1rem; transition: all .25s; cursor: pointer;">
+                <div class="card-body p-4">
+                    <div class="d-flex align-items-center gap-3 mb-3">
+                        <div style="width: 48px; height: 48px; background: linear-gradient(135deg, #3b82f6, #60a5fa); border-radius: 12px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(59,130,246,.25);">
+                            <i class="bi bi-puzzle text-white" style="font-size: 1.3rem;"></i>
+                        </div>
+                        <div>
+                            <h6 class="fw-bold mb-1" style="color: #0f172a;">Sidebar Modules</h6>
+                            <span class="small text-muted">Navigation & permissions</span>
+                        </div>
+                    </div>
+                    <p class="small text-muted mb-0">Manage sidebar navigation items, icons, sections, and assign modules to user roles (super_admin, doctor, nurse, etc.).</p>
+                </div>
+            </div>
+        </a>
+    </div>
+
+    <div class="col-md-6 col-lg-4">
+        <a href="{% url 'admin:accounts_userpermission_changelist' %}" class="text-decoration-none">
+            <div class="card border-0 h-100" style="border-radius: 1rem; transition: all .25s; cursor: pointer;">
+                <div class="card-body p-4">
+                    <div class="d-flex align-items-center gap-3 mb-3">
+                        <div style="width: 48px; height: 48px; background: linear-gradient(135deg, #8b5cf6, #a78bfa); border-radius: 12px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(139,92,246,.25);">
+                            <i class="bi bi-shield-check text-white" style="font-size: 1.3rem;"></i>
+                        </div>
+                        <div>
+                            <h6 class="fw-bold mb-1" style="color: #0f172a;">User Permissions</h6>
+                            <span class="small text-muted">Feature access control</span>
+                        </div>
+                    </div>
+                    <p class="small text-muted mb-0">Configure per-user permissions: manage patients, appointments, billing, pharmacy, lab, inventory, HR, reports, and settings access.</p>
+                </div>
+            </div>
+        </a>
+    </div>
+
+    <div class="col-md-6 col-lg-4">
+        <a href="{% url 'admin:accounts_user_changelist' %}" class="text-decoration-none">
+            <div class="card border-0 h-100" style="border-radius: 1rem; transition: all .25s; cursor: pointer;">
+                <div class="card-body p-4">
+                    <div class="d-flex align-items-center gap-3 mb-3">
+                        <div style="width: 48px; height: 48px; background: linear-gradient(135deg, #10b981, #34d399); border-radius: 12px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(16,185,129,.25);">
+                            <i class="bi bi-people text-white" style="font-size: 1.3rem;"></i>
+                        </div>
+                        <div>
+                            <h6 class="fw-bold mb-1" style="color: #0f172a;">Users & Staff</h6>
+                            <span class="small text-muted">Manage accounts</span>
+                        </div>
+                    </div>
+                    <p class="small text-muted mb-0">Create, edit, and manage all system users. Assign roles (admin, doctor, nurse, receptionist, etc.) and activate/deactivate accounts.</p>
+                </div>
+            </div>
+        </a>
+    </div>
+
+    <div class="col-md-6 col-lg-4">
+        <a href="{% url 'admin:index' %}" class="text-decoration-none">
+            <div class="card border-0 h-100" style="border-radius: 1rem; transition: all .25s; cursor: pointer;">
+                <div class="card-body p-4">
+                    <div class="d-flex align-items-center gap-3 mb-3">
+                        <div style="width: 48px; height: 48px; background: linear-gradient(135deg, #f59e0b, #fbbf24); border-radius: 12px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(245,158,11,.25);">
+                            <i class="bi bi-gear-wide-connected text-white" style="font-size: 1.3rem;"></i>
+                        </div>
+                        <div>
+                            <h6 class="fw-bold mb-1" style="color: #0f172a;">Django Admin</h6>
+                            <span class="small text-muted">Full system administration</span>
+                        </div>
+                    </div>
+                    <p class="small text-muted mb-0">Full access to all models: reference data (departments, specializations, lab tests, medicines, wards, suppliers, ICD codes) and all system records.</p>
+                </div>
+            </div>
+        </a>
+    </div>
+
+    <div class="col-md-6 col-lg-4">
+        <a href="{% url 'accounts:profile' %}" class="text-decoration-none">
+            <div class="card border-0 h-100" style="border-radius: 1rem; transition: all .25s; cursor: pointer;">
+                <div class="card-body p-4">
+                    <div class="d-flex align-items-center gap-3 mb-3">
+                        <div style="width: 48px; height: 48px; background: linear-gradient(135deg, #ef4444, #f87171); border-radius: 12px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(239,68,68,.25);">
+                            <i class="bi bi-person-gear text-white" style="font-size: 1.3rem;"></i>
+                        </div>
+                        <div>
+                            <h6 class="fw-bold mb-1" style="color: #0f172a;">My Profile</h6>
+                            <span class="small text-muted">Account settings</span>
+                        </div>
+                    </div>
+                    <p class="small text-muted mb-0">Update your personal information, change password, and manage your profile picture and contact details.</p>
+                </div>
+            </div>
+        </a>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 28px rgba(0,0,0,.08);
+        border-color: rgba(13,148,136,.1) !important;
+    }
+    [data-bs-theme="dark"] .card h6 { color: #f1f5f9 !important; }
+</style>
+{% endblock %}
